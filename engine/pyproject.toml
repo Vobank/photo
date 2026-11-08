@@ -1,0 +1,64 @@
+# Locked Python environment for the engine (ComfyUI).
+#
+# The engine source itself is pinned in engine.toml and downloaded by `photo setup`.
+# Dependencies below mirror ComfyUI's requirements.txt for that release, with the
+# PyTorch stack taken from the official CUDA 13.0 index. `uv.lock` pins every
+# package by hash, so every install is identical.
+#
+# To bump the engine: update engine.toml, sync this list with the new
+# requirements.txt, run `uv lock`, then run the e2e test on an RTX 40 and RTX 50 card.
+
+[project]
+name = "photo-engine"
+version = "0.44.0"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "torch==2.14.1",
+    "torchvision==0.29.1",
+    "torchsde",
+    "comfyui-frontend-package==1.57.6",
+    "comfyui-workflow-templates==0.11.101",
+    "comfyui-embedded-docs==0.5.16",
+    "numpy>=1.25.0",
+    "einops",
+    "transformers>=4.50.3",
+    "tokenizers>=0.13.3",
+    "sentencepiece",
+    "safetensors>=0.4.2",
+    "aiohttp>=3.11.8",
+    "yarl>=1.18.0",
+    "pyyaml",
+    "Pillow>=10.1.0",
+    "scipy",
+    "tqdm",
+    "psutil",
+    "alembic",
+    "SQLAlchemy>=2.0.0",
+    "filelock",
+    "av>=17.0.0",
+    "comfy-aimdo==0.6.0",
+    "comfy-kitchen==0.2.40",
+    "requests",
+    "simpleeval>=1.0.0",
+    "blake3",
+    "kornia>=0.7.1",
+    "spandrel",
+    "pydantic~=2.0",
+    "pydantic-settings~=2.0",
+]
+
+[tool.uv]
+package = false
+environments = [
+    "sys_platform == 'win32' and platform_machine == 'AMD64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+torchvision = { index = "pytorch-cu130" }
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true

@@ -1,0 +1,7 @@
+# Pinned engine source. `photo setup` refuses any archive whose hash differs.
+name = "ComfyUI"
+version = "v0.44.0"
+commit = "2c75dc1b379a59e0880619d029607af5169a62ef"
+url = "https://codeload.github.com/Comfy-Org/ComfyUI/tar.gz/refs/tags/v0.44.0"
+sha256 = "7d796d74f42fe862eb55d1c217349fee92c2cac5d4ababe06c8b73f90c936dc0"
+size = 12864357
