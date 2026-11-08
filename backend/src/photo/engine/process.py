@@ -130,7 +130,9 @@ class EngineProcess:
 
         env = {**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONIOENCODING": "utf-8"}
         env.pop("PYTHONPATH", None)
-        creationflags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+        creationflags = 0
+        if sys.platform == "win32":
+            creationflags = subprocess.CREATE_NO_WINDOW  # no console window flashing up
         cmd = build_command(self.settings, port, self.gpu)
         log.info("starting engine on port %d", port)
         # Popen only forks/spawns; it does not wait. argv comes from trusted settings.
