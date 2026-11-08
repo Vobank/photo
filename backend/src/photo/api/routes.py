@@ -1,0 +1,285 @@
+"""HTTP + WebSocket routes under ``/api/v1``."""
+
+from __future__ import annotations
+
+import asyncio
+import contextlib
+import json
+import time
+from typing import TYPE_CHECKING, Annotated, Any
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query,
+    Request,
+    WebSocket,
+    WebSocketDisconnect,
+)
+from fastapi.responses import FileResponse
+from pydantic import BaseModel, ConfigDict
+
+from photo import __version__, storage
+from photo.ids import is_valid_id
+from photo.jobs import JobRejected
+from photo.schemas import GenerateParams
+
+if TYPE_CHECKING:
+    from photo.api.app import Services
+
+router = APIRouter()
+
+
+def services(request: Request) -> Services:
+    svc: Services = request.app.state.services
+    return svc
+
+
+Svc = Annotated["Services", Depends(services)]
+
+
+def _error(status: int, code: str, message: str) -> HTTPException:
+    return HTTPException(status, detail={"code": code, "message": message})
+
+
+def _check_id(value: str) -> str:
+    if not is_valid_id(value):
+        raise _error(404, "not_found", "Not found")
+    return value
+
+
+# ---- system ------------------------------------------------------------------------
+
+
+@router.get("/system")
+def system(svc: Svc) -> dict[str, Any]:
+    gpu = svc.gpu
+    return {
+        "version": __version__,
+        "engine": {"state": svc.engine.state, "error": svc.engine.last_error},
+        "gpu": None
+        if gpu is None
+        else {
+            "name": gpu.name,
+            "vram_gb": gpu.vram_gb,
+            "arch": gpu.arch,
+            "driver": gpu.driver,
+            "supported": gpu.supported,
+        },
+        "models_dir": str(svc.settings.models),
+    }
+
+
+@router.post("/system/engine/restart", status_code=202)
+async def restart_engine(svc: Svc) -> dict[str, str]:
+    asyncio.create_task(svc.engine.restart())  # noqa: RUF006 — state is observable via /system
+    return {"status": "restarting"}
+
+
+# ---- models ------------------------------------------------------------------------
+
+
+class InstallBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    variant: str | None = None
+
+
+@router.get("/models")
+def list_models(svc: Svc) -> dict[str, Any]:
+    return {"models": [svc.models.describe(m) for m in svc.catalog.models]}
+
+
+@router.post("/models/{model_id}/install", status_code=202)
+def install_model(model_id: str, svc: Svc, body: InstallBody | None = None) -> dict[str, Any]:
+    try:
+        task = svc.models.install(model_id, body.variant if body else None)
+    except KeyError as exc:
+        raise _error(404, "not_found", f"Unknown model or variant: {exc}") from None
+    return task.to_api()
+
+
+@router.delete("/models/{model_id}/install", status_code=204)
+async def cancel_install(model_id: str, svc: Svc) -> None:
+    await svc.models.cancel(model_id)
+
+
+# ---- jobs --------------------------------------------------------------------------
+
+
+@router.post("/jobs", status_code=202)
+def create_job(params: GenerateParams, svc: Svc) -> dict[str, Any]:
+    try:
+        job = svc.jobs.submit(params)
+    except JobRejected as exc:
+        raise _error(409, exc.code, exc.message) from None
+    return job.to_api()
+
+
+@router.get("/jobs")
+def list_jobs(
+    svc: Svc,
+    active: bool = False,
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+) -> dict[str, Any]:
+    return {"jobs": [j.to_api() for j in svc.jobs.list_jobs(limit, active_only=active)]}
+
+
+@router.get("/jobs/{job_id}")
+def get_job(job_id: str, svc: Svc) -> dict[str, Any]:
+    job = svc.jobs.get(_check_id(job_id))
+    if job is None:
+        raise _error(404, "not_found", "Job not found")
+    return job.to_api()
+
+
+@router.post("/jobs/{job_id}/cancel")
+async def cancel_job(job_id: str, svc: Svc) -> dict[str, Any]:
+    job = await svc.jobs.cancel(_check_id(job_id))
+    if job is None:
+        raise _error(404, "not_found", "Job not found")
+    return job.to_api()
+
+
+# ---- images ------------------------------------------------------------------------
+
+
+def _image_api(row: Any) -> dict[str, Any]:
+    meta = json.loads(row["params"])
+    return {
+        "id": row["id"],
+        "job_id": row["job_id"],
+        "width": row["width"],
+        "height": row["height"],
+        "seed": row["seed"],
+        "model": row["model"],
+        "favorite": bool(row["favorite"]),
+        "created_at": row["created_at"],
+        "params": meta.get("params", {}),
+        "steps": meta.get("steps"),
+        "cfg": meta.get("cfg"),
+    }
+
+
+@router.get("/images")
+def list_images(
+    svc: Svc,
+    before: str | None = None,
+    favorites: bool = False,
+    limit: Annotated[int, Query(ge=1, le=200)] = 60,
+) -> dict[str, Any]:
+    clauses, args = ["deleted_at IS NULL"], []
+    if before:
+        clauses.append("id < ?")
+        args.append(_check_id(before))
+    if favorites:
+        clauses.append("favorite = 1")
+    rows = svc.db.all(
+        f"SELECT * FROM images WHERE {' AND '.join(clauses)} ORDER BY id DESC LIMIT ?",  # noqa: S608
+        (*args, limit + 1),
+    )
+    has_more = len(rows) > limit
+    rows = rows[:limit]
+    return {
+        "images": [_image_api(r) for r in rows],
+        "next": rows[-1]["id"] if has_more and rows else None,
+    }
+
+
+def _image_row(svc: Services, image_id: str) -> Any:
+    row = svc.db.one(
+        "SELECT * FROM images WHERE id=? AND deleted_at IS NULL", (_check_id(image_id),)
+    )
+    if row is None:
+        raise _error(404, "not_found", "Image not found")
+    return row
+
+
+@router.get("/images/{image_id}")
+def get_image(image_id: str, svc: Svc) -> dict[str, Any]:
+    return _image_api(_image_row(svc, image_id))
+
+
+_IMMUTABLE = {"Cache-Control": "private, max-age=31536000, immutable"}
+
+
+@router.get("/images/{image_id}/file")
+def image_file(image_id: str, svc: Svc, download: bool = False) -> FileResponse:
+    row = _image_row(svc, image_id)
+    path = storage.resolve(svc.settings.images_dir, row["path"])
+    return FileResponse(
+        path,
+        media_type="image/png",
+        headers=_IMMUTABLE,
+        filename=f"photo-{row['id']}.png" if download else None,
+    )
+
+
+@router.get("/images/{image_id}/thumb")
+def image_thumb(image_id: str, svc: Svc) -> FileResponse:
+    row = _image_row(svc, image_id)
+    path = storage.resolve(svc.settings.images_dir, row["thumb_path"])
+    return FileResponse(path, media_type="image/webp", headers=_IMMUTABLE)
+
+
+class ImagePatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    favorite: bool | None = None
+
+
+@router.patch("/images/{image_id}")
+def patch_image(image_id: str, body: ImagePatch, svc: Svc) -> dict[str, Any]:
+    _image_row(svc, image_id)
+    if body.favorite is not None:
+        svc.db.execute("UPDATE images SET favorite=? WHERE id=?", (int(body.favorite), image_id))
+    return _image_api(_image_row(svc, image_id))
+
+
+@router.delete("/images/{image_id}", status_code=204)
+def delete_image(image_id: str, svc: Svc) -> None:
+    """Moves the image to the trash; files stay on disk until the trash is emptied."""
+    _image_row(svc, image_id)
+    svc.db.execute("UPDATE images SET deleted_at=? WHERE id=?", (time.time(), image_id))
+    svc.bus.publish("image_deleted", {"image_id": image_id})
+
+
+@router.post("/images/{image_id}/restore")
+def restore_image(image_id: str, svc: Svc) -> dict[str, Any]:
+    svc.db.execute("UPDATE images SET deleted_at=NULL WHERE id=?", (_check_id(image_id),))
+    return _image_api(_image_row(svc, image_id))
+
+
+# ---- events ------------------------------------------------------------------------
+
+
+@router.websocket("/events")
+async def events(ws: WebSocket) -> None:
+    svc: Services = ws.app.state.services
+    await ws.accept()
+    async with svc.bus.subscribe() as queue:
+        # Snapshot first so a freshly opened tab is immediately consistent.
+        await ws.send_text(json.dumps({
+            "type": "hello",
+            "version": __version__,
+            "engine": {"state": svc.engine.state, "error": svc.engine.last_error},
+            "jobs": [j.to_api() for j in svc.jobs.list_jobs(50, active_only=True)],
+        }))  # fmt: skip
+
+        async def pump() -> None:
+            while True:
+                frame = await queue.get()
+                if frame.text is not None:
+                    await ws.send_text(frame.text)
+                elif frame.data is not None:
+                    await ws.send_bytes(frame.data)
+
+        sender = asyncio.create_task(pump())
+        try:
+            while True:  # we only read to notice disconnects; clients send pings
+                await ws.receive_text()
+        except WebSocketDisconnect:
+            pass
+        finally:
+            sender.cancel()
+            with contextlib.suppress(asyncio.CancelledError, Exception):
+                await sender

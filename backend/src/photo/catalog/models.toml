@@ -1,0 +1,81 @@
+# Model catalog.
+#
+# Every file is pinned by repository revision, size and SHA-256. A model is never
+# loaded from a file that has not passed verification.
+#
+# Variants are tried in order; the first one whose `archs` contains the user's GPU
+# architecture (empty = any) and whose `min_vram_gb` fits is chosen.
+# A variant lists file keys from the model's `files` table; files shared between
+# variants or models (same `name`) are downloaded once.
+#
+# `dir` is the ComfyUI model folder under models/.
+
+schema = 1
+
+[[models]]
+id = "z-image-turbo"
+name = "Z-Image Turbo"
+vendor = "Tongyi-MAI (Alibaba)"
+description = "Fast photorealistic text-to-image in 8 steps. Strong at people, products and legible text."
+tasks = ["generate"]
+pipeline = "z_image"
+license = "Apache-2.0"
+license_url = "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo"
+commercial_use = true
+
+[models.defaults]
+steps = 8
+cfg = 1.0
+sampler = "res_multistep"
+scheduler = "simple"
+shift = 3.0
+
+[models.files.dit_nvfp4]
+dir = "diffusion_models"
+name = "z_image_turbo_nvfp4.safetensors"
+repo = "Comfy-Org/z_image_turbo"
+revision = "6fc90a3b1b653e935a0d175e260736de25b84df5"
+path = "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors"
+size = 4509509600
+sha256 = "a553c889dbcb910de4c98293237573219a37007c1074a3f04576646a088bd5c8"
+
+[models.files.dit_bf16]
+dir = "diffusion_models"
+name = "z_image_turbo_bf16.safetensors"
+repo = "Comfy-Org/z_image_turbo"
+revision = "6fc90a3b1b653e935a0d175e260736de25b84df5"
+path = "split_files/diffusion_models/z_image_turbo_bf16.safetensors"
+size = 12309866400
+sha256 = "2407613050b809ffdff18a4ac99af83ea6b95443ecebdf80e064a79c825574a6"
+
+[models.files.text_encoder]
+dir = "text_encoders"
+name = "qwen_3_4b_fp8_mixed.safetensors"
+repo = "Comfy-Org/z_image_turbo"
+revision = "6fc90a3b1b653e935a0d175e260736de25b84df5"
+path = "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors"
+size = 5631994051
+sha256 = "72450b19758172c5a7273cf7de729d1c17e7f434a104a00167624cba94f68f15"
+
+[models.files.vae]
+dir = "vae"
+name = "ae.safetensors"
+repo = "Comfy-Org/z_image_turbo"
+revision = "6fc90a3b1b653e935a0d175e260736de25b84df5"
+path = "split_files/vae/ae.safetensors"
+size = 335304388
+sha256 = "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38"
+
+[[models.variants]]
+id = "nvfp4"
+label = "NVFP4 (RTX 50)"
+archs = ["blackwell"]
+min_vram_gb = 8
+files = { diffusion = "dit_nvfp4", text_encoder = "text_encoder", vae = "vae" }
+
+[[models.variants]]
+id = "bf16"
+label = "BF16"
+archs = []
+min_vram_gb = 12
+files = { diffusion = "dit_bf16", text_encoder = "text_encoder", vae = "vae" }
