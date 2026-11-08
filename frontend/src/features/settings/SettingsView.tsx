@@ -45,7 +45,7 @@ export default function SettingsView() {
         <section className={styles.card}>
           <div className={styles.row}>
             <span>{t('settings.language')}</span>
-            <div style={{ width: 220 }}>
+            <div>
               <Segmented
                 label={t('settings.language')}
                 value={i18n.resolvedLanguage ?? 'en'}
@@ -56,7 +56,7 @@ export default function SettingsView() {
           </div>
           <div className={styles.row}>
             <span>{t('settings.theme')}</span>
-            <div style={{ width: 220 }}>
+            <div>
               <Segmented
                 label={t('settings.theme')}
                 value={theme}

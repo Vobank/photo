@@ -26,7 +26,7 @@ export function Onboarding({ models }: { models: ModelInfo[] }) {
   )
 }
 
-export function ModelInstallLine({ model }: { model: ModelInfo }) {
+export function ModelInstallLine({ model, showName = true }: { model: ModelInfo; showName?: boolean }) {
   const { t, i18n } = useTranslation()
   const qc = useQueryClient()
   const live = useLive((s) => s.installs[model.id])
@@ -45,9 +45,8 @@ export function ModelInstallLine({ model }: { model: ModelInfo }) {
   return (
     <div className={styles.modelLine}>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div>
-          {model.name} <span className={styles.dims}>· {variant.label}</span>
-        </div>
+        {showName ? <div>{model.name}</div> : null}
+        <small>{variant.label}</small>
         {install ? (
           <>
             <small className="num">

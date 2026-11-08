@@ -54,7 +54,7 @@ export default function ModelsView() {
                 </tbody>
               </table>
             ) : (
-              <ModelInstallLine model={m} />
+              <ModelInstallLine model={m} showName={false} />
             )}
           </section>
         ))}

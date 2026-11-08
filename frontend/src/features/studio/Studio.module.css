@@ -387,8 +387,24 @@
   }
 
   .inspector {
+    min-height: auto;
     border-left: 0;
     border-top: 1px solid var(--line);
+  }
+
+  .inspectorBody {
+    flex: none;
+    overflow: visible;
+  }
+
+  .footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--bg-1);
+  }
+
+  .footerHint kbd {
+    display: none;
   }
 
   .canvas {

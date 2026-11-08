@@ -112,6 +112,7 @@ export function Inspector() {
             onChange={(e) => s.set({ model: e.target.value, steps: null, cfg: null })}
             disabled={!installed.length}
           >
+            {!installed.length && <option value="">{t('studio.noModels')}</option>}
             {installed.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name}

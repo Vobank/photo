@@ -26,7 +26,12 @@
     "model": "Model",
     "aspect": "Shape",
     "size": "Size",
-    "sizes": { "s": "S", "m": "M", "l": "L", "xl": "XL" },
+    "sizes": {
+      "s": "S",
+      "m": "M",
+      "l": "L",
+      "xl": "XL"
+    },
     "count": "Images",
     "seed": "Seed",
     "seedRandom": "Random each time",
@@ -51,7 +56,8 @@
     "step": "Step {{value}}/{{max}}",
     "results": "Recent results",
     "inProgress": "In progress",
-    "queued": "Queued"
+    "queued": "Queued",
+    "noModels": "No models installed"
   },
   "actions": {
     "dismiss": "Dismiss",
@@ -107,7 +113,11 @@
     "title": "Settings",
     "language": "Language",
     "theme": "Theme",
-    "themes": { "system": "System", "dark": "Dark", "light": "Light" },
+    "themes": {
+      "system": "System",
+      "dark": "Dark",
+      "light": "Light"
+    },
     "engine": "Engine",
     "restartEngine": "Restart engine",
     "restarting": "Restarting the engine…",

@@ -48,6 +48,8 @@
 .input::placeholder,
 .textarea::placeholder {
   color: var(--text-3);
+  font-family: var(--font-sans);
+  letter-spacing: normal;
 }
 
 .textarea {
@@ -106,7 +108,9 @@
 }
 
 .segment {
-  flex: 1;
+  flex: 1 0 auto;
+  padding: 0 10px;
+  white-space: nowrap;
   height: calc(var(--control-h) - 6px);
   border: 0;
   border-radius: var(--radius-sm);
