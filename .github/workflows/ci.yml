@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_VERSION: "0.13.7"
+
+jobs:
+  backend:
+    name: backend (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - name: Install
+        run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check src tests
+      - name: Format
+        run: uv run ruff format --check src tests
+      - name: Types
+        run: uv run mypy src
+      - name: Tests
+        run: uv run pytest -q
+
+  engine-lock:
+    name: engine lock is current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: ${{ env.UV_VERSION }}
+      - run: uv lock --check --project engine
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test -- --run
+      - run: npm run build
+
+  installer-windows:
+    name: installer scripts (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Parse PowerShell scripts with Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $failed = $false
+          foreach ($f in 'install.ps1', 'update.ps1') {
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f), [ref]$null, [ref]$errors)
+            if ($errors) { $errors | ForEach-Object { Write-Host "${f}: $_" }; $failed = $true }
+          }
+          if ($failed) { exit 1 }
+      - name: Scripts are ASCII (PowerShell 5.1 reads BOM-less files as ANSI)
+        shell: powershell
+        run: |
+          foreach ($f in 'install.ps1', 'update.ps1', 'install.cmd', 'Photo.cmd') {
+            $bytes = [IO.File]::ReadAllBytes((Resolve-Path $f))
+            if ($bytes | Where-Object { $_ -gt 127 }) { Write-Host "$f contains non-ASCII bytes"; exit 1 }
+          }
+
+  installer-linux:
+    name: installer scripts (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: bash -n install.sh && bash -n photo.sh && bash -n update.sh
+      - run: shellcheck install.sh photo.sh update.sh
