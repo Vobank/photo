@@ -12,9 +12,11 @@ import hashlib
 import logging
 import os
 import shutil
+import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import httpx
 
@@ -43,6 +45,50 @@ class NotEnoughSpaceError(DownloadError):
 
 class _RetryableHTTPError(Exception):
     pass
+
+
+class DownloadInProgressError(DownloadError):
+    """Another process (e.g. the CLI while the app runs) is downloading this file."""
+
+
+class _FileLock:
+    """Exclusive, non-blocking OS lock; released automatically if the process dies."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self._fh: Any = None
+
+    def acquire(self) -> bool:
+        fh = self.path.open("a+b")
+        try:
+            if sys.platform == "win32":
+                import msvcrt
+
+                fh.seek(0)
+                msvcrt.locking(fh.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+
+                fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            fh.close()
+            return False
+        self._fh = fh
+        return True
+
+    def release(self) -> None:
+        if self._fh is None:
+            return
+        try:
+            if sys.platform == "win32":
+                import msvcrt
+
+                self._fh.seek(0)
+                msvcrt.locking(self._fh.fileno(), msvcrt.LK_UNLCK, 1)
+        finally:
+            self._fh.close()
+            self._fh = None
+            self.path.unlink(missing_ok=True)
 
 
 @dataclass(frozen=True, slots=True)
@@ -109,7 +155,24 @@ async def download(
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     part = dest.with_name(dest.name + ".part")
+    lock = _FileLock(dest.with_name(dest.name + ".lock"))
+    if not lock.acquire():
+        raise DownloadInProgressError(
+            f"{dest.name} is already being downloaded by another process."
+        )
+    try:
+        return await _download_locked(req, part, progress, client)
+    finally:
+        lock.release()
 
+
+async def _download_locked(
+    req: DownloadRequest,
+    part: Path,
+    progress: ProgressFn | None,
+    client: httpx.AsyncClient | None,
+) -> Path:
+    dest = req.dest
     own_client = client is None
     http = client or _client()
     try:
@@ -118,7 +181,7 @@ async def download(
                 await _download_once(http, req, part, progress)
                 break
             except IntegrityError:
-                part.unlink(missing_ok=True)
+                await asyncio.to_thread(part.unlink, missing_ok=True)
                 raise
             except (httpx.TransportError, _RetryableHTTPError) as exc:
                 if attempt == _MAX_ATTEMPTS:

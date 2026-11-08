@@ -101,3 +101,19 @@ async def test_forbidden_gives_actionable_error(tmp_path: Path) -> None:
 def test_not_enough_space(tmp_path: Path) -> None:
     with pytest.raises(downloads.NotEnoughSpaceError):
         downloads.ensure_space(tmp_path, 1 << 60)
+
+
+async def test_second_downloader_is_refused_while_first_holds_lock(tmp_path: Path) -> None:
+    r = req(tmp_path)
+    r.dest.parent.mkdir(parents=True)
+    held = downloads._FileLock(r.dest.with_name("f.safetensors.lock"))
+    assert held.acquire()
+    try:
+        http, calls = server()
+        with pytest.raises(downloads.DownloadInProgressError):
+            await download(r, client=http)
+        assert calls == []
+    finally:
+        held.release()
+    http, _ = server()
+    assert (await download(r, client=http)).read_bytes() == PAYLOAD
