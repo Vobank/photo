@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import sys
 import tempfile
 import webbrowser
 from pathlib import Path
@@ -236,5 +237,18 @@ def models_install(model_ids: list[str]) -> None:
         raise typer.Exit(1) from None
 
 
+def _force_utf8_stdio() -> None:
+    """Legacy Windows code pages (cp1251, cp437...) cannot encode ✓ and friends.
+
+    Without this, the first status line crashes the installer on most non-English
+    Windows machines whenever output is redirected.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None and (stream.encoding or "").lower() not in ("utf-8", "utf8"):
+            reconfigure(encoding="utf-8", errors="replace")
+
+
 def main() -> None:
+    _force_utf8_stdio()
     app()
