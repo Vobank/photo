@@ -1,0 +1,158 @@
+.shell {
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) var(--statusbar-h);
+  height: 100dvh;
+}
+
+.rail {
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  padding: var(--space-2) 6px;
+  border-right: 1px solid var(--line);
+  background: var(--bg-1);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  height: 40px;
+  margin-bottom: var(--space-2);
+}
+
+.mark span {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--accent);
+  border-radius: 2px;
+  position: relative;
+}
+
+.mark span::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 2px 6px;
+  border-radius: var(--radius);
+  color: var(--text-3);
+  font-size: 10.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+
+.navItem:hover {
+  color: var(--text-1);
+  background: var(--bg-3);
+}
+
+.navItem[aria-current='page'] {
+  color: var(--text-1);
+}
+
+.navItem[aria-current='page'] svg {
+  color: var(--accent);
+}
+
+.main {
+  grid-row: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.status {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-3);
+  border-top: 1px solid var(--line);
+  background: var(--bg-1);
+  color: var(--text-2);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.state i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-3);
+}
+
+.state[data-state='ready'] i {
+  background: var(--ok);
+}
+
+.state[data-state='starting'] i {
+  background: var(--accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.state[data-state='crashed'] i,
+.state[data-state='not_installed'] i,
+.state[data-state='offline'] i {
+  background: var(--danger);
+}
+
+.dim {
+  color: var(--text-3);
+}
+
+.spacer {
+  flex: 1;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Phones (LAN access): rail becomes a bottom tab bar. */
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .rail {
+    grid-row: 2;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 4px 4px max(4px, env(safe-area-inset-bottom));
+    border-right: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .mark,
+  .status {
+    display: none;
+  }
+
+  .navItem {
+    flex: 1;
+  }
+}

@@ -1,0 +1,124 @@
+/*
+ * Design tokens. Neutral graphite with one warm accent (darkroom safelight amber).
+ * Components only reference these variables, never raw colours.
+ */
+
+:root {
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 15px;
+  --text-xl: 19px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --radius-sm: 3px;
+  --radius: 4px;
+  --radius-lg: 6px;
+
+  --control-h: 30px;
+  --rail-w: 64px;
+  --inspector-w: 340px;
+  --statusbar-h: 26px;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 90ms;
+  --dur: 160ms;
+}
+
+/* Dark is the default: images are judged best on a dark neutral surround. */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg-0: #0d0d0d; /* canvas surround */
+  --bg-1: #151515; /* panels */
+  --bg-2: #1c1c1c; /* inputs, cards */
+  --bg-3: #242424; /* hover */
+  --bg-4: #2e2e2e; /* pressed / selected */
+  --line: #262626;
+  --line-strong: #363636;
+  --text-1: #ebebea;
+  --text-2: #a5a4a0;
+  --text-3: #6f6e6a;
+  --accent: #e2a03f;
+  --accent-hover: #edb25a;
+  --accent-ink: #1c1205;
+  --accent-soft: rgb(226 160 63 / 14%);
+  --danger: #e5604f;
+  --danger-soft: rgb(229 96 79 / 14%);
+  --ok: #6db36f;
+  --focus: #e2a03f;
+  --overlay: rgb(0 0 0 / 72%);
+  --shadow-pop: 0 8px 28px rgb(0 0 0 / 55%), 0 0 0 1px var(--line-strong);
+  --checker-a: #1a1a1a;
+  --checker-b: #141414;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg-0: #e4e2dd;
+  --bg-1: #f5f4f1;
+  --bg-2: #ffffff;
+  --bg-3: #ecebe7;
+  --bg-4: #e2e0da;
+  --line: #e0ded8;
+  --line-strong: #cfccc4;
+  --text-1: #1a1a19;
+  --text-2: #5b5a56;
+  --text-3: #8c8a84;
+  --accent: #b5680c;
+  --accent-hover: #9d5a09;
+  --accent-ink: #ffffff;
+  --accent-soft: rgb(181 104 12 / 12%);
+  --danger: #c4402f;
+  --danger-soft: rgb(196 64 47 / 10%);
+  --ok: #3f8a41;
+  --focus: #b5680c;
+  --overlay: rgb(20 20 18 / 55%);
+  --shadow-pop: 0 8px 24px rgb(0 0 0 / 14%), 0 0 0 1px var(--line-strong);
+  --checker-a: #ebe9e4;
+  --checker-b: #f4f3ef;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg-0: #e4e2dd;
+    --bg-1: #f5f4f1;
+    --bg-2: #ffffff;
+    --bg-3: #ecebe7;
+    --bg-4: #e2e0da;
+    --line: #e0ded8;
+    --line-strong: #cfccc4;
+    --text-1: #1a1a19;
+    --text-2: #5b5a56;
+    --text-3: #8c8a84;
+    --accent: #b5680c;
+    --accent-hover: #9d5a09;
+    --accent-ink: #ffffff;
+    --accent-soft: rgb(181 104 12 / 12%);
+    --danger: #c4402f;
+    --danger-soft: rgb(196 64 47 / 10%);
+    --ok: #3f8a41;
+    --focus: #b5680c;
+    --overlay: rgb(20 20 18 / 55%);
+    --shadow-pop: 0 8px 24px rgb(0 0 0 / 14%), 0 0 0 1px var(--line-strong);
+    --checker-a: #ebe9e4;
+    --checker-b: #f4f3ef;
+  }
+}
+
+@media (max-width: 860px) {
+  :root {
+    --control-h: 36px;
+    --text-md: 14px;
+  }
+}

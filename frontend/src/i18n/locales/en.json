@@ -1,0 +1,118 @@
+{
+  "nav": {
+    "label": "Main",
+    "studio": "Studio",
+    "gallery": "Gallery",
+    "models": "Models",
+    "settings": "Settings"
+  },
+  "engine": {
+    "offline": "Disconnected",
+    "ready": "Ready",
+    "starting": "Starting engine",
+    "crashed": "Engine stopped",
+    "not_installed": "Engine not installed",
+    "stopped": "Engine stopped"
+  },
+  "status": {
+    "downloading": "Downloading {{done}} of {{total}}",
+    "queue_one": "{{count}} in queue",
+    "queue_other": "{{count}} in queue"
+  },
+  "studio": {
+    "settings": "Generation settings",
+    "prompt": "Prompt",
+    "promptPlaceholder": "Describe the picture: subject, setting, light, lens, mood…",
+    "model": "Model",
+    "aspect": "Shape",
+    "size": "Size",
+    "sizes": { "s": "S", "m": "M", "l": "L", "xl": "XL" },
+    "count": "Images",
+    "seed": "Seed",
+    "seedRandom": "Random each time",
+    "seedLock": "Keep this seed",
+    "seedUnlock": "Use a random seed",
+    "seedNew": "New seed",
+    "advanced": "Advanced",
+    "steps": "Steps",
+    "cfg": "Guidance",
+    "negative": "Avoid",
+    "negativeHint": "used when guidance > 1",
+    "generate": "Generate",
+    "generateN_one": "Generate {{count}} image",
+    "generateN_other": "Generate {{count}} images",
+    "failed": "This image could not be generated.",
+    "emptyTitle": "Nothing here yet",
+    "emptyBody": "Write a prompt on the right and press Generate. Results appear here and in the strip below.",
+    "queuedAhead_one": "Queued, {{count}} job ahead",
+    "queuedAhead_other": "Queued, {{count}} jobs ahead",
+    "starting": "Starting…",
+    "loadingModel": "Loading model…",
+    "step": "Step {{value}}/{{max}}",
+    "results": "Recent results",
+    "inProgress": "In progress",
+    "queued": "Queued"
+  },
+  "actions": {
+    "dismiss": "Dismiss",
+    "cancel": "Cancel",
+    "favorite": "Add to favourites",
+    "unfavorite": "Remove from favourites",
+    "reuse": "Use these settings",
+    "reuseSeed": "Use settings and seed",
+    "copy": "Copy image",
+    "download": "Download",
+    "delete": "Delete",
+    "undo": "Undo",
+    "retry": "Try again",
+    "previous": "Previous",
+    "next": "Next",
+    "close": "Close"
+  },
+  "toast": {
+    "copied": "Image copied",
+    "deleted": "Image moved to trash"
+  },
+  "errors": {
+    "network": "Photo is not responding. Check that it is still running.",
+    "clipboard": "Your browser did not allow copying the image."
+  },
+  "onboarding": {
+    "title": "Download a model to start",
+    "body": "Photo runs entirely on your computer. It needs one image model on disk before it can generate; the download is checked for integrity and resumes if interrupted.",
+    "later": "More models can be added later on the Models page."
+  },
+  "gallery": {
+    "title": "Gallery",
+    "filter": "Show",
+    "all": "All",
+    "favorites": "Favourites",
+    "noFavorites": "No favourites yet. Press F on an image to add it.",
+    "empty": "Generated images will appear here.",
+    "favorite": "Favourite",
+    "viewer": "Image viewer",
+    "created": "Created",
+    "openInStudio": "Open in Studio with these settings"
+  },
+  "models": {
+    "title": "Models",
+    "gpuLine": "{{gpu}}, {{vram}} GB. Model versions are chosen for {{arch}} automatically.",
+    "commercialOk": "commercial use allowed",
+    "nonCommercial": "non-commercial only",
+    "installed": "Installed",
+    "recommended": "Recommended for this GPU",
+    "location": "Models are stored in"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "themes": { "system": "System", "dark": "Dark", "light": "Light" },
+    "engine": "Engine",
+    "restartEngine": "Restart engine",
+    "restarting": "Restarting the engine…",
+    "about": "About",
+    "aboutBody": "Photo {{version}}. Open source under the Apache 2.0 licence.",
+    "privacy": "Everything runs on this computer. Prompts and images never leave it, and Photo collects no telemetry."
+  }
+}
