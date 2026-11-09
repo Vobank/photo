@@ -25,6 +25,8 @@ def fake_disks(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> list[Disk]:
     root = tmp_path.anchor
     disks = [Disk(root, "System", "fixed", 10**12, 10**11)]
     monkeypatch.setattr(installer, "list_disks", lambda: disks)
+    # Never depend on the real free space of the machine running the tests.
+    monkeypatch.setattr(installer, "free_space", lambda _p: 10**11)
     return disks
 
 
