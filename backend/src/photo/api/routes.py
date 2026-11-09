@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import hashlib
 import json
 import time
 from typing import TYPE_CHECKING, Annotated, Any
@@ -11,25 +12,30 @@ from typing import TYPE_CHECKING, Annotated, Any
 from fastapi import (
     APIRouter,
     Depends,
+    File,
     HTTPException,
     Query,
     Request,
+    UploadFile,
     WebSocket,
     WebSocketDisconnect,
 )
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from photo import __version__, prefs, storage
 from photo.config import LANGUAGES
-from photo.ids import is_valid_id
+from photo.ids import is_valid_id, new_id
 from photo.jobs import JobRejected
 from photo.schemas import GenerateParams
+from photo.styles import STYLES, get_style
 
 if TYPE_CHECKING:
     from photo.api.app import Services
 
 router = APIRouter()
+
+_IMMUTABLE = {"Cache-Control": "private, max-age=31536000, immutable"}
 
 
 def services(request: Request) -> Services:
@@ -94,6 +100,80 @@ async def put_preferences(body: PreferencesBody, svc: Svc) -> dict[str, str]:
     prefs.update({"language": body.language})
     svc.language = body.language
     return {"language": svc.language}
+
+
+# ---- looks and prompts -------------------------------------------------------------
+
+
+@router.get("/styles")
+async def list_styles() -> dict[str, Any]:
+    return {"styles": [{"id": s.id, "suffix": s.suffix} for s in STYLES]}
+
+
+class EnhanceBody(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    prompt: str = Field(min_length=1, max_length=4000)
+    style: str | None = Field(default=None, max_length=32)
+    has_references: bool = False
+
+
+@router.post("/prompt/enhance")
+async def enhance_prompt(body: EnhanceBody, svc: Svc) -> dict[str, str]:
+    """Rewrite a prompt with the local language model, without generating an image."""
+    try:
+        text = await svc.jobs.enhance(body.prompt, get_style(body.style), body.has_references)
+    except JobRejected as exc:
+        raise _error(409, exc.code, exc.message) from None
+    return {"prompt": text}
+
+
+# ---- uploads -----------------------------------------------------------------------
+
+
+@router.post("/uploads", status_code=201)
+async def upload(svc: Svc, file: Annotated[UploadFile, File()]) -> dict[str, Any]:
+    """A picture to use as a reference or variation source. Identical files dedupe."""
+    raw = await file.read(storage.MAX_UPLOAD_BYTES + 1)
+    digest = hashlib.sha256(raw).hexdigest()
+    row = svc.db.one("SELECT * FROM uploads WHERE sha256=?", (digest,))
+    if row is None:
+        upload_id = new_id()
+        try:
+            stored = await asyncio.to_thread(
+                storage.save_upload, svc.settings.uploads_dir, upload_id, raw
+            )
+        except storage.InvalidImageError as exc:
+            raise _error(415, "invalid_image", str(exc)) from None
+        svc.db.execute(
+            "INSERT INTO uploads (id, sha256, path, thumb_path, width, height, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (upload_id, digest, stored.path, stored.thumb_path, stored.width, stored.height,
+             time.time()),
+        )  # fmt: skip
+        row = svc.db.one("SELECT * FROM uploads WHERE id=?", (upload_id,))
+    assert row is not None
+    return {"id": row["id"], "width": row["width"], "height": row["height"]}
+
+
+def _upload_row(svc: Services, upload_id: str) -> Any:
+    row = svc.db.one("SELECT * FROM uploads WHERE id=?", (_check_id(upload_id),))
+    if row is None:
+        raise _error(404, "not_found", "Upload not found")
+    return row
+
+
+@router.get("/uploads/{upload_id}/thumb")
+async def upload_thumb(upload_id: str, svc: Svc) -> FileResponse:
+    row = _upload_row(svc, upload_id)
+    path = storage.resolve(svc.settings.uploads_dir, row["thumb_path"])
+    return FileResponse(path, media_type="image/webp", headers=_IMMUTABLE)
+
+
+@router.get("/uploads/{upload_id}/file")
+async def upload_file(upload_id: str, svc: Svc) -> FileResponse:
+    row = _upload_row(svc, upload_id)
+    path = storage.resolve(svc.settings.uploads_dir, row["path"])
+    return FileResponse(path, media_type="image/png", headers=_IMMUTABLE)
 
 
 # ---- models ------------------------------------------------------------------------
@@ -177,6 +257,7 @@ def _image_api(row: Any) -> dict[str, Any]:
         "params": meta.get("params", {}),
         "steps": meta.get("steps"),
         "cfg": meta.get("cfg"),
+        "final_prompt": meta.get("final_prompt"),
     }
 
 
@@ -217,9 +298,6 @@ def _image_row(svc: Services, image_id: str) -> Any:
 @router.get("/images/{image_id}")
 async def get_image(image_id: str, svc: Svc) -> dict[str, Any]:
     return _image_api(_image_row(svc, image_id))
-
-
-_IMMUTABLE = {"Cache-Control": "private, max-age=31536000, immutable"}
 
 
 @router.get("/images/{image_id}/file")

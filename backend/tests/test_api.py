@@ -26,7 +26,8 @@ def test_system_reports_gpu(client: TestClient) -> None:
 
 
 def test_models_list_marks_recommended_variant(client: TestClient) -> None:
-    (model,) = client.get("/api/v1/models").json()["models"]
+    models = client.get("/api/v1/models").json()["models"]
+    model = next(m for m in models if m["id"] == "z-image-turbo")
     assert model["installed"] is False
     rec = [v for v in model["variants"] if v["recommended"]]
     assert [v["id"] for v in rec] == ["nvfp4"]

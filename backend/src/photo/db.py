@@ -53,6 +53,18 @@ MIGRATIONS: Sequence[str] = (
     """
     ALTER TABLE jobs ADD COLUMN error_code TEXT;
     """,
+    # 3 — pictures users bring in as references or variation sources
+    """
+    CREATE TABLE uploads (
+        id          TEXT PRIMARY KEY,
+        sha256      TEXT NOT NULL UNIQUE,
+        path        TEXT NOT NULL,
+        thumb_path  TEXT NOT NULL,
+        width       INTEGER NOT NULL,
+        height      INTEGER NOT NULL,
+        created_at  REAL NOT NULL
+    );
+    """,
 )
 
 

@@ -33,6 +33,7 @@ class FakeClient:
         self.block: asyncio.Event | None = None
         self.interrupted = False
         self.fail_with: Exception | None = None
+        self.uploads: dict[str, bytes] = {}
 
     async def run(
         self, graph: dict[str, Any], output_node: str, *, on_progress=None, on_preview=None
@@ -53,7 +54,19 @@ class FakeClient:
         if on_progress:
             await on_progress(Progress(2, 2))
         batch = graph_batch(graph)
-        return RunResult([OutputImage(f"out_{i}.png", "photo", "output") for i in range(batch)])
+        texts = {
+            node_id: "Enhanced: a vivid scene"
+            for node_id, node in graph.items()
+            if node["class_type"] == "PreviewAny"
+        }
+        images = [OutputImage(f"out_{i}.png", "photo", "output") for i in range(batch)]
+        if any(n["class_type"] == "SaveImage" for n in graph.values()):
+            return RunResult(images, texts)
+        return RunResult([], texts)
+
+    async def upload_image(self, name: str, data: bytes) -> str:
+        self.uploads[name] = data
+        return name
 
     async def fetch_image(self, img: OutputImage) -> bytes:
         return png_bytes()
@@ -66,8 +79,10 @@ class FakeClient:
 
 def graph_batch(graph: dict[str, Any]) -> int:
     for node in graph.values():
-        if node["class_type"] == "EmptySD3LatentImage":
+        if node["class_type"] in ("EmptySD3LatentImage", "EmptyFlux2LatentImage"):
             return int(node["inputs"]["batch_size"])
+        if node["class_type"] == "RepeatLatentBatch":
+            return int(node["inputs"]["amount"])
     return 1
 
 

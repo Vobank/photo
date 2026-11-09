@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from PIL import Image, PngImagePlugin
+from PIL import Image, ImageOps, PngImagePlugin
 
 from photo import __version__
 
@@ -84,6 +84,59 @@ def save_result(root: Path, image_id: str, raw: bytes, meta: dict[str, Any]) -> 
         thumb_path=f"{month}/{image_id}.thumb.webp",
         width=img.width,
         height=img.height,
+    )
+
+
+MAX_UPLOAD_BYTES = 50 * 2**20
+MAX_UPLOAD_PIXELS = 64_000_000
+# Inputs larger than this are scaled down: models work at ~1-4 MP anyway.
+UPLOAD_MAX_SIDE = 3072
+
+
+# Pillow raises DecompressionBombError above this: guards against tiny files that
+# decode to gigantic images.
+Image.MAX_IMAGE_PIXELS = MAX_UPLOAD_PIXELS
+
+
+class InvalidImageError(ValueError):
+    pass
+
+
+def save_upload(root: Path, upload_id: str, raw: bytes) -> StoredImage:
+    """Validate and normalise a user's picture: orientation applied, metadata (GPS,
+    camera serials) dropped, transparency flattened onto white, stored as PNG."""
+    if len(raw) > MAX_UPLOAD_BYTES:
+        raise InvalidImageError("file too large")
+    try:
+        with Image.open(io.BytesIO(raw)) as probe:
+            probe.verify()
+        with Image.open(io.BytesIO(raw)) as src:
+            src.load()
+            img = ImageOps.exif_transpose(src)
+    except (OSError, ValueError, Image.DecompressionBombError) as exc:
+        raise InvalidImageError("not a supported image") from exc
+
+    if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+        rgba = img.convert("RGBA")
+        flat = Image.new("RGB", rgba.size, (255, 255, 255))
+        flat.paste(rgba, mask=rgba.getchannel("A"))
+        img = flat
+    else:
+        img = img.convert("RGB")
+    if max(img.size) > UPLOAD_MAX_SIDE:
+        img.thumbnail((UPLOAD_MAX_SIDE, UPLOAD_MAX_SIDE), Image.Resampling.LANCZOS)
+
+    root.mkdir(parents=True, exist_ok=True)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG", compress_level=4)
+    _atomic_write(root / f"{upload_id}.png", buf.getvalue())
+    thumb = img.copy()
+    thumb.thumbnail((THUMB_MAX, THUMB_MAX), Image.Resampling.LANCZOS)
+    tbuf = io.BytesIO()
+    thumb.save(tbuf, format="WEBP", quality=82, method=4)
+    _atomic_write(root / f"{upload_id}.thumb.webp", tbuf.getvalue())
+    return StoredImage(
+        upload_id, f"{upload_id}.png", f"{upload_id}.thumb.webp", img.width, img.height
     )
 
 

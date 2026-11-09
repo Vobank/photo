@@ -120,3 +120,28 @@ def test_batch_and_widescreen(server: str) -> None:
     job, elapsed = _generate(server, width=1344, height=768, batch_size=4)
     print(f"\n4 x 1344x768: {elapsed:.2f}s")
     assert len(job["image_ids"]) == 4
+
+
+def test_looks_and_references_on_gpu(server: str) -> None:
+    """Enhanced prompt with a style, the detail pass, a variation and a reference picture."""
+    enhanced, t_enh = _generate(
+        server, width=1024, height=1024, seed=21, enhance=True, style="cinematic"
+    )
+    image_id = enhanced["image_ids"][0]
+    info = httpx.get(f"{server}/api/v1/images/{image_id}").json()
+    assert info["final_prompt"] and len(info["final_prompt"].split()) > 30
+
+    detailed, t_det = _generate(server, width=1024, height=1024, seed=21, detail=True)
+    big = httpx.get(f"{server}/api/v1/images/{detailed['image_ids'][0]}").json()
+    assert (big["width"], big["height"]) == (1536, 1536)
+
+    _, t_var = _generate(server, width=1024, height=1024, seed=22, variation_of=image_id)
+    print(f"\nenhanced {t_enh:.1f}s, detail {t_det:.1f}s, variation {t_var:.1f}s")
+
+    spec = default_catalog().get("flux2-klein-4b")
+    if installed_variant(Settings(), spec, primary_gpu(detect_gpus())) is None:
+        pytest.skip("FLUX.2 Klein not installed")
+    _, t_ref = _generate(
+        server, model="flux2-klein-4b", width=1024, height=1024, seed=5, references=[image_id]
+    )
+    print(f"klein with reference {t_ref:.1f}s")

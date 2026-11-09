@@ -11,7 +11,9 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from photo.hardware import Arch, Gpu
 
-Task = Literal["generate", "edit", "inpaint", "upscale", "remove_background"]
+Task = Literal[
+    "generate", "reference", "variation", "edit", "inpaint", "upscale", "remove_background"
+]
 
 _CATALOG_FILE = Path(__file__).with_name("models.toml")
 _SHA256_LEN = 64

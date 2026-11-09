@@ -9,6 +9,7 @@ import logging
 import secrets
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from photo import storage
@@ -28,6 +29,7 @@ from photo.events import EventBus
 from photo.hardware import Gpu
 from photo.ids import new_id
 from photo.schemas import MAX_SEED, TERMINAL_STATUSES, GenerateParams, JobParams, JobStatus
+from photo.styles import Style, get_style
 
 log = logging.getLogger(__name__)
 
@@ -184,6 +186,7 @@ class JobService:
             raise JobRejected("unknown_model", f"Unknown model {params.model!r}.") from None
         if params.kind not in spec.tasks:
             raise JobRejected("unsupported_task", f"{spec.name} cannot do {params.kind!r}.")
+        self._check_features(spec, params)
         variant = installed_variant(self.settings, spec, self.gpu)
         if variant is None:
             raise JobRejected(
@@ -205,6 +208,86 @@ class JobService:
         self.bus.publish("job", {"job": job.to_api()})
         self._wakeup.set()
         return job
+
+    def _check_features(self, spec: ModelSpec, params: GenerateParams) -> None:
+        caps = pipelines.capabilities(spec)
+        if params.references and not caps.references:
+            raise JobRejected(
+                "references_unsupported", f"{spec.name} cannot follow reference images."
+            )
+        if params.variation_of and not caps.variation:
+            raise JobRejected("variation_unsupported", f"{spec.name} cannot make variations.")
+        if params.detail and not caps.detail:
+            raise JobRejected("detail_unsupported", f"{spec.name} has no detail pass.")
+        if params.style and get_style(params.style) is None:
+            raise JobRejected("unknown_style", f"Unknown style {params.style!r}.")
+        for input_id in [
+            *params.references,
+            *([params.variation_of] if params.variation_of else []),
+        ]:
+            if self.input_path(input_id) is None:
+                raise JobRejected("input_not_found", "A reference picture no longer exists.")
+
+    def input_path(self, input_id: str) -> Path | None:
+        """Disk path of a gallery image or an upload usable as an input picture."""
+        row = self.db.one("SELECT path FROM images WHERE id=? AND deleted_at IS NULL", (input_id,))
+        if row:
+            return storage.resolve(self.settings.images_dir, row["path"])
+        row = self.db.one("SELECT path FROM uploads WHERE id=?", (input_id,))
+        if row:
+            return storage.resolve(self.settings.uploads_dir, row["path"])
+        return None
+
+    async def _send_inputs(self, client: Any, params: GenerateParams) -> pipelines.BuildInputs:
+        """Copy input pictures into the engine; returns their engine file names."""
+
+        async def send(input_id: str) -> str:
+            path = self.input_path(input_id)
+            if path is None:
+                raise EngineError("A reference picture no longer exists.")
+            data = await asyncio.to_thread(path.read_bytes)
+            name: str = await client.upload_image(f"photo-{input_id}.png", data)
+            return name
+
+        refs = tuple([await send(i) for i in params.references])
+        source = await send(params.variation_of) if params.variation_of else None
+        return pipelines.BuildInputs(references=refs, variation_source=source)
+
+    def _writer_file(self) -> str | None:
+        """An installed Qwen3 text encoder the language model can run from."""
+        for spec in self.catalog.models:
+            for f in spec.files.values():
+                if (
+                    f.dir == "text_encoders"
+                    and f.name.startswith("qwen_3_4b")
+                    and is_installed(self.settings.models, f)
+                ):
+                    return f.name
+        return None
+
+    async def enhance(self, prompt: str, style: Style | None, has_references: bool) -> str:
+        """Rewrite a prompt with the local language model (no image is made)."""
+        name = self._writer_file()
+        if name is None:
+            raise JobRejected("enhancer_unavailable", "Download a model first.")
+        if self.engine.state is EngineState.NOT_INSTALLED:
+            raise JobRejected("engine_not_installed", self.engine.last_error or "Engine missing.")
+        try:
+            client = await self.engine.wait_ready(timeout_s=120)
+        except TimeoutError:
+            raise JobRejected("engine_unavailable", "The engine is not ready.") from None
+        built = pipelines.build_enhance(
+            name, prompt, style, secrets.randbelow(MAX_SEED + 1), has_references
+        )
+        try:
+            result = await client.run(built.graph.to_api(), built.output_node)
+        except (EngineError, EngineUnavailable) as exc:
+            code, message = friendly_error(exc)
+            raise JobRejected(code, message) from exc
+        text = result.texts.get(built.output_node, "").strip().strip('"')
+        if not text:
+            raise JobRejected("engine_error", "The language model returned nothing.")
+        return text
 
     async def cancel(self, job_id: str) -> Job | None:
         job = self.get(job_id)
@@ -277,9 +360,6 @@ class JobService:
         spec = self.catalog.get(job.model)
         variant = spec.variant(job.variant)
         params = GenerateParams.model_validate(job.params)
-        built = pipelines.build(
-            params, spec, spec.variant_files(variant), job.seed, f"photo/{job.id}"
-        )
 
         last_progress = 0.0
 
@@ -295,6 +375,10 @@ class JobService:
             self.bus.publish_preview(job.id, pv.mime, pv.data)
 
         try:
+            inputs = await self._send_inputs(client, params)
+            built = pipelines.build(
+                params, spec, spec.variant_files(variant), job.seed, f"photo/{job.id}", inputs
+            )
             result = await client.run(
                 built.graph.to_api(),
                 built.output_node,
@@ -304,7 +388,8 @@ class JobService:
             if not result.images:
                 raise EngineError("The engine finished without producing an image.")
             blobs = [await client.fetch_image(img) for img in result.images]
-            await self._store_outputs(job, spec, variant, params, blobs)
+            final_prompt = result.texts.get(built.prompt_node) if built.prompt_node else None
+            await self._store_outputs(job, spec, variant, params, blobs, final_prompt)
         except EngineInterrupted:
             self._finish(job.id, "cancelled", None)
             return
@@ -330,6 +415,7 @@ class JobService:
         variant: Variant,
         params: GenerateParams,
         blobs: list[bytes],
+        final_prompt: str | None = None,
     ) -> None:
         d = spec.defaults
         for index, raw in enumerate(blobs):
@@ -342,6 +428,8 @@ class JobService:
                 "steps": params.steps or d.steps,
                 "cfg": params.cfg if params.cfg is not None else d.cfg,
                 "model_variant": variant.id,
+                # What the image model actually received, when the language model rewrote it.
+                "final_prompt": final_prompt,
             }
             stored = await asyncio.to_thread(
                 storage.save_result, self.settings.images_dir, image_id, raw, meta

@@ -6,12 +6,13 @@ import asyncio
 import contextlib
 import logging
 import time
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from photo.catalog import Catalog, ModelFile, ModelSpec, Variant, is_installed
 from photo.config import Settings
 from photo.downloads import DownloadError, DownloadRequest, download
+from photo.engine import pipelines
 from photo.events import EventBus
 from photo.hardware import Gpu
 
@@ -81,6 +82,7 @@ class ModelManager:
             "commercial_use": spec.commercial_use,
             "defaults": spec.defaults.model_dump(),
             "installed": any(v["installed"] for v in variants),
+            "features": asdict(pipelines.capabilities(spec)),
             "variants": variants,
             "install": task.to_api() if task and not task.finished else None,
         }

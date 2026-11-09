@@ -63,6 +63,8 @@ class Preview:
 @dataclass
 class RunResult:
     images: list[OutputImage] = field(default_factory=list)
+    # Text shown by preview nodes, by node id (e.g. the enhanced prompt).
+    texts: dict[str, str] = field(default_factory=dict)
 
 
 OnProgress = Callable[[Progress], Awaitable[None]]
@@ -195,6 +197,9 @@ class EngineClient:
                     await on_progress(
                         Progress(int(data["value"]), int(data["max"]), data.get("node"))
                     )
+                elif mtype == "executed" and (data.get("output") or {}).get("text"):
+                    texts = data["output"]["text"]
+                    result.texts[str(data.get("node"))] = "".join(str(t) for t in texts)
                 elif mtype == "executed" and str(data.get("node")) == output_node:
                     for img in (data.get("output") or {}).get("images", []):
                         result.images.append(

@@ -12,6 +12,7 @@ dependencies = [
     "httpx>=0.28,<1",
     "websockets>=15",
     "pillow>=12",
+    "python-multipart>=0.0.20",
     "typer>=0.20",
     "rich>=14",
 ]

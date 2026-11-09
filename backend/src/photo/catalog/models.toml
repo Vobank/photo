@@ -79,3 +79,71 @@ label = "BF16"
 archs = []
 min_vram_gb = 12
 files = { diffusion = "dit_bf16", text_encoder = "text_encoder", vae = "vae" }
+
+[[models]]
+id = "flux2-klein-4b"
+name = "FLUX.2 Klein 4B"
+vendor = "Black Forest Labs"
+description = "Follows reference images: match a style, keep a person or product, combine up to four pictures. Also a fast general text-to-image model."
+tasks = ["generate", "reference"]
+pipeline = "flux2_klein"
+license = "Apache-2.0"
+license_url = "https://huggingface.co/black-forest-labs/FLUX.2-klein-4B"
+commercial_use = true
+
+[models.defaults]
+steps = 4
+cfg = 1.0
+sampler = "euler"
+scheduler = "flux2"
+
+[models.files.dit_nvfp4]
+dir = "diffusion_models"
+name = "flux-2-klein-4b-nvfp4.safetensors"
+repo = "black-forest-labs/FLUX.2-klein-4b-nvfp4"
+revision = "1db2b2f776c24b76f1122e5f69ab1949fc620068"
+path = "flux-2-klein-4b-nvfp4.safetensors"
+size = 2460413488
+sha256 = "d8c5007b6a3bbbdfd38538bbcef5101a55dfde81894f58d2e3c8701cdef3542b"
+
+[models.files.dit_fp8]
+dir = "diffusion_models"
+name = "flux-2-klein-4b-fp8.safetensors"
+repo = "black-forest-labs/FLUX.2-klein-4b-fp8"
+revision = "5b4408e59397a4a37ccb46afe426d8ed86379441"
+path = "flux-2-klein-4b-fp8.safetensors"
+size = 4070624520
+sha256 = "97ed34fe0567e436200f2faee3939b88f2b5d99f8af2a4dc16532c4245c0ccb6"
+
+# Same Qwen3-4B weights as Z-Image Turbo's encoder: downloaded once, shared.
+[models.files.text_encoder]
+dir = "text_encoders"
+name = "qwen_3_4b_fp8_mixed.safetensors"
+repo = "Comfy-Org/z_image_turbo"
+revision = "6fc90a3b1b653e935a0d175e260736de25b84df5"
+path = "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors"
+size = 5631994051
+sha256 = "72450b19758172c5a7273cf7de729d1c17e7f434a104a00167624cba94f68f15"
+
+[models.files.vae]
+dir = "vae"
+name = "flux2-vae.safetensors"
+repo = "Comfy-Org/Flux-2-Klein-4B"
+revision = "5b3abca5c0dc1ecd4eaf3340868d09063fc1c965"
+path = "split_files/vae/flux2-vae.safetensors"
+size = 336211292
+sha256 = "868fe7b343cc8f3a19dbcfcafbc3d5f888802be3f89bd81b65b3621a066ce8f3"
+
+[[models.variants]]
+id = "nvfp4"
+label = "NVFP4 (RTX 50)"
+archs = ["blackwell"]
+min_vram_gb = 8
+files = { diffusion = "dit_nvfp4", text_encoder = "text_encoder", vae = "vae" }
+
+[[models.variants]]
+id = "fp8"
+label = "FP8"
+archs = []
+min_vram_gb = 8
+files = { diffusion = "dit_fp8", text_encoder = "text_encoder", vae = "vae" }
