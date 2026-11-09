@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # Installs or repairs Photo on Linux (x86_64, NVIDIA). Safe to re-run at any time.
 #
-#   ./install.sh [--models recommended|none|id,id] [--skip-frontend] [--no-shortcut]
+#   ./install.sh                 opens the setup wizard in your browser
+#   ./install.sh --unattended [--language de] [--models-dir DIR] [--data-dir DIR]
+#                [--engine-dir DIR] [--models recommended|none|id,id] [--skip-frontend]
+#                [--no-shortcut]
 #
-# Everything is installed inside this folder (runtime/, backend/.venv, engine/.venv,
-# models/, data/). Nothing is installed system-wide.
+# Nothing is installed system-wide. Without a desktop session the installer runs
+# unattended automatically.
 set -euo pipefail
 
 UV_VERSION="0.13.7"
@@ -20,6 +23,11 @@ UV="$BIN/uv"
 BACKEND="$ROOT/backend"
 
 MODELS="recommended"
+UNATTENDED=0
+LANGUAGE=""
+MODELS_DIR=""
+DATA_DIR=""
+ENGINE_DIR=""
 SKIP_FRONTEND=0
 NO_SHORTCUT=0
 
@@ -29,7 +37,7 @@ warn() { printf '  \033[33m!\033[0m   %s\n' "$1"; }
 die() { printf '\n\033[31mInstallation stopped: %s\033[0m\n' "$1" >&2; exit 1; }
 
 usage() {
-    sed -n '2,6p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '2,10p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 parse_args() {
@@ -37,6 +45,11 @@ parse_args() {
         case "$1" in
             --models) [[ $# -ge 2 ]] || die "--models needs a value"; MODELS="$2"; shift 2 ;;
             --models=*) MODELS="${1#*=}"; shift ;;
+            --unattended) UNATTENDED=1; shift ;;
+            --language) [[ $# -ge 2 ]] || die "--language needs a value"; LANGUAGE="$2"; shift 2 ;;
+            --models-dir) [[ $# -ge 2 ]] || die "--models-dir needs a value"; MODELS_DIR="$2"; shift 2 ;;
+            --data-dir) [[ $# -ge 2 ]] || die "--data-dir needs a value"; DATA_DIR="$2"; shift 2 ;;
+            --engine-dir) [[ $# -ge 2 ]] || die "--engine-dir needs a value"; ENGINE_DIR="$2"; shift 2 ;;
             --skip-frontend) SKIP_FRONTEND=1; shift ;;
             --no-shortcut) NO_SHORTCUT=1; shift ;;
             -h|--help) usage; exit 0 ;;
@@ -119,9 +132,27 @@ install_app() {
         die "installing the app server failed (see messages above)."
     ok "App server"
 
-    local args=(setup --models "$MODELS")
-    if (( SKIP_FRONTEND )); then args+=(--skip-frontend); fi
-    "$BACKEND/.venv/bin/photo" "${args[@]}" || die "setup failed (see messages above)."
+    # No desktop session (SSH, server): nothing could show the wizard.
+    if [[ -z "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]]; then UNATTENDED=1; fi
+    if (( UNATTENDED )); then
+        local args=(setup --models "$MODELS")
+        if [[ -n "$LANGUAGE" ]]; then args+=(--language "$LANGUAGE"); fi
+        if [[ -n "$MODELS_DIR" ]]; then args+=(--models-dir "$MODELS_DIR"); fi
+        if [[ -n "$DATA_DIR" ]]; then args+=(--data-dir "$DATA_DIR"); fi
+        if [[ -n "$ENGINE_DIR" ]]; then args+=(--engine-env-dir "$ENGINE_DIR"); fi
+        if (( SKIP_FRONTEND )); then args+=(--skip-frontend); fi
+        "$BACKEND/.venv/bin/photo" "${args[@]}" || die "setup failed (see messages above)."
+    else
+        step "Setup wizard"
+        echo "  The wizard opens in your browser. Keep this terminal open until it finishes."
+        "$BACKEND/.venv/bin/photo" setup --ui || die "setup was not completed."
+    fi
+}
+
+start_photo() {
+    # The wizard page waits for Photo on the same address and switches to it by itself.
+    mkdir -p "$ROOT/data/logs"
+    nohup "$BACKEND/.venv/bin/photo" serve > "$ROOT/data/logs/serve.out" 2>&1 &
 }
 
 create_shortcut() {
@@ -153,6 +184,7 @@ main() {
     install_app
     create_shortcut
     printf '\n\033[32mPhoto is ready. Start it with ./photo.sh or from the application menu.\033[0m\n'
+    if (( ! UNATTENDED )); then start_photo; fi
 }
 
 # Sourcing ("source install.sh") loads the functions without installing, for tests.

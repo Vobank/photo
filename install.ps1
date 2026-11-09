@@ -6,12 +6,28 @@
     Double-click install.cmd, or run from PowerShell:
         powershell -ExecutionPolicy Bypass -File install.ps1
 
-    Everything is installed inside this folder (runtime\, backend\.venv, engine\.venv,
-    models\, data\). Nothing is added to the system PATH or the registry, apart from
-    optional Desktop and Start Menu shortcuts.
+    The installer prepares a small app server, then opens a setup wizard in your
+    browser: choose the language, the drives for models, engine and gallery, and the
+    models. Nothing is added to the system PATH or the registry, apart from optional
+    Desktop and Start Menu shortcuts.
+
+.PARAMETER Unattended
+    No wizard: install with defaults or with the options below (for scripts and CI).
+
+.PARAMETER Language
+    Unattended only. One of: en zh-CN es pt-BR fr de it ru ja ko tr ar.
+
+.PARAMETER ModelsDir
+    Unattended only. Folder for models.
+
+.PARAMETER DataDir
+    Unattended only. Folder for the gallery and database.
+
+.PARAMETER EngineDir
+    Unattended only. Folder for the engine's Python environment.
 
 .PARAMETER Models
-    'recommended' (default), 'none', or a comma-separated list of model ids.
+    Unattended only. 'recommended' (default), 'none', or a comma-separated list of model ids.
 
 .PARAMETER SkipFrontend
     Do not build or check the web UI.
@@ -21,6 +37,11 @@
 #>
 [CmdletBinding()]
 param(
+    [switch]$Unattended,
+    [string]$Language = '',
+    [string]$ModelsDir = '',
+    [string]$DataDir = '',
+    [string]$EngineDir = '',
     [string]$Models = 'recommended',
     [switch]$SkipFrontend,
     [switch]$NoShortcut
@@ -167,10 +188,27 @@ function Install-App {
     Write-Ok 'App server'
 
     $photo = Join-Path $Backend '.venv\Scripts\photo.exe'
-    $setupArgs = @('setup', '--models', $Models)
-    if ($SkipFrontend) { $setupArgs += '--skip-frontend' }
     Remove-Item Env:UV_PROJECT_ENVIRONMENT   # setup points uv at the engine itself
-    Invoke-Native $photo $setupArgs 'Setup'
+    if ($Unattended) {
+        $setupArgs = @('setup', '--models', $Models)
+        if ($Language) { $setupArgs += @('--language', $Language) }
+        if ($ModelsDir) { $setupArgs += @('--models-dir', $ModelsDir) }
+        if ($DataDir) { $setupArgs += @('--data-dir', $DataDir) }
+        if ($EngineDir) { $setupArgs += @('--engine-env-dir', $EngineDir) }
+        if ($SkipFrontend) { $setupArgs += '--skip-frontend' }
+        Invoke-Native $photo $setupArgs 'Setup'
+    } else {
+        Write-Step 'Setup wizard'
+        Write-Host '  The wizard opens in your browser. Keep this window open until it finishes.'
+        Invoke-Native $photo @('setup', '--ui') 'Setup'
+    }
+}
+
+function Start-Photo {
+    # The wizard page waits for Photo on the same address and switches to it by itself,
+    # so no second browser tab is opened here.
+    $photo = Join-Path $Backend '.venv\Scripts\photo.exe'
+    Start-Process -FilePath $photo -ArgumentList 'serve' -WorkingDirectory $Root | Out-Null
 }
 
 function New-Launcher {
@@ -219,6 +257,7 @@ function Main {
     if (-not $NoShortcut) { New-Shortcuts $launcher }
     Write-Host ''
     Write-Host 'Photo is ready. Start it from the desktop shortcut or Photo.cmd.' -ForegroundColor Green
+    if (-not $Unattended) { Start-Photo }
 }
 
 # Dot-sourcing (". .\install.ps1") loads the functions without installing, for tests.
