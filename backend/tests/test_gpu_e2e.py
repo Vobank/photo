@@ -145,3 +145,26 @@ def test_looks_and_references_on_gpu(server: str) -> None:
         server, model="flux2-klein-4b", width=1024, height=1024, seed=5, references=[image_id]
     )
     print(f"klein with reference {t_ref:.1f}s")
+
+
+@pytest.mark.parametrize(
+    ("prompt", "medium", "model"),
+    [
+        ("наклейка с весёлым котиком в очках", "graphic", "z-image-turbo"),
+        ("милый робот-повар на кухне, мультяшный 3D", "render3d", "z-image-turbo"),
+        ("девушка читает книгу в парке осенью", "photo", "flux2-klein-4b"),
+        ("закат над морем акварелью", "watercolor", "flux2-klein-4b"),
+    ],
+)
+def test_auto_mode_routes_by_what_was_asked(
+    server: str, prompt: str, medium: str, model: str
+) -> None:
+    models = httpx.get(f"{server}/api/v1/models").json()["models"]
+    if not all(m["installed"] for m in models if m["id"] in ("z-image-turbo", "flux2-klein-4b")):
+        pytest.skip("needs both Z-Image Turbo and FLUX.2 Klein installed")
+    job, elapsed = _generate(
+        server, model="auto", style="auto", prompt=prompt, width=768, height=768, seed=5
+    )
+    print(f"\n{prompt!r}: {job['resolved']} in {elapsed:.1f}s")
+    assert job["resolved"]["medium"] == medium
+    assert job["model"] == model

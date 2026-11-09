@@ -13,6 +13,15 @@ from pathlib import Path
 from typing import Any
 
 from photo import storage
+from photo.auto import (
+    AUTO,
+    MEDIUM_STYLE,
+    STYLE_MEDIUM,
+    Classification,
+    Medium,
+    parse_classification,
+    route,
+)
 from photo.catalog import Catalog, ModelSpec, Variant, is_installed
 from photo.config import Settings
 from photo.db import Database
@@ -29,7 +38,7 @@ from photo.events import EventBus
 from photo.hardware import Gpu
 from photo.ids import new_id
 from photo.schemas import MAX_SEED, TERMINAL_STATUSES, GenerateParams, JobParams, JobStatus
-from photo.styles import Style, get_style
+from photo.styles import Style, apply_style, get_style
 
 log = logging.getLogger(__name__)
 
@@ -59,6 +68,8 @@ class Job:
     started_at: float | None
     finished_at: float | None
     image_ids: tuple[str, ...] = ()
+    # Automatic mode's decisions: {"medium", "style", "model", "prompt"}.
+    resolved: dict[str, Any] | None = None
 
     def to_api(self) -> dict[str, Any]:
         return {
@@ -76,6 +87,7 @@ class Job:
             "started_at": self.started_at,
             "finished_at": self.finished_at,
             "image_ids": list(self.image_ids),
+            "resolved": self.resolved,
         }
 
 
@@ -166,6 +178,7 @@ class JobService:
             started_at=row["started_at"],
             finished_at=row["finished_at"],
             image_ids=tuple(r["id"] for r in images),
+            resolved=json.loads(row["resolved"]) if row["resolved"] else None,
         )
 
     def get(self, job_id: str) -> Job | None:
@@ -180,10 +193,20 @@ class JobService:
     # ---- commands ------------------------------------------------------------------
 
     def submit(self, params: JobParams) -> Job:
-        try:
-            spec = self.catalog.get(params.model)
-        except KeyError:
-            raise JobRejected("unknown_model", f"Unknown model {params.model!r}.") from None
+        if params.model == AUTO:
+            # Provisional pick; the real one is made when the job runs (see _resolve_auto).
+            candidates = self._candidates(params)
+            if not candidates:
+                raise JobRejected(
+                    "model_not_installed", "No installed model can do this. Install one first."
+                )
+            provisional = STYLE_MEDIUM.get(params.style or "", "photo")
+            spec = self.catalog.get(route(provisional, candidates) or candidates[0])
+        else:
+            try:
+                spec = self.catalog.get(params.model)
+            except KeyError:
+                raise JobRejected("unknown_model", f"Unknown model {params.model!r}.") from None
         if params.kind not in spec.tasks:
             raise JobRejected("unsupported_task", f"{spec.name} cannot do {params.kind!r}.")
         self._check_features(spec, params)
@@ -217,9 +240,10 @@ class JobService:
             )
         if params.variation_of and not caps.variation:
             raise JobRejected("variation_unsupported", f"{spec.name} cannot make variations.")
-        if params.detail and not caps.detail:
+        # In automatic mode the detail pass is best effort: used when the chosen model has it.
+        if params.detail and not caps.detail and params.model != AUTO:
             raise JobRejected("detail_unsupported", f"{spec.name} has no detail pass.")
-        if params.style and get_style(params.style) is None:
+        if params.style and params.style != AUTO and get_style(params.style) is None:
             raise JobRejected("unknown_style", f"Unknown style {params.style!r}.")
         for input_id in [
             *params.references,
@@ -227,6 +251,75 @@ class JobService:
         ]:
             if self.input_path(input_id) is None:
                 raise JobRejected("input_not_found", "A reference picture no longer exists.")
+
+    def _candidates(self, params: GenerateParams) -> list[str]:
+        """Installed models able to do what ``params`` strictly needs, in catalog order."""
+        out: list[str] = []
+        for spec in self.catalog.models:
+            caps = pipelines.capabilities(spec)
+            if (
+                params.kind in spec.tasks
+                and (caps.references or not params.references)
+                and (caps.variation or not params.variation_of)
+                and installed_variant(self.settings, spec, self.gpu) is not None
+            ):
+                out.append(spec.id)
+        return out
+
+    async def _classify(self, client: Any, prompt: str) -> Classification:
+        """Medium + English prompt. Falls back to photo + the original text on any trouble."""
+        fallback = Classification("photo", prompt, understood=False)
+        name = self._writer_file()
+        if name is None:
+            return fallback
+        built = pipelines.build_classify(name, prompt)
+        try:
+            result = await client.run(built.graph.to_api(), built.output_node)
+        except (EngineError, EngineUnavailable) as exc:
+            log.warning("automatic mode could not classify the request: %s", exc)
+            return fallback
+        return parse_classification(result.texts.get(built.output_node, ""), prompt)
+
+    async def _resolve_auto(
+        self, client: Any, job: Job, params: GenerateParams
+    ) -> tuple[GenerateParams, ModelSpec, Variant, dict[str, Any]]:
+        """Turn "auto" style/model into concrete choices and record them on the job."""
+        update: dict[str, Any] = {}
+        translated: str | None = None
+        medium: Medium
+        if params.style == AUTO:
+            c = await self._classify(client, params.prompt)
+            medium = c.medium
+            update["style"] = MEDIUM_STYLE[medium]
+            # With "enhance" on, the writer translates while it expands the prompt.
+            if c.understood and not params.enhance:
+                update["prompt"] = translated = c.prompt
+        else:
+            medium = STYLE_MEDIUM.get(params.style or "", "photo")
+
+        model_id = params.model
+        if model_id == AUTO:
+            model_id = route(medium, self._candidates(params)) or job.model
+        spec = self.catalog.get(model_id)
+        variant = installed_variant(self.settings, spec, self.gpu) or spec.variant(job.variant)
+        if params.detail and not pipelines.capabilities(spec).detail:
+            update["detail"] = False
+        update["model"] = spec.id
+
+        resolved = {
+            "medium": medium,
+            "style": update.get("style", params.style),
+            "model": spec.id,
+            "prompt": translated,
+        }
+        self.db.execute(
+            "UPDATE jobs SET model=?, variant=?, resolved=? WHERE id=?",
+            (spec.id, variant.id, json.dumps(resolved, ensure_ascii=False), job.id),
+        )
+        updated = self.get(job.id)
+        if updated:
+            self.bus.publish("job", {"job": updated.to_api()})
+        return params.model_copy(update=update), spec, variant, resolved
 
     def input_path(self, input_id: str) -> Path | None:
         """Disk path of a gallery image or an upload usable as an input picture."""
@@ -357,9 +450,11 @@ class JobService:
         assert running is not None
         self.bus.publish("job", {"job": running.to_api()})
 
+        request = GenerateParams.model_validate(job.params)
+        params = request
         spec = self.catalog.get(job.model)
         variant = spec.variant(job.variant)
-        params = GenerateParams.model_validate(job.params)
+        resolved: dict[str, Any] | None = None
 
         last_progress = 0.0
 
@@ -375,6 +470,8 @@ class JobService:
             self.bus.publish_preview(job.id, pv.mime, pv.data)
 
         try:
+            if request.style == AUTO or request.model == AUTO:
+                params, spec, variant, resolved = await self._resolve_auto(client, job, request)
             inputs = await self._send_inputs(client, params)
             built = pipelines.build(
                 params, spec, spec.variant_files(variant), job.seed, f"photo/{job.id}", inputs
@@ -388,8 +485,15 @@ class JobService:
             if not result.images:
                 raise EngineError("The engine finished without producing an image.")
             blobs = [await client.fetch_image(img) for img in result.images]
-            final_prompt = result.texts.get(built.prompt_node) if built.prompt_node else None
-            await self._store_outputs(job, spec, variant, params, blobs, final_prompt)
+            if built.prompt_node:
+                final_prompt = result.texts.get(built.prompt_node)
+            elif resolved is not None:
+                final_prompt = apply_style(params.prompt, get_style(params.style))
+            else:
+                final_prompt = None
+            await self._store_outputs(
+                job, spec, variant, params, blobs, final_prompt, request=request, resolved=resolved
+            )
         except EngineInterrupted:
             self._finish(job.id, "cancelled", None)
             return
@@ -416,13 +520,17 @@ class JobService:
         params: GenerateParams,
         blobs: list[bytes],
         final_prompt: str | None = None,
+        *,
+        request: GenerateParams | None = None,
+        resolved: dict[str, Any] | None = None,
     ) -> None:
         d = spec.defaults
         for index, raw in enumerate(blobs):
             image_id = new_id()
             meta = {
                 "schema": 1,
-                "params": params.model_dump(),
+                # The request as made: "auto" stays "auto", so reusing it decides afresh.
+                "params": (request or params).model_dump(),
                 "seed": job.seed,
                 "batch_index": index,
                 "steps": params.steps or d.steps,
@@ -430,6 +538,7 @@ class JobService:
                 "model_variant": variant.id,
                 # What the image model actually received, when the language model rewrote it.
                 "final_prompt": final_prompt,
+                "resolved": resolved,
             }
             stored = await asyncio.to_thread(
                 storage.save_result, self.settings.images_dir, image_id, raw, meta

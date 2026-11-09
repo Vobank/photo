@@ -22,6 +22,15 @@ class Style:
 
 STYLES: tuple[Style, ...] = (
     Style(
+        "photo",
+        "candid unretouched photograph, full-frame camera, natural available light, true-to-life "
+        "colour, realistic textures and small everyday imperfections, subtle sensor grain",
+        "a genuine, unretouched photograph a real person could have taken: name the camera and "
+        "lens, use natural available light, and describe real-world texture (fabric weave, dust, "
+        "wear, small imperfections) in an ordinary, uncurated setting. Keep the framing the idea "
+        "implies. It must look like a real photo, never like a glossy, airbrushed render",
+    ),
+    Style(
         "cinematic",
         "cinematic film still, anamorphic lens, shallow depth of field, motivated dramatic "
         "lighting, rich colour grade, subtle atmospheric haze, fine film grain",
@@ -83,6 +92,36 @@ STYLES: tuple[Style, ...] = (
         "rich saturated colour",
         "epic fantasy concept art: painterly detail, volumetric light shafts, a sense of vast "
         "scale and rich saturated colour",
+    ),
+    Style(
+        "cartoon",
+        "bold cartoon style, clean confident outlines, bright flat colours, expressive "
+        "exaggerated shapes and faces, playful and readable",
+        "a bold cartoon: clean confident outlines, bright flat colours, expressive exaggerated "
+        "shapes and faces, playful and instantly readable",
+    ),
+    Style(
+        "illustration",
+        "hand-drawn digital illustration, confident linework, flat shapes with soft shading, "
+        "harmonious limited palette, storybook charm",
+        "a hand-drawn digital illustration in the manner of a picture book or editorial "
+        "illustration: confident linework, flat shapes with soft shading, a limited harmonious "
+        "palette and storybook charm",
+    ),
+    Style(
+        "painting",
+        "traditional oil painting on canvas, visible expressive brushstrokes, rich layered "
+        "pigment, painterly light, gallery quality",
+        "a traditional oil painting on canvas with visible, expressive brushstrokes, rich layered "
+        "pigment and painterly light, like a work hanging in a gallery",
+    ),
+    Style(
+        "graphic",
+        "clean flat vector graphic design, bold simple shapes, crisp edges, balanced layout, "
+        "solid background, precise legible typography",
+        "clean flat graphic design such as a logo, icon or poster: bold simple vector shapes, "
+        "crisp edges, a balanced layout on a plain background and precise, correctly spelled "
+        "typography exactly as the user wrote it",
     ),
     Style(
         "anime",

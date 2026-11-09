@@ -11,6 +11,7 @@ import math
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from photo.auto import CLASSIFY_MAX_TOKENS, CLASSIFY_SYSTEM
 from photo.catalog import ModelFile, ModelSpec
 from photo.engine.graph import Graph, Link, NodeRef
 from photo.schemas import MAX_PIXELS, GenerateParams
@@ -283,6 +284,28 @@ def build_enhance(
     _, preview = _prompt_with_style(g, clip, p, style, seed, has_refs)
     assert preview is not None
     return BuiltGraph(g, preview, preview)
+
+
+def build_classify(text_encoder: str, prompt: str) -> BuiltGraph:
+    """A graph that labels the request's medium and translates it (automatic mode).
+
+    Greedy decoding: the same request always routes the same way, so seeds reproduce.
+    """
+    g = Graph()
+    clip = g.node("CLIPLoader", clip_name=text_encoder, type="lumina2", device="default")
+    answer = g.node(
+        "TextGenerateV2",
+        clip=clip[0],
+        prompt=prompt,
+        system_prompt=CLASSIFY_SYSTEM,
+        max_length=CLASSIFY_MAX_TOKENS,
+        sampling_mode="off",
+        thinking=False,
+        use_default_template=True,
+        mtp="auto",
+    )
+    preview = g.node("PreviewAny", source=answer[0])
+    return BuiltGraph(g, preview.id, preview.id)
 
 
 PIPELINES: dict[str, _Pipeline] = {

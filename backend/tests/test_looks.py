@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 from PIL import Image
 
 from photo.api.app import Services
+from photo.auto import MEDIUM_STYLE, STYLE_MEDIUM
 from photo.catalog import default_catalog
 from photo.engine.pipelines import BuildInputs, build, build_enhance, detail_size
 from photo.schemas import MAX_PIXELS, GenerateParams
@@ -58,7 +59,10 @@ def test_enhancement_wires_language_model_into_encoder() -> None:
 
 def test_every_style_is_well_formed() -> None:
     ids = [s.id for s in STYLES]
-    assert len(ids) == len(set(ids)) == 12
+    assert len(ids) == len(set(ids))
+    # Automatic mode can route every style, and every medium has a recipe.
+    assert set(ids) == set(STYLE_MEDIUM)
+    assert all(get_style(style) for style in MEDIUM_STYLE.values())
     for s in STYLES:
         assert s.suffix and s.direction and not s.suffix.endswith(".")
     assert get_style("nope") is None
@@ -253,7 +257,7 @@ def test_models_expose_features(client: TestClient) -> None:
 
 
 def test_styles_endpoint(client: TestClient) -> None:
-    assert len(client.get("/api/v1/styles").json()["styles"]) == 12
+    assert len(client.get("/api/v1/styles").json()["styles"]) == len(STYLES)
 
 
 def test_unknown_style_rejected(client: TestClient, services: Services) -> None:

@@ -258,6 +258,7 @@ def _image_api(row: Any) -> dict[str, Any]:
         "steps": meta.get("steps"),
         "cfg": meta.get("cfg"),
         "final_prompt": meta.get("final_prompt"),
+        "resolved": meta.get("resolved"),
     }
 
 

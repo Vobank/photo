@@ -65,6 +65,10 @@ MIGRATIONS: Sequence[str] = (
         created_at  REAL NOT NULL
     );
     """,
+    # 4 — what automatic mode decided (medium, model, translated prompt), as JSON
+    """
+    ALTER TABLE jobs ADD COLUMN resolved TEXT;
+    """,
 )
 
 

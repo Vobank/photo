@@ -34,6 +34,8 @@ class FakeClient:
         self.interrupted = False
         self.fail_with: Exception | None = None
         self.uploads: dict[str, bytes] = {}
+        # What the language model answers to automatic mode's classification step.
+        self.classify_answer = "photo | a lighthouse at dusk"
 
     async def run(
         self, graph: dict[str, Any], output_node: str, *, on_progress=None, on_preview=None
@@ -54,10 +56,12 @@ class FakeClient:
         if on_progress:
             await on_progress(Progress(2, 2))
         batch = graph_batch(graph)
+        from photo.auto import CLASSIFY_SYSTEM
+
+        classify = any(n["inputs"].get("system_prompt") == CLASSIFY_SYSTEM for n in graph.values())
+        answer = self.classify_answer if classify else "Enhanced: a vivid scene"
         texts = {
-            node_id: "Enhanced: a vivid scene"
-            for node_id, node in graph.items()
-            if node["class_type"] == "PreviewAny"
+            node_id: answer for node_id, node in graph.items() if node["class_type"] == "PreviewAny"
         }
         images = [OutputImage(f"out_{i}.png", "photo", "output") for i in range(batch)]
         if any(n["class_type"] == "SaveImage" for n in graph.values()):
