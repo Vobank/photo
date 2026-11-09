@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
-import { ApiError, api } from '../../api/client'
+import { api } from '../../api/client'
 import { keys } from '../../api/queries'
 import type { ModelInfo } from '../../api/types'
 import { Button } from '../../components/Button'
 import { toastError } from '../../components/toast'
+import { apiErrorText } from '../../lib/errors'
 import { formatBytes } from '../../lib/format'
 import { useLive } from '../../state/live'
 import styles from './Studio.module.css'
@@ -36,7 +37,7 @@ export function ModelInstallLine({ model, showName = true }: { model: ModelInfo;
   const start = useMutation({
     mutationFn: () => api.installModel(model.id, variant.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: keys.models }),
-    onError: (e) => toastError(e instanceof ApiError ? e.message : t('errors.network')),
+    onError: (e) => toastError(apiErrorText(t, e)),
   })
 
   const lastError = live?.finished && live.error && live.error !== 'cancelled' ? live.error : null

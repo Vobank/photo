@@ -28,7 +28,17 @@ export const keys = {
   image: (id: string) => ['image', id] as const,
 }
 
-export const useSystem = () => useQuery({ queryKey: keys.system, queryFn: api.system })
+/** App-mode system info; undefined while the setup wizard is being served. */
+export const useSystem = () =>
+  useQuery({
+    queryKey: keys.system,
+    queryFn: api.system,
+    select: (d) => (d.mode === 'app' ? d : undefined),
+  })
+
+/** Whether the server is the app or the setup wizard. */
+export const useServerMode = () =>
+  useQuery({ queryKey: keys.system, queryFn: api.system, select: (d) => d.mode })
 
 export const useModels = () => useQuery({ queryKey: keys.models, queryFn: api.models })
 

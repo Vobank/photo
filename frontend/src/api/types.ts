@@ -26,6 +26,7 @@ export interface Job {
   seed: number
   progress: number
   error: string | null
+  error_code: string | null
   created_at: number
   started_at: number | null
   finished_at: number | null
@@ -81,7 +82,10 @@ export interface ModelInfo {
 }
 
 export interface SystemInfo {
+  mode: 'app'
   version: string
+  language: string
+  languages: string[]
   engine: { state: EngineState; error: string | null }
   gpu: {
     name: string
@@ -93,12 +97,99 @@ export interface SystemInfo {
   models_dir: string
 }
 
+export interface SetupSystemInfo {
+  mode: 'setup'
+  version: string
+  language: string
+}
+
 export interface ApiErrorBody {
-  error: { code: string; message: string; fields?: { field: string; message: string }[] }
+  error: {
+    code: string
+    message: string
+    fields?: { field: string; message?: string; code?: string; detail?: string }[]
+  }
+}
+
+// ---- setup wizard ----
+
+export type SetupStepId = 'engine' | 'packages' | 'gpu' | 'models'
+
+export interface SetupStep {
+  id: SetupStepId
+  status: 'pending' | 'running' | 'done' | 'failed' | 'skipped'
+  done: number
+  total: number
+  detail: string
+}
+
+export interface SetupRun {
+  status: 'idle' | 'running' | 'failed' | 'done'
+  steps: SetupStep[]
+  error: { code: string; detail: string; step: string } | null
+  run_id: string
+}
+
+export interface Disk {
+  root: string
+  label: string
+  kind: 'fixed' | 'removable' | 'network' | 'unknown'
+  total: number
+  free: number
+}
+
+export interface SetupModel {
+  id: string
+  name: string
+  vendor: string
+  license: string
+  license_url: string
+  commercial_use: boolean
+  variant: string
+  bytes: number
+  installed: boolean
+  recommended: boolean
+}
+
+export interface SetupPlan {
+  languages: string[]
+  defaults: { language: string; models_dir: string; data_dir: string; engine_env_dir: string }
+  configured: boolean
+  install_dir: string
+  engine_env_bytes: number
+  data_hint_bytes: number
+  disks: Disk[]
+  gpu: {
+    name: string
+    vram_gb: number
+    arch: string
+    driver: string
+    supported: boolean
+    driver_ok: boolean
+  } | null
+  min_driver: number
+  models: SetupModel[]
+  run: SetupRun
+}
+
+export interface InstallConfig {
+  language: string
+  models_dir: string
+  data_dir: string
+  engine_env_dir: string
+  models: string[]
+}
+
+export interface FieldError {
+  field: string
+  code: string
+  detail: string
 }
 
 export type ServerEvent =
-  | { type: 'hello'; version: string; engine: SystemInfo['engine']; jobs: Job[] }
+  | { type: 'hello'; mode?: 'app'; version: string; engine: SystemInfo['engine']; jobs: Job[] }
+  | { type: 'hello'; mode: 'setup'; run: SetupRun }
+  | { type: 'setup'; run: SetupRun }
   | { type: 'job'; job: Job }
   | { type: 'progress'; job_id: string; value: number; max: number }
   | { type: 'image'; image_id: string; job_id: string }

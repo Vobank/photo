@@ -102,8 +102,11 @@ function Viewer({ imageId, images }: { imageId: string | null; images: ImageInfo
           className={styles.viewer}
           aria-describedby={undefined}
           onKeyDown={(e) => {
-            if (e.key === 'ArrowRight') go(1)
-            if (e.key === 'ArrowLeft') go(-1)
+            // In right-to-left languages "next" lies to the left.
+            const forward = document.documentElement.dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
+            const back = forward === 'ArrowLeft' ? 'ArrowRight' : 'ArrowLeft'
+            if (e.key === forward) go(1)
+            if (e.key === back) go(-1)
           }}
         >
           <Dialog.Title className="visually-hidden">{t('gallery.viewer')}</Dialog.Title>

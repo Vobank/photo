@@ -6,7 +6,8 @@ import { useSystem } from '../../api/queries'
 import { Button } from '../../components/Button'
 import { Segmented } from '../../components/Segmented'
 import { toast } from '../../components/toast'
-import { LANGUAGES } from '../../i18n'
+import fieldStyles from '../../components/Field.module.css'
+import { LANGUAGES, setLanguage } from '../../i18n'
 import styles from './Page.module.css'
 
 type Theme = 'system' | 'dark' | 'light'
@@ -45,14 +46,24 @@ export default function SettingsView() {
         <section className={styles.card}>
           <div className={styles.row}>
             <span>{t('settings.language')}</span>
-            <div>
-              <Segmented
-                label={t('settings.language')}
-                value={i18n.resolvedLanguage ?? 'en'}
-                options={LANGUAGES.map((l) => ({ value: l.id, label: l.label }))}
-                onChange={(lng) => void i18n.changeLanguage(lng)}
-              />
-            </div>
+            <select
+              aria-label={t('settings.language')}
+              className={fieldStyles.select}
+              style={{ width: 240 }}
+              value={i18n.resolvedLanguage ?? 'en'}
+              onChange={(e) => {
+                const lng = e.target.value
+                void setLanguage(lng, { remember: true })
+                // Saved on the server too, so phones and other browsers follow.
+                api.setLanguage(lng).catch(() => undefined)
+              }}
+            >
+              {LANGUAGES.map((l) => (
+                <option key={l.id} value={l.id} lang={l.id}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className={styles.row}>
             <span>{t('settings.theme')}</span>

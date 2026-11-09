@@ -46,7 +46,6 @@
     "generate": "Generate",
     "generateN_one": "Generate {{count}} image",
     "generateN_other": "Generate {{count}} images",
-    "failed": "This image could not be generated.",
     "emptyTitle": "Nothing here yet",
     "emptyBody": "Write a prompt on the right and press Generate. Results appear here and in the strip below.",
     "queuedAhead_one": "Queued, {{count}} job ahead",
@@ -81,7 +80,25 @@
   },
   "errors": {
     "network": "Photo is not responding. Check that it is still running.",
-    "clipboard": "Your browser did not allow copying the image."
+    "clipboard": "Your browser did not allow copying the image.",
+    "api": {
+      "unknown_model": "This model is not available.",
+      "unsupported_task": "This model cannot do that.",
+      "model_not_installed": "This model is not downloaded yet. Install it on the Models page.",
+      "engine_not_installed": "The engine is not installed. Run the installer again.",
+      "invalid_request": "Some settings are not valid.",
+      "unsupported_language": "This language is not supported.",
+      "token_required": "This device needs an access token to use Photo.",
+      "host_not_allowed": "Open Photo using its own address.",
+      "origin_not_allowed": "This request came from another website and was blocked."
+    },
+    "job": {
+      "out_of_memory": "Not enough video memory. Try a smaller size or fewer images, or close other programs that use the GPU.",
+      "engine_unavailable": "The engine stopped and is restarting. Try again in a moment.",
+      "engine_not_installed": "The engine is not installed. Run the installer again.",
+      "interrupted": "Photo was closed while this image was being made.",
+      "engine_error": "This image could not be generated."
+    }
   },
   "onboarding": {
     "title": "Download a model to start",
@@ -124,5 +141,103 @@
     "about": "About",
     "aboutBody": "Photo {{version}}. Open source under the Apache 2.0 licence.",
     "privacy": "Everything runs on this computer. Prompts and images never leave it, and Photo collects no telemetry."
+  },
+  "modelInfo": {
+    "z-image-turbo": "Fast photorealistic images in 8 steps. Strong at people, products and legible text."
+  },
+  "setup": {
+    "back": "Back",
+    "continue": "Continue",
+    "stages": {
+      "language": "Language",
+      "storage": "Storage",
+      "models": "Models",
+      "install": "Install"
+    },
+    "language": {
+      "title": "Choose your language",
+      "lead": "Photo will use it everywhere. You can change it later in Settings."
+    },
+    "system": {
+      "title": "Your computer",
+      "gpu": "{{name}}, {{vram}} GB",
+      "gpuUnsupported": "Photo is built for NVIDIA RTX 40 and 50 series. This card may be slow or fail.",
+      "driver": "NVIDIA driver {{version}}",
+      "driverOld": "Driver {{min}} or newer is required. Update it at nvidia.com/drivers, then run the installer again.",
+      "noGpu": "No NVIDIA graphics card found",
+      "noGpuHelp": "Photo needs an NVIDIA RTX graphics card with a current driver. Install the driver from nvidia.com/drivers, then run the installer again."
+    },
+    "storage": {
+      "title": "Where to keep everything",
+      "lead": "Models and the engine are large. Put them on a fast drive with plenty of space; an SSD makes models load several times faster.",
+      "drive": "Drive",
+      "free": "{{size}} free",
+      "removable": "removable",
+      "needs": "needs {{size}}",
+      "recommended": "{{size}} or more recommended",
+      "alreadyThere": "already installed",
+      "diskNeed": "{{need}} needed · {{free}} free",
+      "models_dir": {
+        "title": "Models",
+        "body": "AI models you download. Grows as you add models."
+      },
+      "engine_env_dir": {
+        "title": "Engine",
+        "body": "The image engine and its GPU libraries."
+      },
+      "data_dir": {
+        "title": "Gallery",
+        "body": "Your images, their settings and the history."
+      }
+    },
+    "models": {
+      "title": "Choose models",
+      "lead": "Start with the recommended model. You can add others later on the Models page.",
+      "recommended": "Recommended",
+      "total": "Total download: {{size}}"
+    },
+    "install": {
+      "title": "Ready to install",
+      "lead": "Everything will be downloaded and checked. This usually takes 10–40 minutes, depending on your connection.",
+      "start": "Install",
+      "runningTitle": "Installing",
+      "runningLead": "You can keep using your computer. Downloads resume if the connection drops.",
+      "doneTitle": "Photo is ready",
+      "doneLead": "Everything is installed and checked.",
+      "failedTitle": "Installation stopped",
+      "details": "Technical details",
+      "change": "Change settings",
+      "open": "Open Photo",
+      "opening": "Starting Photo…",
+      "keepOpen": "Keep this page and the installer window open.",
+      "upToDate": "Up to date"
+    },
+    "steps": {
+      "engine": "Download the engine",
+      "packages": "Install GPU libraries",
+      "gpu": "Check the graphics card",
+      "models": "Download models"
+    },
+    "errors": {
+      "network": "The installer is not responding. Check that its window is still open.",
+      "unsupported_language": "This language is not supported.",
+      "unknown_model": "One of the selected models is not available.",
+      "path_not_absolute": "Enter a full path, for example D:\\Photo\\models.",
+      "path_system_folder": "System folders cannot be used. Choose another folder.",
+      "path_is_file": "This path points to a file. Choose a folder.",
+      "path_not_writable": "Photo cannot write to this folder. Choose another one.",
+      "not_enough_space": "Not enough space: {{need}} needed, {{free}} free.",
+      "already_running": "Installation is already running.",
+      "invalid_config": "Some choices need attention.",
+      "cancelled": "Installation was cancelled.",
+      "download_failed": "A download failed. Check your internet connection and try again.",
+      "disk_error": "Could not write to the disk. Check that it is connected and has free space.",
+      "engine_checksum": "The engine download was damaged. Try again.",
+      "engine_packages": "Installing the GPU libraries failed. Check your connection and try again.",
+      "cuda_unavailable": "The engine cannot use your graphics card. Update the NVIDIA driver and try again.",
+      "uv_missing": "The installer is incomplete. Download Photo again.",
+      "frontend_missing": "The interface files are missing. Download the release package again.",
+      "setup_failed": "Something went wrong during installation."
+    }
   }
 }

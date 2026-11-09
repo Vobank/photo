@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import { connectEvents } from '../api/events'
 import { keys, patchCachedImage, queryClient } from '../api/queries'
-import type { SystemInfo } from '../api/types'
+import type { SetupSystemInfo, SystemInfo } from '../api/types'
 import { useLive } from '../state/live'
 
 /** Wires the server event socket into the live store and the query cache. */
@@ -26,8 +26,8 @@ export function useEventStream() {
             patchCachedImage(queryClient, event.image_id, null)
             break
           case 'engine':
-            queryClient.setQueryData<SystemInfo>(keys.system, (s) =>
-              s ? { ...s, engine: { state: event.state, error: event.error } } : s,
+            queryClient.setQueryData<SystemInfo | SetupSystemInfo>(keys.system, (s) =>
+              s?.mode === 'app' ? { ...s, engine: { state: event.state, error: event.error } } : s,
             )
             break
           case 'model_install':

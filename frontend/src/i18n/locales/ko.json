@@ -1,0 +1,240 @@
+{
+  "nav": {
+    "label": "기본 메뉴",
+    "studio": "스튜디오",
+    "gallery": "갤러리",
+    "models": "모델",
+    "settings": "설정"
+  },
+  "engine": {
+    "offline": "연결 끊김",
+    "ready": "준비됨",
+    "starting": "엔진 시작 중",
+    "crashed": "엔진이 중지됨",
+    "not_installed": "엔진이 설치되지 않음",
+    "stopped": "엔진이 중지됨"
+  },
+  "status": {
+    "downloading": "다운로드 중 {{done}} / {{total}}",
+    "queue_other": "대기열 {{count}}개"
+  },
+  "studio": {
+    "settings": "생성 설정",
+    "prompt": "프롬프트",
+    "promptPlaceholder": "이미지를 설명하세요: 피사체, 배경, 조명, 렌즈, 분위기…",
+    "model": "모델",
+    "aspect": "비율",
+    "size": "크기",
+    "sizes": {
+      "s": "S",
+      "m": "M",
+      "l": "L",
+      "xl": "XL"
+    },
+    "count": "이미지 수",
+    "seed": "시드",
+    "seedRandom": "매번 무작위",
+    "seedLock": "이 시드 고정",
+    "seedUnlock": "무작위 시드 사용",
+    "seedNew": "새 시드",
+    "advanced": "고급",
+    "steps": "스텝",
+    "cfg": "가이던스",
+    "negative": "네거티브 프롬프트",
+    "negativeHint": "가이던스가 1보다 클 때 사용됨",
+    "generate": "생성",
+    "generateN_other": "이미지 {{count}}개 생성",
+    "emptyTitle": "아직 아무것도 없습니다",
+    "emptyBody": "오른쪽에 프롬프트를 입력하고 [생성]을 누르세요. 결과는 여기와 아래 스트립에 표시됩니다.",
+    "queuedAhead_other": "대기 중, 앞에 작업 {{count}}개",
+    "starting": "시작하는 중…",
+    "loadingModel": "모델을 불러오는 중…",
+    "step": "스텝 {{value}}/{{max}}",
+    "results": "최근 결과",
+    "inProgress": "진행 중",
+    "queued": "대기 중",
+    "noModels": "설치된 모델이 없습니다"
+  },
+  "actions": {
+    "dismiss": "닫기",
+    "cancel": "취소",
+    "favorite": "즐겨찾기에 추가",
+    "unfavorite": "즐겨찾기에서 제거",
+    "reuse": "이 설정 사용",
+    "reuseSeed": "설정 및 시드 사용",
+    "copy": "이미지 복사",
+    "download": "다운로드",
+    "delete": "삭제",
+    "undo": "실행 취소",
+    "retry": "다시 시도",
+    "previous": "이전",
+    "next": "다음",
+    "close": "닫기"
+  },
+  "toast": {
+    "copied": "이미지를 복사했습니다",
+    "deleted": "이미지를 휴지통으로 이동했습니다"
+  },
+  "errors": {
+    "network": "Photo가 응답하지 않습니다. 실행 중인지 확인하세요.",
+    "clipboard": "브라우저에서 이미지 복사를 허용하지 않았습니다.",
+    "api": {
+      "unknown_model": "이 모델은 사용할 수 없습니다.",
+      "unsupported_task": "이 모델은 해당 작업을 지원하지 않습니다.",
+      "model_not_installed": "이 모델은 아직 다운로드되지 않았습니다. [모델] 페이지에서 설치하세요.",
+      "engine_not_installed": "엔진이 설치되지 않았습니다. 설치 프로그램을 다시 실행하세요.",
+      "invalid_request": "일부 설정이 올바르지 않습니다.",
+      "unsupported_language": "지원되지 않는 언어입니다.",
+      "token_required": "이 기기에서 Photo를 사용하려면 액세스 토큰이 필요합니다.",
+      "host_not_allowed": "Photo 자체 주소로 여세요.",
+      "origin_not_allowed": "다른 웹사이트에서 보낸 요청이므로 차단되었습니다."
+    },
+    "job": {
+      "out_of_memory": "비디오 메모리가 부족합니다. 크기를 줄이거나 이미지 수를 줄이거나, GPU를 사용하는 다른 프로그램을 닫으세요.",
+      "engine_unavailable": "엔진이 중지되어 다시 시작하는 중입니다. 잠시 후 다시 시도하세요.",
+      "engine_not_installed": "엔진이 설치되지 않았습니다. 설치 프로그램을 다시 실행하세요.",
+      "interrupted": "이 이미지를 생성하는 동안 Photo가 종료되었습니다.",
+      "engine_error": "이 이미지를 생성할 수 없습니다."
+    }
+  },
+  "onboarding": {
+    "title": "시작하려면 모델을 다운로드하세요",
+    "body": "Photo는 전적으로 이 컴퓨터에서 실행됩니다. 이미지를 생성하려면 디스크에 이미지 모델이 하나 있어야 합니다. 다운로드한 파일은 무결성을 검사하며, 중단되면 이어서 받습니다.",
+    "later": "나중에 [모델] 페이지에서 모델을 더 추가할 수 있습니다."
+  },
+  "gallery": {
+    "title": "갤러리",
+    "filter": "표시",
+    "all": "전체",
+    "favorites": "즐겨찾기",
+    "noFavorites": "아직 즐겨찾기가 없습니다. 이미지에서 F 키를 눌러 추가하세요.",
+    "empty": "생성된 이미지가 여기에 표시됩니다.",
+    "favorite": "즐겨찾기",
+    "viewer": "이미지 뷰어",
+    "created": "생성 날짜",
+    "openInStudio": "이 설정으로 스튜디오에서 열기"
+  },
+  "models": {
+    "title": "모델",
+    "gpuLine": "{{gpu}}, {{vram}} GB. {{arch}}에 맞는 모델 버전이 자동으로 선택됩니다.",
+    "commercialOk": "상업적 사용 가능",
+    "nonCommercial": "비상업적 용도만 가능",
+    "installed": "설치됨",
+    "recommended": "이 GPU에 권장",
+    "location": "모델 저장 위치"
+  },
+  "settings": {
+    "title": "설정",
+    "language": "언어",
+    "theme": "테마",
+    "themes": {
+      "system": "시스템",
+      "dark": "어둡게",
+      "light": "밝게"
+    },
+    "engine": "엔진",
+    "restartEngine": "엔진 다시 시작",
+    "restarting": "엔진을 다시 시작하는 중…",
+    "about": "정보",
+    "aboutBody": "Photo {{version}}. Apache 2.0 라이선스에 따른 오픈 소스 소프트웨어입니다.",
+    "privacy": "모든 작업은 이 컴퓨터에서 실행됩니다. 프롬프트와 이미지는 외부로 전송되지 않으며, Photo는 원격 측정 데이터를 수집하지 않습니다."
+  },
+  "modelInfo": {
+    "z-image-turbo": "8스텝 만에 사실적인 이미지를 빠르게 생성합니다. 인물, 제품, 읽기 쉬운 텍스트 표현에 강합니다."
+  },
+  "setup": {
+    "back": "뒤로",
+    "continue": "계속",
+    "stages": {
+      "language": "언어",
+      "storage": "저장 위치",
+      "models": "모델",
+      "install": "설치"
+    },
+    "language": {
+      "title": "언어 선택",
+      "lead": "Photo 전체에서 이 언어를 사용합니다. 나중에 [설정]에서 변경할 수 있습니다."
+    },
+    "system": {
+      "title": "내 컴퓨터",
+      "gpu": "{{name}}, {{vram}} GB",
+      "gpuUnsupported": "Photo는 NVIDIA RTX 40 및 50 시리즈용으로 설계되었습니다. 이 그래픽 카드에서는 느리거나 제대로 작동하지 않을 수 있습니다.",
+      "driver": "NVIDIA 드라이버 {{version}}",
+      "driverOld": "드라이버 {{min}} 이상이 필요합니다. nvidia.com/drivers에서 업데이트한 후 설치 프로그램을 다시 실행하세요.",
+      "noGpu": "NVIDIA 그래픽 카드를 찾을 수 없습니다",
+      "noGpuHelp": "Photo를 사용하려면 최신 드라이버가 설치된 NVIDIA RTX 그래픽 카드가 필요합니다. nvidia.com/drivers에서 드라이버를 설치한 후 설치 프로그램을 다시 실행하세요."
+    },
+    "storage": {
+      "title": "저장 위치 선택",
+      "lead": "모델과 엔진은 용량이 큽니다. 여유 공간이 충분한 빠른 드라이브에 저장하세요. SSD를 사용하면 모델을 몇 배 더 빠르게 불러올 수 있습니다.",
+      "drive": "드라이브",
+      "free": "{{size}} 사용 가능",
+      "removable": "이동식",
+      "needs": "{{size}} 필요",
+      "recommended": "{{size}} 이상 권장",
+      "alreadyThere": "이미 설치됨",
+      "diskNeed": "{{need}} 필요 · {{free}} 사용 가능",
+      "models_dir": {
+        "title": "모델",
+        "body": "다운로드한 AI 모델입니다. 모델을 추가할수록 용량이 늘어납니다."
+      },
+      "engine_env_dir": {
+        "title": "엔진",
+        "body": "이미지 엔진과 GPU 라이브러리입니다."
+      },
+      "data_dir": {
+        "title": "갤러리",
+        "body": "이미지와 생성 설정, 기록입니다."
+      }
+    },
+    "models": {
+      "title": "모델 선택",
+      "lead": "권장 모델로 시작하세요. 다른 모델은 나중에 [모델] 페이지에서 추가할 수 있습니다.",
+      "recommended": "권장",
+      "total": "총 다운로드 크기: {{size}}"
+    },
+    "install": {
+      "title": "설치 준비 완료",
+      "lead": "모든 파일을 다운로드하고 검사합니다. 연결 상태에 따라 보통 10–40분 정도 걸립니다.",
+      "start": "설치",
+      "runningTitle": "설치 중",
+      "runningLead": "설치하는 동안 컴퓨터를 계속 사용할 수 있습니다. 연결이 끊어져도 다운로드는 이어서 진행됩니다.",
+      "doneTitle": "Photo 준비 완료",
+      "doneLead": "모든 항목을 설치하고 검사했습니다.",
+      "failedTitle": "설치가 중지되었습니다",
+      "details": "기술 정보",
+      "change": "설정 변경",
+      "open": "Photo 열기",
+      "opening": "Photo를 시작하는 중…",
+      "keepOpen": "이 페이지와 설치 프로그램 창을 열어 두세요.",
+      "upToDate": "최신 상태"
+    },
+    "steps": {
+      "engine": "엔진 다운로드",
+      "packages": "GPU 라이브러리 설치",
+      "gpu": "그래픽 카드 확인",
+      "models": "모델 다운로드"
+    },
+    "errors": {
+      "network": "설치 프로그램이 응답하지 않습니다. 설치 프로그램 창이 열려 있는지 확인하세요.",
+      "unsupported_language": "지원되지 않는 언어입니다.",
+      "unknown_model": "선택한 모델 중 하나를 사용할 수 없습니다.",
+      "path_not_absolute": "전체 경로를 입력하세요(예: D:\\Photo\\models).",
+      "path_system_folder": "시스템 폴더는 사용할 수 없습니다. 다른 폴더를 선택하세요.",
+      "path_is_file": "이 경로는 파일을 가리킵니다. 폴더를 선택하세요.",
+      "path_not_writable": "Photo가 이 폴더에 쓸 수 없습니다. 다른 폴더를 선택하세요.",
+      "not_enough_space": "공간이 부족합니다. {{need}} 필요, {{free}} 사용 가능.",
+      "already_running": "이미 설치가 진행 중입니다.",
+      "invalid_config": "일부 선택 항목을 확인해야 합니다.",
+      "cancelled": "설치가 취소되었습니다.",
+      "download_failed": "다운로드에 실패했습니다. 인터넷 연결을 확인하고 다시 시도하세요.",
+      "disk_error": "디스크에 쓸 수 없습니다. 디스크가 연결되어 있고 여유 공간이 있는지 확인하세요.",
+      "engine_checksum": "엔진 다운로드 파일이 손상되었습니다. 다시 시도하세요.",
+      "engine_packages": "GPU 라이브러리를 설치하지 못했습니다. 연결을 확인하고 다시 시도하세요.",
+      "cuda_unavailable": "엔진에서 그래픽 카드를 사용할 수 없습니다. NVIDIA 드라이버를 업데이트하고 다시 시도하세요.",
+      "uv_missing": "설치 프로그램이 불완전합니다. Photo를 다시 다운로드하세요.",
+      "frontend_missing": "인터페이스 파일이 없습니다. 릴리스 패키지를 다시 다운로드하세요.",
+      "setup_failed": "설치 중 문제가 발생했습니다."
+    }
+  }
+}

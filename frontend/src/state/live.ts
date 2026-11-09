@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { EngineState, InstallState, Job, ServerEvent } from '../api/types'
+import type { EngineState, InstallState, Job, ServerEvent, SetupRun } from '../api/types'
 
 interface Progress {
   value: number
@@ -15,6 +15,7 @@ interface LiveState {
   progress: Record<string, Progress>
   previews: Record<string, string> // jobId → object URL of latest step preview
   installs: Record<string, InstallState>
+  setupRun: SetupRun | null
   setConnected: (connected: boolean) => void
   apply: (event: ServerEvent) => void
   setPreview: (jobId: string, blob: Blob) => void
@@ -38,6 +39,7 @@ export const useLive = create<LiveState>()((set) => ({
   progress: {},
   previews: {},
   installs: {},
+  setupRun: null,
 
   setConnected: (connected) => set({ connected }),
 
@@ -56,6 +58,7 @@ export const useLive = create<LiveState>()((set) => ({
     set((s) => {
       switch (event.type) {
         case 'hello': {
+          if (event.mode === 'setup') return { setupRun: event.run }
           const jobs = { ...s.jobs }
           for (const j of event.jobs) jobs[j.id] = j
           return { engine: event.engine, jobs }
@@ -84,6 +87,8 @@ export const useLive = create<LiveState>()((set) => ({
             },
           }
         }
+        case 'setup':
+          return { setupRun: event.run }
         case 'engine':
           return { engine: { state: event.state, error: event.error } }
         case 'model_install': {

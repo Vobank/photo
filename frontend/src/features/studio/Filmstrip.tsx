@@ -26,7 +26,8 @@ export function Filmstrip() {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
       if ((e.target as HTMLElement).closest('input, textarea, select, [role="radiogroup"]')) return
       const idx = images.findIndex((i) => i.id === shownId)
-      const next = images[e.key === 'ArrowRight' ? idx + 1 : Math.max(0, idx - 1)]
+      const older = e.key === (document.documentElement.dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight')
+      const next = images[older ? idx + 1 : Math.max(0, idx - 1)]
       if (next) {
         e.preventDefault()
         select(next.id)

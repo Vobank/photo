@@ -1,0 +1,243 @@
+{
+  "nav": {
+    "label": "Hauptnavigation",
+    "studio": "Studio",
+    "gallery": "Galerie",
+    "models": "Modelle",
+    "settings": "Einstellungen"
+  },
+  "engine": {
+    "offline": "Keine Verbindung",
+    "ready": "Bereit",
+    "starting": "Engine wird gestartet",
+    "crashed": "Engine angehalten",
+    "not_installed": "Engine nicht installiert",
+    "stopped": "Engine angehalten"
+  },
+  "status": {
+    "downloading": "Download: {{done}} von {{total}}",
+    "queue_one": "{{count}} in der Warteschlange",
+    "queue_other": "{{count}} in der Warteschlange"
+  },
+  "studio": {
+    "settings": "Generierungseinstellungen",
+    "prompt": "Prompt",
+    "promptPlaceholder": "Beschreiben Sie das Bild: Motiv, Umgebung, Licht, Objektiv, Stimmung…",
+    "model": "Modell",
+    "aspect": "Format",
+    "size": "Größe",
+    "sizes": {
+      "s": "S",
+      "m": "M",
+      "l": "L",
+      "xl": "XL"
+    },
+    "count": "Bilder",
+    "seed": "Seed",
+    "seedRandom": "Jedes Mal zufällig",
+    "seedLock": "Diesen Seed beibehalten",
+    "seedUnlock": "Zufälligen Seed verwenden",
+    "seedNew": "Neuer Seed",
+    "advanced": "Erweitert",
+    "steps": "Schritte",
+    "cfg": "Prompt-Treue",
+    "negative": "Vermeiden",
+    "negativeHint": "wird verwendet, wenn Prompt-Treue > 1",
+    "generate": "Erstellen",
+    "generateN_one": "{{count}} Bild erstellen",
+    "generateN_other": "{{count}} Bilder erstellen",
+    "emptyTitle": "Noch nichts vorhanden",
+    "emptyBody": "Schreiben Sie rechts einen Prompt und klicken Sie auf „Erstellen“. Die Ergebnisse erscheinen hier und in der Leiste unten.",
+    "queuedAhead_one": "In der Warteschlange, {{count}} Auftrag davor",
+    "queuedAhead_other": "In der Warteschlange, {{count}} Aufträge davor",
+    "starting": "Wird gestartet…",
+    "loadingModel": "Modell wird geladen…",
+    "step": "Schritt {{value}}/{{max}}",
+    "results": "Letzte Ergebnisse",
+    "inProgress": "In Bearbeitung",
+    "queued": "In der Warteschlange",
+    "noModels": "Keine Modelle installiert"
+  },
+  "actions": {
+    "dismiss": "Ausblenden",
+    "cancel": "Abbrechen",
+    "favorite": "Zu Favoriten hinzufügen",
+    "unfavorite": "Aus Favoriten entfernen",
+    "reuse": "Diese Einstellungen verwenden",
+    "reuseSeed": "Einstellungen und Seed verwenden",
+    "copy": "Bild kopieren",
+    "download": "Herunterladen",
+    "delete": "Löschen",
+    "undo": "Rückgängig",
+    "retry": "Erneut versuchen",
+    "previous": "Vorheriges",
+    "next": "Nächstes",
+    "close": "Schließen"
+  },
+  "toast": {
+    "copied": "Bild kopiert",
+    "deleted": "Bild in den Papierkorb verschoben"
+  },
+  "errors": {
+    "network": "Photo reagiert nicht. Prüfen Sie, ob die Anwendung noch läuft.",
+    "clipboard": "Ihr Browser hat das Kopieren des Bildes nicht zugelassen.",
+    "api": {
+      "unknown_model": "Dieses Modell ist nicht verfügbar.",
+      "unsupported_task": "Dieses Modell unterstützt diese Funktion nicht.",
+      "model_not_installed": "Dieses Modell wurde noch nicht heruntergeladen. Installieren Sie es auf der Seite „Modelle“.",
+      "engine_not_installed": "Die Engine ist nicht installiert. Führen Sie das Installationsprogramm erneut aus.",
+      "invalid_request": "Einige Einstellungen sind ungültig.",
+      "unsupported_language": "Diese Sprache wird nicht unterstützt.",
+      "token_required": "Dieses Gerät benötigt ein Zugriffstoken, um Photo zu verwenden.",
+      "host_not_allowed": "Öffnen Sie Photo über die eigene Adresse der Anwendung.",
+      "origin_not_allowed": "Diese Anfrage stammt von einer anderen Website und wurde blockiert."
+    },
+    "job": {
+      "out_of_memory": "Nicht genügend Grafikspeicher. Wählen Sie eine kleinere Größe oder weniger Bilder, oder schließen Sie andere Programme, die die GPU nutzen.",
+      "engine_unavailable": "Die Engine wurde angehalten und startet neu. Versuchen Sie es gleich noch einmal.",
+      "engine_not_installed": "Die Engine ist nicht installiert. Führen Sie das Installationsprogramm erneut aus.",
+      "interrupted": "Photo wurde geschlossen, während dieses Bild erstellt wurde.",
+      "engine_error": "Dieses Bild konnte nicht erstellt werden."
+    }
+  },
+  "onboarding": {
+    "title": "Laden Sie ein Modell herunter, um zu beginnen",
+    "body": "Photo läuft vollständig auf Ihrem Computer. Zum Generieren wird mindestens ein Bildmodell auf dem Datenträger benötigt. Der Download wird auf Integrität geprüft und nach einer Unterbrechung fortgesetzt.",
+    "later": "Weitere Modelle können Sie später auf der Seite „Modelle“ hinzufügen."
+  },
+  "gallery": {
+    "title": "Galerie",
+    "filter": "Anzeigen",
+    "all": "Alle",
+    "favorites": "Favoriten",
+    "noFavorites": "Noch keine Favoriten. Drücken Sie bei einem Bild F, um es hinzuzufügen.",
+    "empty": "Erstellte Bilder werden hier angezeigt.",
+    "favorite": "Favorit",
+    "viewer": "Bildbetrachter",
+    "created": "Erstellt",
+    "openInStudio": "Mit diesen Einstellungen im Studio öffnen"
+  },
+  "models": {
+    "title": "Modelle",
+    "gpuLine": "{{gpu}}, {{vram}} GB. Modellversionen werden automatisch für {{arch}} ausgewählt.",
+    "commercialOk": "kommerzielle Nutzung erlaubt",
+    "nonCommercial": "nur nicht kommerzielle Nutzung",
+    "installed": "Installiert",
+    "recommended": "Empfohlen für diese GPU",
+    "location": "Speicherort der Modelle:"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "theme": "Design",
+    "themes": {
+      "system": "System",
+      "dark": "Dunkel",
+      "light": "Hell"
+    },
+    "engine": "Engine",
+    "restartEngine": "Engine neu starten",
+    "restarting": "Engine wird neu gestartet…",
+    "about": "Über",
+    "aboutBody": "Photo {{version}}. Open Source unter der Apache-2.0-Lizenz.",
+    "privacy": "Alles läuft auf diesem Computer. Prompts und Bilder verlassen ihn nie, und Photo erfasst keine Telemetriedaten."
+  },
+  "modelInfo": {
+    "z-image-turbo": "Schnelle fotorealistische Bilder in 8 Schritten. Stark bei Personen, Produkten und lesbarem Text."
+  },
+  "setup": {
+    "back": "Zurück",
+    "continue": "Weiter",
+    "stages": {
+      "language": "Sprache",
+      "storage": "Speicherort",
+      "models": "Modelle",
+      "install": "Installation"
+    },
+    "language": {
+      "title": "Sprache auswählen",
+      "lead": "Photo verwendet sie überall. Sie können sie später in den Einstellungen ändern."
+    },
+    "system": {
+      "title": "Ihr Computer",
+      "gpu": "{{name}}, {{vram}} GB",
+      "gpuUnsupported": "Photo ist für NVIDIA RTX der Serien 40 und 50 ausgelegt. Mit dieser Karte kann es langsam sein oder nicht funktionieren.",
+      "driver": "NVIDIA-Treiber {{version}}",
+      "driverOld": "Treiber {{min}} oder neuer ist erforderlich. Aktualisieren Sie ihn unter nvidia.com/drivers und führen Sie dann das Installationsprogramm erneut aus.",
+      "noGpu": "Keine NVIDIA-Grafikkarte gefunden",
+      "noGpuHelp": "Photo benötigt eine NVIDIA-RTX-Grafikkarte mit aktuellem Treiber. Installieren Sie den Treiber von nvidia.com/drivers und führen Sie dann das Installationsprogramm erneut aus."
+    },
+    "storage": {
+      "title": "Speicherort für alle Daten",
+      "lead": "Modelle und Engine sind groß. Legen Sie sie auf ein schnelles Laufwerk mit viel freiem Speicherplatz; mit einer SSD werden Modelle um ein Vielfaches schneller geladen.",
+      "drive": "Laufwerk",
+      "free": "{{size}} frei",
+      "removable": "Wechseldatenträger",
+      "needs": "benötigt {{size}}",
+      "recommended": "{{size}} oder mehr empfohlen",
+      "alreadyThere": "bereits installiert",
+      "diskNeed": "{{need}} benötigt · {{free}} frei",
+      "models_dir": {
+        "title": "Modelle",
+        "body": "Heruntergeladene KI-Modelle. Wächst mit jedem weiteren Modell."
+      },
+      "engine_env_dir": {
+        "title": "Engine",
+        "body": "Die Bild-Engine und ihre GPU-Bibliotheken."
+      },
+      "data_dir": {
+        "title": "Galerie",
+        "body": "Ihre Bilder, deren Einstellungen und der Verlauf."
+      }
+    },
+    "models": {
+      "title": "Modelle auswählen",
+      "lead": "Beginnen Sie mit dem empfohlenen Modell. Weitere können Sie später auf der Seite „Modelle“ hinzufügen.",
+      "recommended": "Empfohlen",
+      "total": "Download gesamt: {{size}}"
+    },
+    "install": {
+      "title": "Bereit zur Installation",
+      "lead": "Alles wird heruntergeladen und geprüft. Das dauert je nach Verbindung meist 10–40 Minuten.",
+      "start": "Installieren",
+      "runningTitle": "Wird installiert",
+      "runningLead": "Sie können Ihren Computer weiter verwenden. Downloads werden fortgesetzt, wenn die Verbindung abbricht.",
+      "doneTitle": "Photo ist bereit",
+      "doneLead": "Alles ist installiert und geprüft.",
+      "failedTitle": "Installation unterbrochen",
+      "details": "Technische Details",
+      "change": "Einstellungen ändern",
+      "open": "Photo öffnen",
+      "opening": "Photo wird gestartet…",
+      "keepOpen": "Lassen Sie diese Seite und das Fenster des Installationsprogramms geöffnet.",
+      "upToDate": "Aktuell"
+    },
+    "steps": {
+      "engine": "Engine herunterladen",
+      "packages": "GPU-Bibliotheken installieren",
+      "gpu": "Grafikkarte prüfen",
+      "models": "Modelle herunterladen"
+    },
+    "errors": {
+      "network": "Das Installationsprogramm reagiert nicht. Prüfen Sie, ob sein Fenster noch geöffnet ist.",
+      "unsupported_language": "Diese Sprache wird nicht unterstützt.",
+      "unknown_model": "Eines der ausgewählten Modelle ist nicht verfügbar.",
+      "path_not_absolute": "Geben Sie einen vollständigen Pfad ein, zum Beispiel D:\\Photo\\models.",
+      "path_system_folder": "Systemordner können nicht verwendet werden. Wählen Sie einen anderen Ordner.",
+      "path_is_file": "Dieser Pfad verweist auf eine Datei. Wählen Sie einen Ordner.",
+      "path_not_writable": "Photo kann nicht in diesen Ordner schreiben. Wählen Sie einen anderen.",
+      "not_enough_space": "Nicht genügend Speicherplatz: {{need}} benötigt, {{free}} frei.",
+      "already_running": "Die Installation läuft bereits.",
+      "invalid_config": "Einige Angaben müssen überprüft werden.",
+      "cancelled": "Die Installation wurde abgebrochen.",
+      "download_failed": "Ein Download ist fehlgeschlagen. Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+      "disk_error": "Auf das Laufwerk konnte nicht geschrieben werden. Prüfen Sie, ob es angeschlossen ist und freien Speicherplatz hat.",
+      "engine_checksum": "Der Download der Engine ist beschädigt. Versuchen Sie es erneut.",
+      "engine_packages": "Die Installation der GPU-Bibliotheken ist fehlgeschlagen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "cuda_unavailable": "Die Engine kann Ihre Grafikkarte nicht verwenden. Aktualisieren Sie den NVIDIA-Treiber und versuchen Sie es erneut.",
+      "uv_missing": "Das Installationsprogramm ist unvollständig. Laden Sie Photo erneut herunter.",
+      "frontend_missing": "Die Dateien der Benutzeroberfläche fehlen. Laden Sie das Release-Paket erneut herunter.",
+      "setup_failed": "Bei der Installation ist ein Fehler aufgetreten."
+    }
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "nav": {
+    "label": "Principale",
+    "studio": "Studio",
+    "gallery": "Galleria",
+    "models": "Modelli",
+    "settings": "Impostazioni"
+  },
+  "engine": {
+    "offline": "Disconnesso",
+    "ready": "Pronto",
+    "starting": "Avvio del motore",
+    "crashed": "Motore arrestato",
+    "not_installed": "Motore non installato",
+    "stopped": "Motore arrestato"
+  },
+  "status": {
+    "downloading": "Download: {{done}} di {{total}}",
+    "queue_one": "{{count}} in coda",
+    "queue_many": "{{count}} in coda",
+    "queue_other": "{{count}} in coda"
+  },
+  "studio": {
+    "settings": "Impostazioni di generazione",
+    "prompt": "Prompt",
+    "promptPlaceholder": "Descrivi l’immagine: soggetto, ambientazione, luce, obiettivo, atmosfera…",
+    "model": "Modello",
+    "aspect": "Formato",
+    "size": "Dimensione",
+    "sizes": {
+      "s": "S",
+      "m": "M",
+      "l": "L",
+      "xl": "XL"
+    },
+    "count": "Immagini",
+    "seed": "Seed",
+    "seedRandom": "Casuale ogni volta",
+    "seedLock": "Mantieni questo seed",
+    "seedUnlock": "Usa un seed casuale",
+    "seedNew": "Nuovo seed",
+    "advanced": "Avanzate",
+    "steps": "Passi",
+    "cfg": "Guida",
+    "negative": "Da evitare",
+    "negativeHint": "usato quando la guida è > 1",
+    "generate": "Genera",
+    "generateN_one": "Genera {{count}} immagine",
+    "generateN_many": "Genera {{count}} immagini",
+    "generateN_other": "Genera {{count}} immagini",
+    "emptyTitle": "Ancora niente",
+    "emptyBody": "Scrivi un prompt a destra e premi «Genera». I risultati compaiono qui e nella barra sottostante.",
+    "queuedAhead_one": "In coda, {{count}} lavoro prima di questo",
+    "queuedAhead_many": "In coda, {{count}} lavori prima di questo",
+    "queuedAhead_other": "In coda, {{count}} lavori prima di questo",
+    "starting": "Avvio…",
+    "loadingModel": "Caricamento del modello…",
+    "step": "Passo {{value}}/{{max}}",
+    "results": "Risultati recenti",
+    "inProgress": "In corso",
+    "queued": "In coda",
+    "noModels": "Nessun modello installato"
+  },
+  "actions": {
+    "dismiss": "Ignora",
+    "cancel": "Annulla",
+    "favorite": "Aggiungi ai preferiti",
+    "unfavorite": "Rimuovi dai preferiti",
+    "reuse": "Usa queste impostazioni",
+    "reuseSeed": "Usa impostazioni e seed",
+    "copy": "Copia immagine",
+    "download": "Scarica",
+    "delete": "Elimina",
+    "undo": "Annulla",
+    "retry": "Riprova",
+    "previous": "Precedente",
+    "next": "Successiva",
+    "close": "Chiudi"
+  },
+  "toast": {
+    "copied": "Immagine copiata",
+    "deleted": "Immagine spostata nel cestino"
+  },
+  "errors": {
+    "network": "Photo non risponde. Verifica che sia ancora in esecuzione.",
+    "clipboard": "Il browser non ha consentito di copiare l’immagine.",
+    "api": {
+      "unknown_model": "Questo modello non è disponibile.",
+      "unsupported_task": "Questo modello non supporta questa operazione.",
+      "model_not_installed": "Questo modello non è ancora stato scaricato. Installalo dalla pagina Modelli.",
+      "engine_not_installed": "Il motore non è installato. Esegui di nuovo il programma di installazione.",
+      "invalid_request": "Alcune impostazioni non sono valide.",
+      "unsupported_language": "Questa lingua non è supportata.",
+      "token_required": "Questo dispositivo richiede un token di accesso per usare Photo.",
+      "host_not_allowed": "Apri Photo dal suo indirizzo.",
+      "origin_not_allowed": "Questa richiesta proveniva da un altro sito web ed è stata bloccata."
+    },
+    "job": {
+      "out_of_memory": "Memoria video insufficiente. Prova una dimensione più piccola o meno immagini, oppure chiudi altri programmi che usano la GPU.",
+      "engine_unavailable": "Il motore si è arrestato e si sta riavviando. Riprova tra un momento.",
+      "engine_not_installed": "Il motore non è installato. Esegui di nuovo il programma di installazione.",
+      "interrupted": "Photo è stato chiuso durante la creazione di questa immagine.",
+      "engine_error": "Impossibile generare questa immagine."
+    }
+  },
+  "onboarding": {
+    "title": "Scarica un modello per iniziare",
+    "body": "Photo funziona interamente sul tuo computer. Per generare ha bisogno di un modello di immagini su disco; l’integrità del download viene verificata e il download riprende se viene interrotto.",
+    "later": "Potrai aggiungere altri modelli in seguito dalla pagina Modelli."
+  },
+  "gallery": {
+    "title": "Galleria",
+    "filter": "Mostra",
+    "all": "Tutte",
+    "favorites": "Preferite",
+    "noFavorites": "Ancora nessuna immagine preferita. Premi F su un’immagine per aggiungerla.",
+    "empty": "Le immagini generate compariranno qui.",
+    "favorite": "Preferita",
+    "viewer": "Visualizzatore immagini",
+    "created": "Creata",
+    "openInStudio": "Apri in Studio con queste impostazioni"
+  },
+  "models": {
+    "title": "Modelli",
+    "gpuLine": "{{gpu}}, {{vram}} GB. Le versioni dei modelli vengono scelte automaticamente per {{arch}}.",
+    "commercialOk": "uso commerciale consentito",
+    "nonCommercial": "solo uso non commerciale",
+    "installed": "Installato",
+    "recommended": "Consigliato per questa GPU",
+    "location": "I modelli sono archiviati in"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "language": "Lingua",
+    "theme": "Tema",
+    "themes": {
+      "system": "Sistema",
+      "dark": "Scuro",
+      "light": "Chiaro"
+    },
+    "engine": "Motore",
+    "restartEngine": "Riavvia il motore",
+    "restarting": "Riavvio del motore…",
+    "about": "Informazioni",
+    "aboutBody": "Photo {{version}}. Open source con licenza Apache 2.0.",
+    "privacy": "Tutto viene eseguito su questo computer. Prompt e immagini non lo lasciano mai e Photo non raccoglie dati di telemetria."
+  },
+  "modelInfo": {
+    "z-image-turbo": "Immagini fotorealistiche rapide in 8 passi. Particolarmente adatto a persone, prodotti e testo leggibile."
+  },
+  "setup": {
+    "back": "Indietro",
+    "continue": "Continua",
+    "stages": {
+      "language": "Lingua",
+      "storage": "Archiviazione",
+      "models": "Modelli",
+      "install": "Installazione"
+    },
+    "language": {
+      "title": "Scegli la lingua",
+      "lead": "Photo la userà ovunque. Puoi cambiarla in seguito nelle Impostazioni."
+    },
+    "system": {
+      "title": "Il tuo computer",
+      "gpu": "{{name}}, {{vram}} GB",
+      "gpuUnsupported": "Photo è progettato per le serie NVIDIA RTX 40 e 50. Con questa scheda potrebbe essere lento o non funzionare.",
+      "driver": "Driver NVIDIA {{version}}",
+      "driverOld": "È richiesto il driver {{min}} o successivo. Aggiornalo da nvidia.com/drivers, quindi esegui di nuovo il programma di installazione.",
+      "noGpu": "Nessuna scheda grafica NVIDIA trovata",
+      "noGpuHelp": "Photo richiede una scheda grafica NVIDIA RTX con un driver aggiornato. Installa il driver da nvidia.com/drivers, quindi esegui di nuovo il programma di installazione."
+    },
+    "storage": {
+      "title": "Dove salvare tutto",
+      "lead": "Modelli e motore occupano molto spazio. Mettili su un’unità veloce con ampio spazio libero; con un SSD i modelli si caricano diverse volte più velocemente.",
+      "drive": "Unità",
+      "free": "{{size}} liberi",
+      "removable": "rimovibile",
+      "needs": "richiede {{size}}",
+      "recommended": "consigliati almeno {{size}}",
+      "alreadyThere": "già installato",
+      "diskNeed": "{{need}} necessari · {{free}} liberi",
+      "models_dir": {
+        "title": "Modelli",
+        "body": "I modelli di IA che scarichi. Lo spazio aumenta man mano che aggiungi modelli."
+      },
+      "engine_env_dir": {
+        "title": "Motore",
+        "body": "Il motore di immagini e le sue librerie GPU."
+      },
+      "data_dir": {
+        "title": "Galleria",
+        "body": "Le tue immagini, le relative impostazioni e la cronologia."
+      }
+    },
+    "models": {
+      "title": "Scegli i modelli",
+      "lead": "Inizia con il modello consigliato. Potrai aggiungerne altri in seguito dalla pagina Modelli.",
+      "recommended": "Consigliato",
+      "total": "Download totale: {{size}}"
+    },
+    "install": {
+      "title": "Pronto per l’installazione",
+      "lead": "Tutto verrà scaricato e verificato. Di solito richiede 10–40 minuti, a seconda della connessione.",
+      "start": "Installa",
+      "runningTitle": "Installazione in corso",
+      "runningLead": "Puoi continuare a usare il computer. I download riprendono se la connessione si interrompe.",
+      "doneTitle": "Photo è pronto",
+      "doneLead": "Tutto è installato e verificato.",
+      "failedTitle": "Installazione interrotta",
+      "details": "Dettagli tecnici",
+      "change": "Modifica impostazioni",
+      "open": "Apri Photo",
+      "opening": "Avvio di Photo…",
+      "keepOpen": "Tieni aperte questa pagina e la finestra del programma di installazione.",
+      "upToDate": "Aggiornato"
+    },
+    "steps": {
+      "engine": "Scarica il motore",
+      "packages": "Installa le librerie GPU",
+      "gpu": "Verifica la scheda grafica",
+      "models": "Scarica i modelli"
+    },
+    "errors": {
+      "network": "Il programma di installazione non risponde. Verifica che la sua finestra sia ancora aperta.",
+      "unsupported_language": "Questa lingua non è supportata.",
+      "unknown_model": "Uno dei modelli selezionati non è disponibile.",
+      "path_not_absolute": "Inserisci un percorso completo, ad esempio D:\\Photo\\models.",
+      "path_system_folder": "Non è possibile usare le cartelle di sistema. Scegli un’altra cartella.",
+      "path_is_file": "Questo percorso punta a un file. Scegli una cartella.",
+      "path_not_writable": "Photo non può scrivere in questa cartella. Scegline un’altra.",
+      "not_enough_space": "Spazio insufficiente: {{need}} necessari, {{free}} liberi.",
+      "already_running": "L’installazione è già in corso.",
+      "invalid_config": "Alcune scelte richiedono attenzione.",
+      "cancelled": "L’installazione è stata annullata.",
+      "download_failed": "Un download non è riuscito. Controlla la connessione a Internet e riprova.",
+      "disk_error": "Impossibile scrivere sul disco. Verifica che sia collegato e che abbia spazio libero.",
+      "engine_checksum": "Il download del motore è danneggiato. Riprova.",
+      "engine_packages": "Installazione delle librerie GPU non riuscita. Controlla la connessione e riprova.",
+      "cuda_unavailable": "Il motore non riesce a usare la scheda grafica. Aggiorna il driver NVIDIA e riprova.",
+      "uv_missing": "Il programma di installazione è incompleto. Scarica di nuovo Photo.",
+      "frontend_missing": "Mancano i file dell’interfaccia. Scarica di nuovo il pacchetto della release.",
+      "setup_failed": "Si è verificato un problema durante l’installazione."
+    }
+  }
+}

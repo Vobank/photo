@@ -89,7 +89,7 @@
 }
 
 .table td:last-child {
-  text-align: right;
+  text-align: end;
   color: var(--text-3);
 }
 

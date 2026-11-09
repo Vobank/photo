@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useEffect, useId, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { ApiError, api } from '../../api/client'
+import { api } from '../../api/client'
 import { useModels } from '../../api/queries'
 import { Button, IconButton } from '../../components/Button'
 import fieldStyles from '../../components/Field.module.css'
@@ -11,6 +11,7 @@ import { NumberField } from '../../components/NumberField'
 import { Segmented } from '../../components/Segmented'
 import { toastError } from '../../components/toast'
 import { ASPECTS, SIZES, dimensionsFor, megapixels } from '../../lib/dimensions'
+import { apiErrorText } from '../../lib/errors'
 import { isMac } from '../../lib/format'
 import { activeJobs, useLive } from '../../state/live'
 import { MAX_SEED, useStudio } from '../../state/studio'
@@ -47,7 +48,7 @@ export function Inspector() {
       useStudio.getState().set({ selectedImageId: null })
       if (!useStudio.getState().seedLocked) useStudio.getState().randomizeSeed()
     },
-    onError: (err) => toastError(err instanceof ApiError ? err.message : t('errors.network')),
+    onError: (err) => toastError(apiErrorText(t, err)),
   })
 
   const params = s.toParams()

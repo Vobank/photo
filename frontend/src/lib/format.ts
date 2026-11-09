@@ -1,18 +1,29 @@
+const BYTE_UNITS = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte'] as const
+
+/** Decimal units (1 GB = 10^9 bytes, as drives and downloads are labelled), localised. */
 export function formatBytes(bytes: number, locale: string): string {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
   let i = 0
   let v = bytes
-  while (v >= 1000 && i < units.length - 1) {
+  while (v >= 1000 && i < BYTE_UNITS.length - 1) {
     v /= 1000
     i += 1
   }
-  const digits = v >= 100 || i === 0 ? 0 : 1
-  return `${new Intl.NumberFormat(locale, { maximumFractionDigits: digits }).format(v)} ${units[i]}`
+  return new Intl.NumberFormat(locale, {
+    style: 'unit',
+    unit: BYTE_UNITS[i],
+    unitDisplay: 'short',
+    maximumFractionDigits: v >= 100 || i === 0 ? 0 : 1,
+  }).format(v)
 }
 
 export function formatDuration(seconds: number, locale: string): string {
-  const fmt = new Intl.NumberFormat(locale, { maximumFractionDigits: seconds < 10 ? 1 : 0 })
-  if (seconds < 60) return `${fmt.format(seconds)} s`
+  const fmt = new Intl.NumberFormat(locale, {
+    style: 'unit',
+    unit: 'second',
+    unitDisplay: 'narrow',
+    maximumFractionDigits: seconds < 10 ? 1 : 0,
+  })
+  if (seconds < 60) return fmt.format(seconds)
   const m = Math.floor(seconds / 60)
   const s = Math.round(seconds % 60)
   return `${m}:${String(s).padStart(2, '0')}`

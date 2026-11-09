@@ -13,6 +13,7 @@ const job = (id: string, status: Job['status']): Job => ({
   seed: 1,
   progress: 0,
   error: null,
+  error_code: null,
   created_at: 0,
   started_at: null,
   finished_at: null,

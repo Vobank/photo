@@ -16,6 +16,7 @@ import { patchCachedImage, useImages, useToggleFavorite } from '../../api/querie
 import type { ImageInfo, Job } from '../../api/types'
 import { IconButton } from '../../components/Button'
 import { toast, toastError } from '../../components/toast'
+import { jobErrorText } from '../../lib/errors'
 import { formatDuration } from '../../lib/format'
 import { useLive } from '../../state/live'
 import { useStudio } from '../../state/studio'
@@ -63,8 +64,8 @@ export function Canvas() {
     return (
       <div className={styles.canvas}>
         <div className={styles.errorBox} role="alert">
-          <p>{t('studio.failed')}</p>
-          <p>{latestJob.error}</p>
+          <p>{jobErrorText(t, latestJob).title}</p>
+          {jobErrorText(t, latestJob).detail && <p>{jobErrorText(t, latestJob).detail}</p>}
         </div>
         <div className={styles.toolbar}>
           <IconButton label={t('actions.dismiss')} onClick={() => setDismissedError(latestJob.id)}>

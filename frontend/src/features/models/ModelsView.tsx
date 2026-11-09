@@ -38,7 +38,7 @@ export default function ModelsView() {
                 {m.commercial_use ? ` · ${t('models.commercialOk')}` : ` · ${t('models.nonCommercial')}`}
               </a>
             </div>
-            <p className={styles.muted}>{m.description}</p>
+            <p className={styles.muted}>{t(`modelInfo.${m.id}`, { defaultValue: m.description })}</p>
             {m.installed ? (
               <table className={styles.table}>
                 <tbody>

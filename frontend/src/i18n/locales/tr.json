@@ -1,0 +1,243 @@
+{
+  "nav": {
+    "label": "Ana menü",
+    "studio": "Stüdyo",
+    "gallery": "Galeri",
+    "models": "Modeller",
+    "settings": "Ayarlar"
+  },
+  "engine": {
+    "offline": "Bağlantı yok",
+    "ready": "Hazır",
+    "starting": "Motor başlatılıyor",
+    "crashed": "Motor durdu",
+    "not_installed": "Motor kurulu değil",
+    "stopped": "Motor durdu"
+  },
+  "status": {
+    "downloading": "İndiriliyor: {{done}} / {{total}}",
+    "queue_one": "Sırada: {{count}}",
+    "queue_other": "Sırada: {{count}}"
+  },
+  "studio": {
+    "settings": "Oluşturma ayarları",
+    "prompt": "İstem",
+    "promptPlaceholder": "Görseli tanımlayın: konu, ortam, ışık, objektif, atmosfer…",
+    "model": "Model",
+    "aspect": "Biçim",
+    "size": "Boyut",
+    "sizes": {
+      "s": "S",
+      "m": "M",
+      "l": "L",
+      "xl": "XL"
+    },
+    "count": "Görsel sayısı",
+    "seed": "Seed",
+    "seedRandom": "Her seferinde rastgele",
+    "seedLock": "Bu seed'i koru",
+    "seedUnlock": "Rastgele seed kullan",
+    "seedNew": "Yeni seed",
+    "advanced": "Gelişmiş",
+    "steps": "Adım",
+    "cfg": "Yönlendirme",
+    "negative": "Kaçınılacaklar",
+    "negativeHint": "yönlendirme > 1 olduğunda kullanılır",
+    "generate": "Oluştur",
+    "generateN_one": "{{count}} görsel oluştur",
+    "generateN_other": "{{count}} görsel oluştur",
+    "emptyTitle": "Henüz bir şey yok",
+    "emptyBody": "Sağ tarafa bir istem yazın ve “Oluştur” düğmesine basın. Sonuçlar burada ve alttaki şeritte görünür.",
+    "queuedAhead_one": "Sırada, önünde {{count}} iş var",
+    "queuedAhead_other": "Sırada, önünde {{count}} iş var",
+    "starting": "Başlatılıyor…",
+    "loadingModel": "Model yükleniyor…",
+    "step": "Adım {{value}}/{{max}}",
+    "results": "Son sonuçlar",
+    "inProgress": "Sürüyor",
+    "queued": "Sırada",
+    "noModels": "Kurulu model yok"
+  },
+  "actions": {
+    "dismiss": "Gizle",
+    "cancel": "İptal",
+    "favorite": "Favorilere ekle",
+    "unfavorite": "Favorilerden kaldır",
+    "reuse": "Bu ayarları kullan",
+    "reuseSeed": "Ayarları ve seed'i kullan",
+    "copy": "Görseli kopyala",
+    "download": "İndir",
+    "delete": "Sil",
+    "undo": "Geri al",
+    "retry": "Yeniden dene",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "close": "Kapat"
+  },
+  "toast": {
+    "copied": "Görsel kopyalandı",
+    "deleted": "Görsel çöp kutusuna taşındı"
+  },
+  "errors": {
+    "network": "Photo yanıt vermiyor. Hâlâ çalıştığını kontrol edin.",
+    "clipboard": "Tarayıcınız görselin kopyalanmasına izin vermedi.",
+    "api": {
+      "unknown_model": "Bu model kullanılamıyor.",
+      "unsupported_task": "Bu model bu işlemi desteklemiyor.",
+      "model_not_installed": "Bu model henüz indirilmedi. Modeller sayfasından kurun.",
+      "engine_not_installed": "Motor kurulu değil. Kurulum programını yeniden çalıştırın.",
+      "invalid_request": "Bazı ayarlar geçersiz.",
+      "unsupported_language": "Bu dil desteklenmiyor.",
+      "token_required": "Bu cihazda Photo'yu kullanmak için bir erişim belirteci gerekiyor.",
+      "host_not_allowed": "Photo'yu kendi adresinden açın.",
+      "origin_not_allowed": "Bu istek başka bir web sitesinden geldiği için engellendi."
+    },
+    "job": {
+      "out_of_memory": "Yeterli video belleği yok. Daha küçük bir boyut veya daha az görsel deneyin ya da GPU kullanan diğer programları kapatın.",
+      "engine_unavailable": "Motor durdu ve yeniden başlatılıyor. Birazdan yeniden deneyin.",
+      "engine_not_installed": "Motor kurulu değil. Kurulum programını yeniden çalıştırın.",
+      "interrupted": "Bu görsel oluşturulurken Photo kapatıldı.",
+      "engine_error": "Bu görsel oluşturulamadı."
+    }
+  },
+  "onboarding": {
+    "title": "Başlamak için bir model indirin",
+    "body": "Photo tamamen bilgisayarınızda çalışır. Görsel oluşturabilmesi için diskte bir görsel modeli bulunması gerekir; indirilen dosyanın bütünlüğü doğrulanır ve indirme kesilirse kaldığı yerden devam eder.",
+    "later": "Daha sonra Modeller sayfasından başka modeller ekleyebilirsiniz."
+  },
+  "gallery": {
+    "title": "Galeri",
+    "filter": "Göster",
+    "all": "Tümü",
+    "favorites": "Favoriler",
+    "noFavorites": "Henüz favori yok. Eklemek için bir görselde F tuşuna basın.",
+    "empty": "Oluşturulan görseller burada görünür.",
+    "favorite": "Favori",
+    "viewer": "Görsel görüntüleyici",
+    "created": "Oluşturulma",
+    "openInStudio": "Bu ayarlarla Stüdyo'da aç"
+  },
+  "models": {
+    "title": "Modeller",
+    "gpuLine": "{{gpu}}, {{vram}} GB. Model sürümleri {{arch}} için otomatik olarak seçilir.",
+    "commercialOk": "ticari kullanıma izin verilir",
+    "nonCommercial": "yalnızca ticari olmayan kullanım",
+    "installed": "Kurulu",
+    "recommended": "Bu GPU için önerilir",
+    "location": "Modellerin konumu:"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "language": "Dil",
+    "theme": "Tema",
+    "themes": {
+      "system": "Sistem",
+      "dark": "Koyu",
+      "light": "Açık"
+    },
+    "engine": "Motor",
+    "restartEngine": "Motoru yeniden başlat",
+    "restarting": "Motor yeniden başlatılıyor…",
+    "about": "Hakkında",
+    "aboutBody": "Photo {{version}}. Apache 2.0 lisansı altında açık kaynak.",
+    "privacy": "Her şey bu bilgisayarda çalışır. İstemler ve görseller bilgisayardan hiçbir zaman çıkmaz ve Photo telemetri verisi toplamaz."
+  },
+  "modelInfo": {
+    "z-image-turbo": "8 adımda hızlı, fotogerçekçi görseller. İnsanlar, ürünler ve okunaklı metinlerde güçlüdür."
+  },
+  "setup": {
+    "back": "Geri",
+    "continue": "Devam",
+    "stages": {
+      "language": "Dil",
+      "storage": "Depolama",
+      "models": "Modeller",
+      "install": "Kurulum"
+    },
+    "language": {
+      "title": "Dilinizi seçin",
+      "lead": "Photo bu dili her yerde kullanır. Daha sonra Ayarlar'dan değiştirebilirsiniz."
+    },
+    "system": {
+      "title": "Bilgisayarınız",
+      "gpu": "{{name}}, {{vram}} GB",
+      "gpuUnsupported": "Photo, NVIDIA RTX 40 ve 50 serisi için tasarlanmıştır. Bu kartta yavaş çalışabilir veya hata verebilir.",
+      "driver": "NVIDIA sürücüsü {{version}}",
+      "driverOld": "{{min}} veya daha yeni bir sürücü gerekir. Sürücüyü nvidia.com/drivers adresinden güncelleyin, ardından kurulum programını yeniden çalıştırın.",
+      "noGpu": "NVIDIA ekran kartı bulunamadı",
+      "noGpuHelp": "Photo, güncel sürücüsü olan bir NVIDIA RTX ekran kartı gerektirir. Sürücüyü nvidia.com/drivers adresinden kurun, ardından kurulum programını yeniden çalıştırın."
+    },
+    "storage": {
+      "title": "Dosyalar nerede saklansın",
+      "lead": "Modeller ve motor çok yer kaplar. Bunları bol boş alanı olan hızlı bir sürücüye koyun; SSD kullanıldığında modeller birkaç kat daha hızlı yüklenir.",
+      "drive": "Sürücü",
+      "free": "{{size}} boş",
+      "removable": "çıkarılabilir",
+      "needs": "{{size}} gerekli",
+      "recommended": "{{size}} veya daha fazlası önerilir",
+      "alreadyThere": "zaten kurulu",
+      "diskNeed": "{{need}} gerekli · {{free}} boş",
+      "models_dir": {
+        "title": "Modeller",
+        "body": "İndirdiğiniz yapay zekâ modelleri. Model ekledikçe büyür."
+      },
+      "engine_env_dir": {
+        "title": "Motor",
+        "body": "Görsel motoru ve GPU kitaplıkları."
+      },
+      "data_dir": {
+        "title": "Galeri",
+        "body": "Görselleriniz, ayarları ve geçmiş."
+      }
+    },
+    "models": {
+      "title": "Modelleri seçin",
+      "lead": "Önerilen modelle başlayın. Diğerlerini daha sonra Modeller sayfasından ekleyebilirsiniz.",
+      "recommended": "Önerilen",
+      "total": "Toplam indirme: {{size}}"
+    },
+    "install": {
+      "title": "Kuruluma hazır",
+      "lead": "Her şey indirilip doğrulanacak. Bu işlem, bağlantınıza bağlı olarak genellikle 10–40 dakika sürer.",
+      "start": "Kur",
+      "runningTitle": "Kuruluyor",
+      "runningLead": "Bilgisayarınızı kullanmaya devam edebilirsiniz. Bağlantı kesilirse indirmeler kaldığı yerden devam eder.",
+      "doneTitle": "Photo hazır",
+      "doneLead": "Her şey kuruldu ve doğrulandı.",
+      "failedTitle": "Kurulum durdu",
+      "details": "Teknik ayrıntılar",
+      "change": "Ayarları değiştir",
+      "open": "Photo'yu aç",
+      "opening": "Photo başlatılıyor…",
+      "keepOpen": "Bu sayfayı ve kurulum programı penceresini açık tutun.",
+      "upToDate": "Güncel"
+    },
+    "steps": {
+      "engine": "Motoru indir",
+      "packages": "GPU kitaplıklarını kur",
+      "gpu": "Ekran kartını denetle",
+      "models": "Modelleri indir"
+    },
+    "errors": {
+      "network": "Kurulum programı yanıt vermiyor. Penceresinin hâlâ açık olduğunu kontrol edin.",
+      "unsupported_language": "Bu dil desteklenmiyor.",
+      "unknown_model": "Seçilen modellerden biri kullanılamıyor.",
+      "path_not_absolute": "Tam bir yol girin, örneğin D:\\Photo\\models.",
+      "path_system_folder": "Sistem klasörleri kullanılamaz. Başka bir klasör seçin.",
+      "path_is_file": "Bu yol bir dosyayı gösteriyor. Bir klasör seçin.",
+      "path_not_writable": "Photo bu klasöre yazamıyor. Başka bir klasör seçin.",
+      "not_enough_space": "Yeterli alan yok: {{need}} gerekli, {{free}} boş.",
+      "already_running": "Kurulum zaten sürüyor.",
+      "invalid_config": "Bazı seçimlerin gözden geçirilmesi gerekiyor.",
+      "cancelled": "Kurulum iptal edildi.",
+      "download_failed": "Bir indirme başarısız oldu. İnternet bağlantınızı kontrol edip yeniden deneyin.",
+      "disk_error": "Diske yazılamadı. Diskin bağlı olduğunu ve boş alanı bulunduğunu kontrol edin.",
+      "engine_checksum": "İndirilen motor dosyası bozuk. Yeniden deneyin.",
+      "engine_packages": "GPU kitaplıkları kurulamadı. Bağlantınızı kontrol edip yeniden deneyin.",
+      "cuda_unavailable": "Motor ekran kartınızı kullanamıyor. NVIDIA sürücüsünü güncelleyip yeniden deneyin.",
+      "uv_missing": "Kurulum programı eksik. Photo'yu yeniden indirin.",
+      "frontend_missing": "Arayüz dosyaları eksik. Sürüm paketini yeniden indirin.",
+      "setup_failed": "Kurulum sırasında bir sorun oluştu."
+    }
+  }
+}

@@ -4,7 +4,7 @@
  */
 
 :root {
-  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', 'Noto Sans', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
   --text-xs: 11px;
@@ -25,13 +25,30 @@
   --radius-lg: 6px;
 
   --control-h: 30px;
-  --rail-w: 64px;
+  --rail-w: 76px;
   --inspector-w: 340px;
   --statusbar-h: 26px;
 
   --ease: cubic-bezier(0.2, 0, 0, 1);
   --dur-fast: 90ms;
   --dur: 160ms;
+}
+
+/* Per-script families. Plex JP/KR/Arabic are loaded on demand by i18n/index.ts. */
+:root:lang(zh-CN) {
+  --font-sans: 'IBM Plex Sans', 'Microsoft YaHei UI', 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+:root:lang(ja) {
+  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans JP', 'Yu Gothic UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+}
+
+:root:lang(ko) {
+  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+}
+
+:root:lang(ar) {
+  --font-sans: 'IBM Plex Sans Arabic', 'IBM Plex Sans', 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif;
 }
 
 /* Dark is the default: images are judged best on a dark neutral surround. */

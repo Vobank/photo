@@ -4,7 +4,12 @@ import type {
   ImageInfo,
   InstallState,
   Job,
+  FieldError,
+  InstallConfig,
   ModelInfo,
+  SetupPlan,
+  SetupRun,
+  SetupSystemInfo,
   SystemInfo,
 } from './types'
 
@@ -13,7 +18,7 @@ const BASE = '/api/v1'
 export class ApiError extends Error {
   readonly status: number
   readonly code: string
-  readonly fields: { field: string; message: string }[]
+  readonly fields: { field: string; message?: string; code?: string; detail?: string }[]
 
   constructor(status: number, body: ApiErrorBody | null) {
     super(body?.error.message ?? `Request failed (${status})`)
@@ -44,7 +49,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 const json = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.stringify(body) })
 
 export const api = {
-  system: () => request<SystemInfo>('/system'),
+  system: () => request<SystemInfo | SetupSystemInfo>('/system'),
+  setLanguage: (language: string) =>
+    request<{ language: string }>('/preferences', { method: 'PUT', body: JSON.stringify({ language }) }),
+
+  setup: {
+    plan: () => request<SetupPlan>('/setup'),
+    validate: (cfg: InstallConfig) => request<{ ok: boolean; errors: FieldError[] }>('/setup/validate', json(cfg)),
+    start: (cfg: InstallConfig) => request<SetupRun>('/setup/start', json(cfg)),
+    cancel: () => request<SetupRun>('/setup/cancel', { method: 'POST' }),
+    finish: () => request<{ status: string }>('/setup/finish', { method: 'POST' }),
+  },
   restartEngine: () => request<{ status: string }>('/system/engine/restart', { method: 'POST' }),
 
   models: () => request<{ models: ModelInfo[] }>('/models').then((r) => r.models),
