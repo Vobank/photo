@@ -72,7 +72,8 @@
     "retry": "Try again",
     "previous": "Previous",
     "next": "Next",
-    "close": "Close"
+    "close": "Close",
+    "remove": "Remove"
   },
   "toast": {
     "copied": "Image copied",
@@ -90,7 +91,16 @@
       "unsupported_language": "This language is not supported.",
       "token_required": "This device needs an access token to use Photo.",
       "host_not_allowed": "Open Photo using its own address.",
-      "origin_not_allowed": "This request came from another website and was blocked."
+      "origin_not_allowed": "This request came from another website and was blocked.",
+      "references_unsupported": "This model cannot follow reference pictures. Choose FLUX.2 Klein.",
+      "variation_unsupported": "Variations need Z-Image Turbo. Download it on the Models page.",
+      "detail_unsupported": "Extra detail is not available for this model.",
+      "unknown_style": "This style is not available.",
+      "input_not_found": "One of the pictures no longer exists. Remove it and try again.",
+      "enhancer_unavailable": "Download a model first: the prompt helper uses its language model.",
+      "invalid_image": "This file is not a picture Photo can read.",
+      "engine_unavailable": "The engine is starting. Try again in a moment.",
+      "engine_error": "The engine could not finish this request."
     },
     "job": {
       "out_of_memory": "Not enough video memory. Try a smaller size or fewer images, or close other programs that use the GPU.",
@@ -143,7 +153,8 @@
     "privacy": "Everything runs on this computer. Prompts and images never leave it, and Photo collects no telemetry."
   },
   "modelInfo": {
-    "z-image-turbo": "Fast photorealistic images in 8 steps. Strong at people, products and legible text."
+    "z-image-turbo": "Fast photorealistic images in 8 steps. Strong at people, products and legible text.",
+    "flux2-klein-4b": "Follows reference pictures: matches a style, keeps a person or a product, combines up to four pictures. Also fast at plain text-to-image."
   },
   "setup": {
     "back": "Back",
@@ -239,5 +250,50 @@
       "frontend_missing": "The interface files are missing. Download the release package again.",
       "setup_failed": "Something went wrong during installation."
     }
+  },
+  "looks": {
+    "pictures": "Pictures",
+    "modeReferences": "Like these",
+    "modeReferencesHint": "The result follows the style, people or objects in up to four pictures",
+    "modeVariation": "Variation",
+    "modeVariationHint": "Start from one picture and keep its composition and colours",
+    "dropReferences": "Add pictures to follow",
+    "dropVariation": "Add a picture to vary",
+    "dropHint": "Drop files here, paste with Ctrl+V or click to choose",
+    "addPicture": "Add a picture",
+    "uploading": "Uploading…",
+    "closeness": "How close to the original",
+    "close": "Close",
+    "loose": "Loose",
+    "needsReferenceModel": "Following pictures needs {{name}}.",
+    "style": "Style",
+    "enhance": "Improve the prompt",
+    "enhanceHint": "A local language model adds light, lens and mood, and translates it to English",
+    "detail": "Extra detail",
+    "detailHint": "A second pass at a higher resolution; takes about twice as long",
+    "detailUnavailable": "Not available for this model",
+    "improve": "Improve",
+    "improving": "Improving…",
+    "improveHint": "Rewrite the prompt with more visual detail so you can review it",
+    "improved": "Prompt improved",
+    "moreLikeThis": "More like this",
+    "useAsReference": "Use as a reference",
+    "addedAsReference": "Added to the pictures to follow",
+    "promptUsed": "Prompt the model received"
+  },
+  "styles": {
+    "none": "No style",
+    "cinematic": "Cinematic",
+    "film": "35mm film",
+    "portrait": "Portrait",
+    "golden_hour": "Golden hour",
+    "noir": "Noir",
+    "neon": "Neon night",
+    "product": "Product shot",
+    "architecture": "Architecture",
+    "fantasy": "Fantasy art",
+    "anime": "Anime",
+    "watercolor": "Watercolour",
+    "render3d": "3D render"
   }
 }

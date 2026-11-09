@@ -69,7 +69,8 @@
     "retry": "다시 시도",
     "previous": "이전",
     "next": "다음",
-    "close": "닫기"
+    "close": "닫기",
+    "remove": "제거"
   },
   "toast": {
     "copied": "이미지를 복사했습니다",
@@ -87,7 +88,16 @@
       "unsupported_language": "지원되지 않는 언어입니다.",
       "token_required": "이 기기에서 Photo를 사용하려면 액세스 토큰이 필요합니다.",
       "host_not_allowed": "Photo 자체 주소로 여세요.",
-      "origin_not_allowed": "다른 웹사이트에서 보낸 요청이므로 차단되었습니다."
+      "origin_not_allowed": "다른 웹사이트에서 보낸 요청이므로 차단되었습니다.",
+      "references_unsupported": "이 모델은 참조 이미지를 따를 수 없습니다. FLUX.2 Klein을 선택하세요.",
+      "variation_unsupported": "변형을 만들려면 Z-Image Turbo가 필요합니다. [모델] 페이지에서 다운로드하세요.",
+      "detail_unsupported": "이 모델에서는 디테일 향상을 사용할 수 없습니다.",
+      "unknown_style": "이 스타일은 사용할 수 없습니다.",
+      "input_not_found": "이미지 중 하나가 더 이상 존재하지 않습니다. 해당 이미지를 제거하고 다시 시도하세요.",
+      "enhancer_unavailable": "먼저 모델을 다운로드하세요. 프롬프트 도우미는 모델에 포함된 언어 모델을 사용합니다.",
+      "invalid_image": "이 파일은 Photo에서 읽을 수 있는 이미지가 아닙니다.",
+      "engine_unavailable": "엔진을 시작하는 중입니다. 잠시 후 다시 시도하세요.",
+      "engine_error": "엔진이 이 요청을 완료할 수 없습니다."
     },
     "job": {
       "out_of_memory": "비디오 메모리가 부족합니다. 크기를 줄이거나 이미지 수를 줄이거나, GPU를 사용하는 다른 프로그램을 닫으세요.",
@@ -140,7 +150,8 @@
     "privacy": "모든 작업은 이 컴퓨터에서 실행됩니다. 프롬프트와 이미지는 외부로 전송되지 않으며, Photo는 원격 측정 데이터를 수집하지 않습니다."
   },
   "modelInfo": {
-    "z-image-turbo": "8스텝 만에 사실적인 이미지를 빠르게 생성합니다. 인물, 제품, 읽기 쉬운 텍스트 표현에 강합니다."
+    "z-image-turbo": "8스텝 만에 사실적인 이미지를 빠르게 생성합니다. 인물, 제품, 읽기 쉬운 텍스트 표현에 강합니다.",
+    "flux2-klein-4b": "참조 이미지를 따라 생성합니다. 스타일을 맞추고, 인물이나 제품을 그대로 유지하며, 최대 4장의 이미지를 조합합니다. 일반 텍스트-이미지 생성도 빠릅니다."
   },
   "setup": {
     "back": "뒤로",
@@ -236,5 +247,50 @@
       "frontend_missing": "인터페이스 파일이 없습니다. 릴리스 패키지를 다시 다운로드하세요.",
       "setup_failed": "설치 중 문제가 발생했습니다."
     }
+  },
+  "looks": {
+    "pictures": "입력 이미지",
+    "modeReferences": "참조",
+    "modeReferencesHint": "최대 4장의 이미지에 담긴 스타일, 인물, 사물을 따라 생성합니다",
+    "modeVariation": "변형",
+    "modeVariationHint": "한 장의 이미지에서 시작해 구도와 색감을 유지합니다",
+    "dropReferences": "참조할 이미지 추가",
+    "dropVariation": "변형할 이미지 추가",
+    "dropHint": "여기에 파일을 끌어다 놓거나 Ctrl+V로 붙여넣거나 클릭하여 선택하세요",
+    "addPicture": "이미지 추가",
+    "uploading": "업로드하는 중…",
+    "closeness": "원본과의 유사도",
+    "close": "가깝게",
+    "loose": "자유롭게",
+    "needsReferenceModel": "이미지를 참조하려면 {{name}} 모델이 필요합니다.",
+    "style": "스타일",
+    "enhance": "프롬프트 개선",
+    "enhanceHint": "로컬 언어 모델이 조명, 렌즈, 분위기를 더하고 영어로 번역합니다",
+    "detail": "디테일 향상",
+    "detailHint": "더 높은 해상도로 한 번 더 처리합니다. 시간이 약 두 배 걸립니다",
+    "detailUnavailable": "이 모델에서는 사용할 수 없습니다",
+    "improve": "개선",
+    "improving": "개선하는 중…",
+    "improveHint": "시각적 묘사를 더해 프롬프트를 다시 작성합니다. 결과를 검토할 수 있습니다",
+    "improved": "프롬프트를 개선했습니다",
+    "moreLikeThis": "비슷한 이미지 생성",
+    "useAsReference": "참조 이미지로 사용",
+    "addedAsReference": "참조할 이미지에 추가했습니다",
+    "promptUsed": "모델이 받은 프롬프트"
+  },
+  "styles": {
+    "none": "스타일 없음",
+    "cinematic": "시네마틱",
+    "film": "35mm 필름",
+    "portrait": "인물 사진",
+    "golden_hour": "골든 아워",
+    "noir": "누아르",
+    "neon": "네온 야경",
+    "product": "제품 사진",
+    "architecture": "건축",
+    "fantasy": "판타지 아트",
+    "anime": "애니메이션",
+    "watercolor": "수채화",
+    "render3d": "3D 렌더링"
   }
 }

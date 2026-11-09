@@ -1,5 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { CaretLeft, CaretRight, DownloadSimple, Heart, X } from '@phosphor-icons/react'
+import { CaretLeft, CaretRight, DownloadSimple, Heart, ImageSquare, Shuffle, X } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -11,6 +11,7 @@ import { Segmented } from '../../components/Segmented'
 import { formatRelative } from '../../lib/format'
 import { navigate } from '../../lib/router'
 import { useStudio } from '../../state/studio'
+import { addAsReference, moreLikeThis } from '../studio/pictureActions'
 import styles from './Gallery.module.css'
 
 export default function GalleryView({ imageId }: { imageId: string | null }) {
@@ -137,6 +138,12 @@ function Viewer({ imageId, images }: { imageId: string | null; images: ImageInfo
                   <IconButton label={t('actions.download')} onClick={() => (location.href = downloadUrl(image.id))}>
                     <DownloadSimple size={16} />
                   </IconButton>
+                  <IconButton label={t('looks.moreLikeThis')} onClick={() => void moreLikeThis(image, t)}>
+                    <Shuffle size={16} />
+                  </IconButton>
+                  <IconButton label={t('looks.useAsReference')} onClick={() => addAsReference(image, t)}>
+                    <ImageSquare size={16} />
+                  </IconButton>
                   <span style={{ flex: 1 }} />
                   <Dialog.Close asChild>
                     <IconButton label={t('actions.close')}>
@@ -145,6 +152,12 @@ function Viewer({ imageId, images }: { imageId: string | null; images: ImageInfo
                   </Dialog.Close>
                 </div>
                 <p className={styles.prompt}>{image.params.prompt}</p>
+                {image.final_prompt && image.final_prompt !== image.params.prompt && (
+                  <div className={styles.finalPrompt}>
+                    <span>{t('looks.promptUsed')}</span>
+                    <p>{image.final_prompt}</p>
+                  </div>
+                )}
                 <dl className={styles.meta}>
                   <dt>{t('studio.model')}</dt>
                   <dd>{image.model}</dd>

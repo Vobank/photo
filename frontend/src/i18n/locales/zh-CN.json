@@ -69,7 +69,8 @@
     "retry": "重试",
     "previous": "上一张",
     "next": "下一张",
-    "close": "关闭"
+    "close": "关闭",
+    "remove": "移除"
   },
   "toast": {
     "copied": "图像已复制",
@@ -87,7 +88,16 @@
       "unsupported_language": "不支持此语言。",
       "token_required": "此设备需要访问令牌才能使用 Photo。",
       "host_not_allowed": "请通过 Photo 自己的地址打开它。",
-      "origin_not_allowed": "此请求来自其他网站，已被阻止。"
+      "origin_not_allowed": "此请求来自其他网站，已被阻止。",
+      "references_unsupported": "此模型不支持参考图像。请选择 FLUX.2 Klein。",
+      "variation_unsupported": "生成变体需要 Z-Image Turbo。请在“模型”页面中下载。",
+      "detail_unsupported": "此模型不支持“增强细节”。",
+      "unknown_style": "此风格不可用。",
+      "input_not_found": "其中一张图像已不存在。请将其移除后重试。",
+      "enhancer_unavailable": "请先下载模型：提示词助手会使用模型自带的语言模型。",
+      "invalid_image": "此文件不是 Photo 能读取的图像。",
+      "engine_unavailable": "引擎正在启动。请稍后重试。",
+      "engine_error": "引擎无法完成此请求。"
     },
     "job": {
       "out_of_memory": "显存不足。请尝试更小的尺寸或更少的图像数量，或关闭其他占用 GPU 的程序。",
@@ -140,7 +150,8 @@
     "privacy": "所有处理均在本机完成。提示词和图像不会离开这台电脑，Photo 也不收集任何遥测数据。"
   },
   "modelInfo": {
-    "z-image-turbo": "8 步即可快速生成写实图像。擅长人物、产品和清晰可读的文字。"
+    "z-image-turbo": "8 步即可快速生成写实图像。擅长人物、产品和清晰可读的文字。",
+    "flux2-klein-4b": "可参考图像生成：匹配风格，保持人物或产品一致，最多组合四张图像。普通文生图同样快速。"
   },
   "setup": {
     "back": "上一步",
@@ -236,5 +247,50 @@
       "frontend_missing": "界面文件缺失。请重新下载发布包。",
       "setup_failed": "安装过程中出现问题。"
     }
+  },
+  "looks": {
+    "pictures": "输入图像",
+    "modeReferences": "参考",
+    "modeReferencesHint": "结果会遵循最多四张图像中的风格、人物或物体",
+    "modeVariation": "变体",
+    "modeVariationHint": "从一张图像出发，保留其构图和色彩",
+    "dropReferences": "添加参考图像",
+    "dropVariation": "添加要生成变体的图像",
+    "dropHint": "将文件拖放到此处、按 Ctrl+V 粘贴或点击选择",
+    "addPicture": "添加图像",
+    "uploading": "正在上传…",
+    "closeness": "与原图的贴近程度",
+    "close": "贴近",
+    "loose": "自由",
+    "needsReferenceModel": "参考图像需要使用 {{name}}。",
+    "style": "风格",
+    "enhance": "优化提示词",
+    "enhanceHint": "本地语言模型会补充光线、镜头和氛围，并将其翻译成英文",
+    "detail": "增强细节",
+    "detailHint": "以更高分辨率再处理一遍，耗时约为两倍",
+    "detailUnavailable": "此模型不支持",
+    "improve": "优化",
+    "improving": "正在优化…",
+    "improveHint": "用更多视觉细节改写提示词，便于您查看和修改",
+    "improved": "提示词已优化",
+    "moreLikeThis": "生成类似图像",
+    "useAsReference": "用作参考图像",
+    "addedAsReference": "已添加到参考图像",
+    "promptUsed": "模型实际收到的提示词"
+  },
+  "styles": {
+    "none": "无风格",
+    "cinematic": "电影感",
+    "film": "35mm 胶片",
+    "portrait": "人像",
+    "golden_hour": "黄金时刻",
+    "noir": "黑色电影",
+    "neon": "霓虹夜景",
+    "product": "产品摄影",
+    "architecture": "建筑",
+    "fantasy": "奇幻艺术",
+    "anime": "动漫",
+    "watercolor": "水彩",
+    "render3d": "3D 渲染"
   }
 }

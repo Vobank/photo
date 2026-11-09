@@ -72,7 +72,8 @@
     "retry": "Yeniden dene",
     "previous": "Önceki",
     "next": "Sonraki",
-    "close": "Kapat"
+    "close": "Kapat",
+    "remove": "Kaldır"
   },
   "toast": {
     "copied": "Görsel kopyalandı",
@@ -90,7 +91,16 @@
       "unsupported_language": "Bu dil desteklenmiyor.",
       "token_required": "Bu cihazda Photo'yu kullanmak için bir erişim belirteci gerekiyor.",
       "host_not_allowed": "Photo'yu kendi adresinden açın.",
-      "origin_not_allowed": "Bu istek başka bir web sitesinden geldiği için engellendi."
+      "origin_not_allowed": "Bu istek başka bir web sitesinden geldiği için engellendi.",
+      "references_unsupported": "Bu model referans görselleri takip edemez. FLUX.2 Klein'ı seçin.",
+      "variation_unsupported": "Varyasyonlar için Z-Image Turbo gerekir. Modeller sayfasından indirin.",
+      "detail_unsupported": "Ek ayrıntı bu model için kullanılamıyor.",
+      "unknown_style": "Bu stil kullanılamıyor.",
+      "input_not_found": "Görsellerden biri artık mevcut değil. Kaldırıp yeniden deneyin.",
+      "enhancer_unavailable": "Önce bir model indirin: istem yardımcısı onun dil modelini kullanır.",
+      "invalid_image": "Bu dosya, Photo'nun okuyabileceği bir görsel değil.",
+      "engine_unavailable": "Motor başlatılıyor. Birazdan yeniden deneyin.",
+      "engine_error": "Motor bu isteği tamamlayamadı."
     },
     "job": {
       "out_of_memory": "Yeterli video belleği yok. Daha küçük bir boyut veya daha az görsel deneyin ya da GPU kullanan diğer programları kapatın.",
@@ -143,7 +153,8 @@
     "privacy": "Her şey bu bilgisayarda çalışır. İstemler ve görseller bilgisayardan hiçbir zaman çıkmaz ve Photo telemetri verisi toplamaz."
   },
   "modelInfo": {
-    "z-image-turbo": "8 adımda hızlı, fotogerçekçi görseller. İnsanlar, ürünler ve okunaklı metinlerde güçlüdür."
+    "z-image-turbo": "8 adımda hızlı, fotogerçekçi görseller. İnsanlar, ürünler ve okunaklı metinlerde güçlüdür.",
+    "flux2-klein-4b": "Referans görselleri takip eder: bir stili yakalar, bir kişiyi veya ürünü korur, en fazla dört görseli birleştirir. Yalnızca metinden görsel oluşturmada da hızlıdır."
   },
   "setup": {
     "back": "Geri",
@@ -239,5 +250,50 @@
       "frontend_missing": "Arayüz dosyaları eksik. Sürüm paketini yeniden indirin.",
       "setup_failed": "Kurulum sırasında bir sorun oluştu."
     }
+  },
+  "looks": {
+    "pictures": "Görseller",
+    "modeReferences": "Bunlar gibi",
+    "modeReferencesHint": "Sonuç, en fazla dört görseldeki stili, kişileri veya nesneleri takip eder",
+    "modeVariation": "Varyasyon",
+    "modeVariationHint": "Tek bir görselden başlar, kompozisyonunu ve renklerini korur",
+    "dropReferences": "Takip edilecek görselleri ekleyin",
+    "dropVariation": "Varyasyon için bir görsel ekleyin",
+    "dropHint": "Dosyaları buraya bırakın, Ctrl+V ile yapıştırın veya seçmek için tıklayın",
+    "addPicture": "Görsel ekle",
+    "uploading": "Yükleniyor…",
+    "closeness": "Orijinale yakınlık",
+    "close": "Yakın",
+    "loose": "Serbest",
+    "needsReferenceModel": "Görselleri takip etmek için {{name}} gerekir.",
+    "style": "Stil",
+    "enhance": "İstemi iyileştir",
+    "enhanceHint": "Yerel bir dil modeli ışık, objektif ve atmosfer ekler ve istemi İngilizceye çevirir",
+    "detail": "Ek ayrıntı",
+    "detailHint": "Daha yüksek çözünürlükte ikinci bir geçiş; yaklaşık iki kat uzun sürer",
+    "detailUnavailable": "Bu model için kullanılamıyor",
+    "improve": "İyileştir",
+    "improving": "İyileştiriliyor…",
+    "improveHint": "İstemi daha fazla görsel ayrıntıyla yeniden yazar, böylece gözden geçirebilirsiniz",
+    "improved": "İstem iyileştirildi",
+    "moreLikeThis": "Buna benzer daha fazla",
+    "useAsReference": "Referans olarak kullan",
+    "addedAsReference": "Takip edilecek görsellere eklendi",
+    "promptUsed": "Modelin aldığı istem"
+  },
+  "styles": {
+    "none": "Stil yok",
+    "cinematic": "Sinematik",
+    "film": "35 mm film",
+    "portrait": "Portre",
+    "golden_hour": "Altın saat",
+    "noir": "Noir",
+    "neon": "Neon gece",
+    "product": "Ürün çekimi",
+    "architecture": "Mimari",
+    "fantasy": "Fantastik sanat",
+    "anime": "Anime",
+    "watercolor": "Suluboya",
+    "render3d": "3D render"
   }
 }

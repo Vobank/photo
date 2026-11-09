@@ -2,9 +2,21 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import type { GenerateParams, ImageInfo } from '../api/types'
-import { type AspectId, type SizeId, dimensionsFor } from '../lib/dimensions'
+import { ASPECTS, type AspectId, type SizeId, dimensionsFor } from '../lib/dimensions'
 
 export const MAX_SEED = 2 ** 53 - 1
+export const MAX_REFERENCES = 4
+
+/** A picture used as input: from the gallery or uploaded from disk. */
+export interface InputPicture {
+  id: string
+  kind: 'image' | 'upload'
+  width: number
+  height: number
+}
+
+/** "references": the result follows these pictures. "variation": start from one picture. */
+export type InputMode = 'references' | 'variation'
 
 interface StudioState {
   prompt: string
@@ -18,16 +30,44 @@ interface StudioState {
   steps: number | null // null = model default
   cfg: number | null
   advancedOpen: boolean
+
+  style: string | null
+  enhance: boolean
+  detail: boolean
+  inputMode: InputMode
+  inputs: InputPicture[]
+  /** 0.05 = stay very close to the source, 0.95 = barely related. */
+  variationStrength: number
+
   /** Image shown on the canvas; null means "follow the newest result". */
   selectedImageId: string | null
 
-  set: (patch: Partial<Omit<StudioState, 'set' | 'toParams' | 'reuse' | 'randomizeSeed'>>) => void
+  set: (patch: Partial<StudioData>) => void
   randomizeSeed: () => void
   reuse: (image: ImageInfo, opts?: { withSeed?: boolean }) => void
+  addInput: (picture: InputPicture, mode?: InputMode) => void
+  removeInput: (id: string) => void
   toParams: () => GenerateParams | null
 }
 
+type StudioData = Omit<StudioState, 'set' | 'toParams' | 'reuse' | 'randomizeSeed' | 'addInput' | 'removeInput'>
+
 export const randomSeed = () => Math.floor(Math.random() * MAX_SEED)
+
+/** The preset shape closest to a picture's own proportions. */
+export function closestAspect(width: number, height: number): AspectId {
+  const r = width / height
+  let best: AspectId = ASPECTS[0].id
+  let bestDiff = Infinity
+  for (const a of ASPECTS) {
+    const diff = Math.abs(Math.log(a.w / a.h / r))
+    if (diff < bestDiff) {
+      bestDiff = diff
+      best = a.id
+    }
+  }
+  return best
+}
 
 export const useStudio = create<StudioState>()(
   persist(
@@ -43,10 +83,30 @@ export const useStudio = create<StudioState>()(
       steps: null,
       cfg: null,
       advancedOpen: false,
+      style: null,
+      enhance: false,
+      detail: false,
+      inputMode: 'references',
+      inputs: [],
+      variationStrength: 0.5,
       selectedImageId: null,
 
       set: (patch) => set(patch),
       randomizeSeed: () => set({ seed: randomSeed() }),
+
+      addInput: (picture, mode) => {
+        const s = get()
+        const nextMode = mode ?? s.inputMode
+        if (nextMode === 'variation') {
+          // One source; the output takes its shape.
+          set({ inputMode: 'variation', inputs: [picture], aspect: closestAspect(picture.width, picture.height) })
+          return
+        }
+        const kept = (s.inputMode === 'references' ? s.inputs : []).filter((p) => p.id !== picture.id)
+        set({ inputMode: 'references', inputs: [...kept, picture].slice(-MAX_REFERENCES) })
+      },
+
+      removeInput: (id) => set((s) => ({ inputs: s.inputs.filter((p) => p.id !== id) })),
 
       reuse: (image, opts = {}) => {
         const p = image.params
@@ -57,6 +117,9 @@ export const useStudio = create<StudioState>()(
           steps: p.steps ?? null,
           cfg: p.cfg ?? null,
           batch: p.batch_size,
+          style: p.style ?? null,
+          enhance: p.enhance ?? false,
+          detail: p.detail ?? false,
           ...(opts.withSeed ? { seed: image.seed, seedLocked: true } : {}),
           ...matchDimensions(p.width, p.height),
         })
@@ -66,6 +129,7 @@ export const useStudio = create<StudioState>()(
         const s = get()
         if (!s.model || !s.prompt.trim()) return null
         const { width, height } = dimensionsFor(s.aspect, s.size)
+        const ids = s.inputs.map((p) => p.id)
         return {
           kind: 'generate',
           model: s.model,
@@ -77,24 +141,32 @@ export const useStudio = create<StudioState>()(
           seed: s.seedLocked ? s.seed : null,
           steps: s.steps,
           cfg: s.cfg,
+          style: s.style,
+          enhance: s.enhance,
+          detail: s.detail,
+          references: s.inputMode === 'references' ? ids : [],
+          variation_of: s.inputMode === 'variation' ? (ids[0] ?? null) : null,
+          variation_strength: s.variationStrength,
         }
       },
     }),
     {
       name: 'photo.studio',
-      version: 1,
+      version: 2,
       partialize: ({ selectedImageId: _s, set: _set, ...rest }) => rest,
+      // v1 had no looks or inputs: defaults fill them in.
+      migrate: (persisted) => persisted as StudioState,
     },
   ),
 )
 
-function matchDimensions(width: number, height: number): Partial<StudioState> {
+function matchDimensions(width: number, height: number): Partial<StudioData> {
   // Find the preset pair that reproduces these exact dimensions, if any.
-  for (const aspect of ['1:1', '4:5', '3:4', '2:3', '9:16', '5:4', '4:3', '3:2', '16:9', '21:9'] as const) {
+  for (const a of ASPECTS) {
     for (const size of ['s', 'm', 'l', 'xl'] as const) {
-      const d = dimensionsFor(aspect, size)
-      if (d.width === width && d.height === height) return { aspect, size }
+      const d = dimensionsFor(a.id, size)
+      if (d.width === width && d.height === height) return { aspect: a.id, size }
     }
   }
-  return {}
+  return { aspect: closestAspect(width, height) }
 }

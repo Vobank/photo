@@ -69,7 +69,8 @@
     "retry": "再試行",
     "previous": "前へ",
     "next": "次へ",
-    "close": "閉じる"
+    "close": "閉じる",
+    "remove": "取り除く"
   },
   "toast": {
     "copied": "画像をコピーしました",
@@ -87,7 +88,16 @@
       "unsupported_language": "この言語はサポートされていません。",
       "token_required": "このデバイスで Photo を使用するにはアクセストークンが必要です。",
       "host_not_allowed": "Photo 本来のアドレスから開いてください。",
-      "origin_not_allowed": "このリクエストは別のウェブサイトから送信されたため、ブロックされました。"
+      "origin_not_allowed": "このリクエストは別のウェブサイトから送信されたため、ブロックされました。",
+      "references_unsupported": "このモデルは参照画像に対応していません。FLUX.2 Klein を選択してください。",
+      "variation_unsupported": "バリエーションには Z-Image Turbo が必要です。「モデル」ページでダウンロードしてください。",
+      "detail_unsupported": "このモデルではディテール強化を使用できません。",
+      "unknown_style": "このスタイルは利用できません。",
+      "input_not_found": "画像の 1 つが見つかりません。その画像を取り除いて、もう一度お試しください。",
+      "enhancer_unavailable": "先にモデルをダウンロードしてください。プロンプトの改善には、モデルに含まれる言語モデルを使用します。",
+      "invalid_image": "このファイルは Photo で読み込める画像ではありません。",
+      "engine_unavailable": "エンジンを起動しています。しばらくしてからもう一度お試しください。",
+      "engine_error": "エンジンはこのリクエストを完了できませんでした。"
     },
     "job": {
       "out_of_memory": "ビデオメモリが不足しています。サイズを小さくするか枚数を減らすか、GPU を使用している他のプログラムを終了してください。",
@@ -140,7 +150,8 @@
     "privacy": "すべての処理はこのコンピューター上で行われます。プロンプトや画像が外部に送信されることはなく、Photo はテレメトリを一切収集しません。"
   },
   "modelInfo": {
-    "z-image-turbo": "8 ステップで写実的な画像を高速に生成します。人物、製品、判読しやすい文字の描写に優れています。"
+    "z-image-turbo": "8 ステップで写実的な画像を高速に生成します。人物、製品、判読しやすい文字の描写に優れています。",
+    "flux2-klein-4b": "参照画像に沿って生成します。スタイルを合わせる、人物や製品を維持する、最大 4 枚の画像を組み合わせることができます。通常のテキストからの画像生成も高速です。"
   },
   "setup": {
     "back": "戻る",
@@ -236,5 +247,50 @@
       "frontend_missing": "インターフェイスのファイルが見つかりません。リリースパッケージをもう一度ダウンロードしてください。",
       "setup_failed": "インストール中に問題が発生しました。"
     }
+  },
+  "looks": {
+    "pictures": "入力画像",
+    "modeReferences": "参照",
+    "modeReferencesHint": "最大 4 枚の画像のスタイル、人物、物体に沿った結果を生成します",
+    "modeVariation": "バリエーション",
+    "modeVariationHint": "1 枚の画像から始めて、構図と色を維持します",
+    "dropReferences": "参照する画像を追加",
+    "dropVariation": "バリエーションの元になる画像を追加",
+    "dropHint": "ここにファイルをドロップ、Ctrl+V で貼り付け、またはクリックして選択",
+    "addPicture": "画像を追加",
+    "uploading": "アップロード中…",
+    "closeness": "元の画像への忠実度",
+    "close": "忠実",
+    "loose": "自由",
+    "needsReferenceModel": "画像を参照するには {{name}} が必要です。",
+    "style": "スタイル",
+    "enhance": "プロンプトを改善",
+    "enhanceHint": "ローカルの言語モデルが光、レンズ、雰囲気を加え、英語に翻訳します",
+    "detail": "ディテール強化",
+    "detailHint": "より高い解像度で 2 回目の処理を行います。所要時間は約 2 倍です",
+    "detailUnavailable": "このモデルでは使用できません",
+    "improve": "改善",
+    "improving": "改善中…",
+    "improveHint": "視覚的な描写を加えてプロンプトを書き直します。内容は確認してから使用できます",
+    "improved": "プロンプトを改善しました",
+    "moreLikeThis": "似た画像を生成",
+    "useAsReference": "参照画像として使用",
+    "addedAsReference": "参照する画像に追加しました",
+    "promptUsed": "モデルが受け取ったプロンプト"
+  },
+  "styles": {
+    "none": "スタイルなし",
+    "cinematic": "シネマティック",
+    "film": "35mm フィルム",
+    "portrait": "ポートレート",
+    "golden_hour": "ゴールデンアワー",
+    "noir": "ノワール",
+    "neon": "ネオンの夜",
+    "product": "商品撮影",
+    "architecture": "建築",
+    "fantasy": "ファンタジーアート",
+    "anime": "アニメ",
+    "watercolor": "水彩",
+    "render3d": "3D レンダリング"
   }
 }

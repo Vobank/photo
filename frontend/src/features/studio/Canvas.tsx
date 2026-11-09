@@ -3,7 +3,9 @@ import {
   Copy,
   DownloadSimple,
   Heart,
+  ImageSquare,
   Plant,
+  Shuffle,
   Trash,
   X,
 } from '@phosphor-icons/react'
@@ -20,6 +22,7 @@ import { jobErrorText } from '../../lib/errors'
 import { formatDuration } from '../../lib/format'
 import { useLive } from '../../state/live'
 import { useStudio } from '../../state/studio'
+import { moreLikeThis, addAsReference } from './pictureActions'
 import styles from './Studio.module.css'
 
 /** The job the canvas should follow: running first, then the oldest queued. */
@@ -187,6 +190,7 @@ function ImageView({ image }: { image: ImageInfo }) {
 
   useCanvasShortcuts({
     f: () => favorite.mutate({ id: image.id, favorite: !image.favorite }),
+    m: () => void moreLikeThis(image, t),
     Delete: () => void remove(),
   })
 
@@ -223,6 +227,13 @@ function ImageView({ image }: { image: ImageInfo }) {
         </IconButton>
         <IconButton label={t('actions.reuseSeed')} onClick={() => reuse(image, { withSeed: true })}>
           <Plant size={16} />
+        </IconButton>
+        <span className={styles.toolbarSep} />
+        <IconButton label={t('looks.moreLikeThis')} shortcut="M" onClick={() => void moreLikeThis(image, t)}>
+          <Shuffle size={16} />
+        </IconButton>
+        <IconButton label={t('looks.addAsReference')} onClick={() => addAsReference(image, t)}>
+          <ImageSquare size={16} />
         </IconButton>
         <span className={styles.toolbarSep} />
         <IconButton label={t('actions.copy')} onClick={() => void copy()}>

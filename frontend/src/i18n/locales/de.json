@@ -72,7 +72,8 @@
     "retry": "Erneut versuchen",
     "previous": "Vorheriges",
     "next": "Nächstes",
-    "close": "Schließen"
+    "close": "Schließen",
+    "remove": "Entfernen"
   },
   "toast": {
     "copied": "Bild kopiert",
@@ -90,7 +91,16 @@
       "unsupported_language": "Diese Sprache wird nicht unterstützt.",
       "token_required": "Dieses Gerät benötigt ein Zugriffstoken, um Photo zu verwenden.",
       "host_not_allowed": "Öffnen Sie Photo über die eigene Adresse der Anwendung.",
-      "origin_not_allowed": "Diese Anfrage stammt von einer anderen Website und wurde blockiert."
+      "origin_not_allowed": "Diese Anfrage stammt von einer anderen Website und wurde blockiert.",
+      "references_unsupported": "Dieses Modell kann Referenzbildern nicht folgen. Wählen Sie FLUX.2 Klein.",
+      "variation_unsupported": "Für Variationen wird Z-Image Turbo benötigt. Laden Sie es auf der Seite „Modelle“ herunter.",
+      "detail_unsupported": "Zusätzliche Details sind für dieses Modell nicht verfügbar.",
+      "unknown_style": "Dieser Stil ist nicht verfügbar.",
+      "input_not_found": "Eines der Bilder existiert nicht mehr. Entfernen Sie es und versuchen Sie es erneut.",
+      "enhancer_unavailable": "Laden Sie zuerst ein Modell herunter: Der Prompt-Assistent nutzt dessen Sprachmodell.",
+      "invalid_image": "Diese Datei ist kein Bild, das Photo lesen kann.",
+      "engine_unavailable": "Die Engine wird gestartet. Versuchen Sie es gleich noch einmal.",
+      "engine_error": "Die Engine konnte diese Anfrage nicht abschließen."
     },
     "job": {
       "out_of_memory": "Nicht genügend Grafikspeicher. Wählen Sie eine kleinere Größe oder weniger Bilder, oder schließen Sie andere Programme, die die GPU nutzen.",
@@ -143,7 +153,8 @@
     "privacy": "Alles läuft auf diesem Computer. Prompts und Bilder verlassen ihn nie, und Photo erfasst keine Telemetriedaten."
   },
   "modelInfo": {
-    "z-image-turbo": "Schnelle fotorealistische Bilder in 8 Schritten. Stark bei Personen, Produkten und lesbarem Text."
+    "z-image-turbo": "Schnelle fotorealistische Bilder in 8 Schritten. Stark bei Personen, Produkten und lesbarem Text.",
+    "flux2-klein-4b": "Folgt Referenzbildern: übernimmt einen Stil, behält eine Person oder ein Produkt bei, kombiniert bis zu vier Bilder. Auch schnell bei reiner Text-zu-Bild-Erstellung."
   },
   "setup": {
     "back": "Zurück",
@@ -239,5 +250,50 @@
       "frontend_missing": "Die Dateien der Benutzeroberfläche fehlen. Laden Sie das Release-Paket erneut herunter.",
       "setup_failed": "Bei der Installation ist ein Fehler aufgetreten."
     }
+  },
+  "looks": {
+    "pictures": "Bilder",
+    "modeReferences": "Wie diese",
+    "modeReferencesHint": "Das Ergebnis folgt dem Stil, den Personen oder Objekten aus bis zu vier Bildern",
+    "modeVariation": "Variation",
+    "modeVariationHint": "Von einem Bild ausgehen und dessen Komposition und Farben beibehalten",
+    "dropReferences": "Referenzbilder hinzufügen",
+    "dropVariation": "Bild zum Variieren hinzufügen",
+    "dropHint": "Dateien hier ablegen, mit Ctrl+V einfügen oder zum Auswählen klicken",
+    "addPicture": "Bild hinzufügen",
+    "uploading": "Wird hochgeladen…",
+    "closeness": "Nähe zum Original",
+    "close": "Nah",
+    "loose": "Frei",
+    "needsReferenceModel": "Für Referenzbilder wird {{name}} benötigt.",
+    "style": "Stil",
+    "enhance": "Prompt verbessern",
+    "enhanceHint": "Ein lokales Sprachmodell ergänzt Licht, Objektiv und Stimmung und übersetzt den Prompt ins Englische",
+    "detail": "Mehr Details",
+    "detailHint": "Ein zweiter Durchgang mit höherer Auflösung; dauert etwa doppelt so lange",
+    "detailUnavailable": "Für dieses Modell nicht verfügbar",
+    "improve": "Verbessern",
+    "improving": "Wird verbessert…",
+    "improveHint": "Den Prompt mit mehr visuellen Details umschreiben, damit Sie ihn prüfen können",
+    "improved": "Prompt verbessert",
+    "moreLikeThis": "Ähnliche erstellen",
+    "useAsReference": "Als Referenz verwenden",
+    "addedAsReference": "Zu den Referenzbildern hinzugefügt",
+    "promptUsed": "Prompt, den das Modell erhalten hat"
+  },
+  "styles": {
+    "none": "Kein Stil",
+    "cinematic": "Kinolook",
+    "film": "35-mm-Film",
+    "portrait": "Porträt",
+    "golden_hour": "Goldene Stunde",
+    "noir": "Noir",
+    "neon": "Neonnacht",
+    "product": "Produktfoto",
+    "architecture": "Architektur",
+    "fantasy": "Fantasy-Art",
+    "anime": "Anime",
+    "watercolor": "Aquarell",
+    "render3d": "3D-Rendering"
   }
 }

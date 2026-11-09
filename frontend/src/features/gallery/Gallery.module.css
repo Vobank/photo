@@ -218,3 +218,21 @@
 [dir='rtl'] .nav svg {
   transform: scaleX(-1);
 }
+
+.finalPrompt {
+  padding: var(--space-2) var(--space-3);
+  border-inline-start: 2px solid var(--accent);
+  background: var(--bg-2);
+  font-size: var(--text-sm);
+}
+
+.finalPrompt span {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+}
+
+.finalPrompt p {
+  margin-top: 2px;
+  color: var(--text-2);
+  line-height: 1.5;
+}

@@ -416,3 +416,212 @@
 [dir='rtl'] .advancedToggle[aria-expanded='false'] svg {
   transform: scaleX(-1);
 }
+
+/* ---- prompt helper ---- */
+
+.promptHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: -2px;
+}
+
+.promptHead button {
+  margin-inline-end: -6px;
+}
+
+/* ---- input pictures ---- */
+
+.dropZone {
+  position: relative;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+
+.dropZone[data-empty='false'] {
+  padding: 6px;
+  border-style: solid;
+  border-color: var(--line);
+}
+
+.dropZone[data-dragging='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dropEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 14px var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--text-2);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.dropEmpty:hover {
+  color: var(--text-1);
+}
+
+.dropEmpty small {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.inputThumb,
+.inputAdd {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.inputThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.inputThumb .inputRemove {
+  position: absolute;
+  top: 3px;
+  inset-inline-end: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 65%);
+  color: #fff;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.inputThumb:hover .inputRemove,
+.inputThumb .inputRemove:focus-visible {
+  opacity: 1;
+}
+
+.inputAdd {
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--line-strong);
+  background: none;
+  color: var(--text-3);
+}
+
+.inputAdd:hover {
+  border-color: var(--text-3);
+  color: var(--text-1);
+}
+
+.uploading {
+  position: absolute;
+  inset-inline-end: 8px;
+  bottom: 6px;
+  color: var(--text-3);
+  font-size: var(--text-xs);
+}
+
+.strength {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
+.strength input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.strengthLabels {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-3);
+  font-size: var(--text-xs);
+}
+
+.needsModel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
+/* ---- styles and switches ---- */
+
+.styles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.styleChip {
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--bg-2);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.styleChip:hover {
+  border-color: var(--text-3);
+  color: var(--text-1);
+}
+
+.styleChip[aria-checked='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--text-1);
+}
+
+.toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.toggle input {
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.toggle span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.toggle small {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+  font-weight: 400;
+}
+
+.toggle[data-disabled='true'] {
+  cursor: default;
+  opacity: 0.55;
+}

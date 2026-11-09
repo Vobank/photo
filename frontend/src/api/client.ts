@@ -11,6 +11,7 @@ import type {
   SetupRun,
   SetupSystemInfo,
   SystemInfo,
+  Upload,
 } from './types'
 
 const BASE = '/api/v1'
@@ -69,6 +70,15 @@ export const api = {
     request<void>(`/models/${encodeURIComponent(id)}/install`, { method: 'DELETE' }),
 
   createJob: (params: GenerateParams) => request<Job>('/jobs', json(params)),
+  enhancePrompt: (prompt: string, style: string | null, hasReferences: boolean) =>
+    request<{ prompt: string }>('/prompt/enhance', json({ prompt, style, has_references: hasReferences })),
+  upload: async (file: Blob): Promise<Upload> => {
+    const form = new FormData()
+    form.append('file', file, file instanceof File ? file.name : 'pasted.png')
+    const res = await fetch(`${BASE}/uploads`, { method: 'POST', body: form })
+    if (!res.ok) throw new ApiError(res.status, await res.json().catch(() => null))
+    return (await res.json()) as Upload
+  },
   jobs: (active = false) => request<{ jobs: Job[] }>(`/jobs?active=${active}`).then((r) => r.jobs),
   cancelJob: (id: string) => request<Job>(`/jobs/${id}/cancel`, { method: 'POST' }),
 
@@ -88,4 +98,5 @@ export const api = {
 
 export const imageUrl = (id: string) => `${BASE}/images/${id}/file`
 export const thumbUrl = (id: string) => `${BASE}/images/${id}/thumb`
+export const uploadThumbUrl = (id: string) => `${BASE}/uploads/${id}/thumb`
 export const downloadUrl = (id: string) => `${BASE}/images/${id}/file?download=true`

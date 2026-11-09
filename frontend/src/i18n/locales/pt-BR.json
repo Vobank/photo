@@ -75,7 +75,8 @@
     "retry": "Tentar novamente",
     "previous": "Anterior",
     "next": "Próxima",
-    "close": "Fechar"
+    "close": "Fechar",
+    "remove": "Remover"
   },
   "toast": {
     "copied": "Imagem copiada",
@@ -93,7 +94,16 @@
       "unsupported_language": "Este idioma não é compatível.",
       "token_required": "Este dispositivo precisa de um token de acesso para usar o Photo.",
       "host_not_allowed": "Abra o Photo pelo endereço próprio dele.",
-      "origin_not_allowed": "Esta solicitação veio de outro site e foi bloqueada."
+      "origin_not_allowed": "Esta solicitação veio de outro site e foi bloqueada.",
+      "references_unsupported": "Este modelo não consegue seguir imagens de referência. Escolha o FLUX.2 Klein.",
+      "variation_unsupported": "As variações precisam do Z-Image Turbo. Baixe-o na página Modelos.",
+      "detail_unsupported": "O detalhe extra não está disponível para este modelo.",
+      "unknown_style": "Este estilo não está disponível.",
+      "input_not_found": "Uma das imagens não existe mais. Remova-a e tente novamente.",
+      "enhancer_unavailable": "Baixe um modelo primeiro: o assistente de prompt usa o modelo de linguagem dele.",
+      "invalid_image": "Este arquivo não é uma imagem que o Photo consiga ler.",
+      "engine_unavailable": "O mecanismo está iniciando. Tente novamente em instantes.",
+      "engine_error": "O mecanismo não conseguiu concluir esta solicitação."
     },
     "job": {
       "out_of_memory": "Memória de vídeo insuficiente. Tente um tamanho menor ou menos imagens, ou feche outros programas que usam a GPU.",
@@ -146,7 +156,8 @@
     "privacy": "Tudo é executado neste computador. Prompts e imagens nunca saem dele, e o Photo não coleta telemetria."
   },
   "modelInfo": {
-    "z-image-turbo": "Imagens fotorrealistas rápidas em 8 passos. Destaca-se em pessoas, produtos e texto legível."
+    "z-image-turbo": "Imagens fotorrealistas rápidas em 8 passos. Destaca-se em pessoas, produtos e texto legível.",
+    "flux2-klein-4b": "Segue imagens de referência: reproduz um estilo, mantém uma pessoa ou um produto e combina até quatro imagens. Também é rápido em texto para imagem."
   },
   "setup": {
     "back": "Voltar",
@@ -242,5 +253,50 @@
       "frontend_missing": "Os arquivos da interface estão faltando. Baixe o pacote da versão novamente.",
       "setup_failed": "Algo deu errado durante a instalação."
     }
+  },
+  "looks": {
+    "pictures": "Imagens de referência",
+    "modeReferences": "Como estas",
+    "modeReferencesHint": "O resultado segue o estilo, as pessoas ou os objetos de até quatro imagens",
+    "modeVariation": "Variação",
+    "modeVariationHint": "Parta de uma imagem e mantenha a composição e as cores dela",
+    "dropReferences": "Adicione imagens para seguir",
+    "dropVariation": "Adicione uma imagem para variar",
+    "dropHint": "Solte arquivos aqui, cole com Ctrl+V ou clique para escolher",
+    "addPicture": "Adicionar uma imagem",
+    "uploading": "Enviando…",
+    "closeness": "Semelhança com o original",
+    "close": "Fiel",
+    "loose": "Livre",
+    "needsReferenceModel": "Para seguir imagens, é preciso o {{name}}.",
+    "style": "Estilo",
+    "enhance": "Melhorar o prompt",
+    "enhanceHint": "Um modelo de linguagem local adiciona luz, lente e clima, e traduz o prompt para o inglês",
+    "detail": "Detalhe extra",
+    "detailHint": "Uma segunda passagem em resolução maior; leva cerca do dobro do tempo",
+    "detailUnavailable": "Não disponível para este modelo",
+    "improve": "Melhorar",
+    "improving": "Melhorando…",
+    "improveHint": "Reescreve o prompt com mais detalhes visuais para você revisar",
+    "improved": "Prompt melhorado",
+    "moreLikeThis": "Mais como esta",
+    "useAsReference": "Usar como referência",
+    "addedAsReference": "Adicionada às imagens para seguir",
+    "promptUsed": "Prompt que o modelo recebeu"
+  },
+  "styles": {
+    "none": "Sem estilo",
+    "cinematic": "Cinematográfico",
+    "film": "Filme 35 mm",
+    "portrait": "Retrato",
+    "golden_hour": "Hora dourada",
+    "noir": "Noir",
+    "neon": "Noite neon",
+    "product": "Foto de produto",
+    "architecture": "Arquitetura",
+    "fantasy": "Arte de fantasia",
+    "anime": "Anime",
+    "watercolor": "Aquarela",
+    "render3d": "Render 3D"
   }
 }

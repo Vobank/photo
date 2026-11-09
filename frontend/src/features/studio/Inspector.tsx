@@ -1,6 +1,6 @@
-import { ArrowsClockwise, CaretRight, LockSimple, LockSimpleOpen } from '@phosphor-icons/react'
+import { ArrowsClockwise, CaretRight, LockSimple, LockSimpleOpen, PenNib } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/react-query'
-import { useEffect, useId, useMemo, useRef } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { api } from '../../api/client'
@@ -9,12 +9,15 @@ import { Button, IconButton } from '../../components/Button'
 import fieldStyles from '../../components/Field.module.css'
 import { NumberField } from '../../components/NumberField'
 import { Segmented } from '../../components/Segmented'
-import { toastError } from '../../components/toast'
+import { toast, toastError } from '../../components/toast'
 import { ASPECTS, SIZES, dimensionsFor, megapixels } from '../../lib/dimensions'
 import { apiErrorText } from '../../lib/errors'
 import { isMac } from '../../lib/format'
 import { activeJobs, useLive } from '../../state/live'
 import { MAX_SEED, useStudio } from '../../state/studio'
+import { InputPictures } from './InputPictures'
+import { improvePrompt } from './inputs'
+import { Looks } from './Looks'
 import styles from './Studio.module.css'
 
 const PROMPT_MAX = 4000
@@ -27,7 +30,14 @@ export function Inspector() {
     () => models?.filter((m) => m.installed && m.tasks.includes('generate')) ?? [],
     [models],
   )
-  const model = installed.find((m) => m.id === s.model)
+  // Models able to do what the current inputs ask for.
+  const need = s.inputs.length ? (s.inputMode === 'references' ? 'references' : 'variation') : null
+  const usable = useMemo(
+    () => (need ? installed.filter((m) => m.features[need]) : installed),
+    [installed, need],
+  )
+  const model = usable.find((m) => m.id === s.model)
+  const [improving, setImproving] = useState(false)
   const queued = useLive((st) => activeJobs(st.jobs).length)
   const upsertJob = useLive((st) => st.upsertJob)
   const promptRef = useRef<HTMLTextAreaElement>(null)
@@ -35,11 +45,28 @@ export function Inspector() {
   const negativeId = useId()
   const modelId = useId()
 
-  // Pick a model automatically when the stored one is gone or none was chosen yet.
+  // Pick a model automatically when the stored one is gone, none was chosen yet, or the
+  // current one cannot handle the pictures the user added.
   const setStudio = s.set
   useEffect(() => {
-    if (installed.length && !model) setStudio({ model: installed[0].id })
-  }, [installed, model, setStudio])
+    if (usable.length && !model) setStudio({ model: usable[0].id, steps: null, cfg: null })
+  }, [usable, model, setStudio])
+
+  const improve = async () => {
+    if (!s.prompt.trim() || improving) return
+    setImproving(true)
+    try {
+      await improvePrompt((previous) =>
+        toast(t('looks.improved'), {
+          action: { label: t('actions.undo'), run: () => useStudio.getState().set({ prompt: previous }) },
+        }),
+      )
+    } catch (e) {
+      toastError(apiErrorText(t, e))
+    } finally {
+      setImproving(false)
+    }
+  }
 
   const create = useMutation({
     mutationFn: api.createJob,
@@ -79,9 +106,21 @@ export function Inspector() {
     <aside className={styles.inspector} aria-label={t('studio.settings')}>
       <div className={styles.inspectorBody}>
         <div className={styles.section}>
-          <label htmlFor={promptId} className={fieldStyles.label}>
-            {t('studio.prompt')}
-          </label>
+          <div className={styles.promptHead}>
+            <label htmlFor={promptId} className={fieldStyles.label}>
+              {t('studio.prompt')}
+            </label>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={<PenNib size={14} />}
+              disabled={!s.prompt.trim() || improving}
+              title={t('looks.improveHint')}
+              onClick={() => void improve()}
+            >
+              {improving ? t('looks.improving') : t('looks.improve')}
+            </Button>
+          </div>
           <div className={styles.promptWrap}>
             <textarea
               id={promptId}
@@ -92,6 +131,7 @@ export function Inspector() {
               placeholder={t('studio.promptPlaceholder')}
               value={s.prompt}
               onChange={(e) => s.set({ prompt: e.target.value })}
+              readOnly={improving}
               spellCheck
             />
             {s.prompt.length > PROMPT_MAX * 0.8 && (
@@ -102,6 +142,8 @@ export function Inspector() {
           </div>
         </div>
 
+        <InputPictures models={models ?? []} />
+
         <div className={styles.section}>
           <label htmlFor={modelId} className={fieldStyles.label}>
             {t('studio.model')}
@@ -111,16 +153,18 @@ export function Inspector() {
             className={fieldStyles.select}
             value={s.model ?? ''}
             onChange={(e) => s.set({ model: e.target.value, steps: null, cfg: null })}
-            disabled={!installed.length}
+            disabled={!usable.length}
           >
-            {!installed.length && <option value="">{t('studio.noModels')}</option>}
-            {installed.map((m) => (
+            {!usable.length && <option value="">{t('studio.noModels')}</option>}
+            {usable.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name}
               </option>
             ))}
           </select>
         </div>
+
+        <Looks features={model?.features} />
 
         <div className={styles.divider} />
 

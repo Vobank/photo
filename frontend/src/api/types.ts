@@ -14,6 +14,24 @@ export interface GenerateParams {
   batch_size: number
   steps?: number | null
   cfg?: number | null
+  style?: string | null
+  enhance?: boolean
+  detail?: boolean
+  references?: string[]
+  variation_of?: string | null
+  variation_strength?: number
+}
+
+export interface ModelFeatures {
+  references: boolean
+  variation: boolean
+  detail: boolean
+}
+
+export interface Upload {
+  id: string
+  width: number
+  height: number
 }
 
 export interface Job {
@@ -45,6 +63,7 @@ export interface ImageInfo {
   params: GenerateParams
   steps: number | null
   cfg: number | null
+  final_prompt: string | null
 }
 
 export interface ModelVariant {
@@ -77,6 +96,7 @@ export interface ModelInfo {
   commercial_use: boolean
   defaults: { steps: number; cfg: number; sampler: string; scheduler: string }
   installed: boolean
+  features: ModelFeatures
   variants: ModelVariant[]
   install: InstallState | null
 }
