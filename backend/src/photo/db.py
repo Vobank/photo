@@ -49,6 +49,10 @@ MIGRATIONS: Sequence[str] = (
     CREATE INDEX images_created ON images(created_at DESC) WHERE deleted_at IS NULL;
     CREATE INDEX images_job ON images(job_id);
     """,
+    # 2 — machine-readable error codes so the UI can explain failures in any language
+    """
+    ALTER TABLE jobs ADD COLUMN error_code TEXT;
+    """,
 )
 
 

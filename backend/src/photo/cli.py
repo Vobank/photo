@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import socket
 import sys
 import tempfile
+import threading
 import webbrowser
 from pathlib import Path
 from typing import Annotated
@@ -22,10 +24,10 @@ from rich.progress import (
 )
 from rich.table import Table
 
-from photo import __version__
+from photo import __version__, prefs
 from photo import setup as steps
 from photo.catalog import default_catalog
-from photo.config import Settings, is_loopback_host
+from photo.config import LANGUAGES, Settings, is_loopback_host
 from photo.downloads import DownloadError, DownloadRequest, download
 from photo.hardware import detect_gpus, primary_gpu
 from photo.model_manager import missing_files
@@ -138,8 +140,38 @@ def setup(
         str, typer.Option(help="Models to install: 'recommended', 'none', or comma-separated ids.")
     ] = "recommended",
     skip_frontend: bool = False,
+    ui: Annotated[
+        bool, typer.Option("--ui", help="Open the setup wizard in the browser instead.")
+    ] = False,
+    language: Annotated[
+        str | None, typer.Option(help=f"Interface language: {', '.join(LANGUAGES)}.")
+    ] = None,
+    models_dir: Annotated[Path | None, typer.Option(help="Where to store models.")] = None,
+    data_dir: Annotated[
+        Path | None, typer.Option(help="Where to store images and the database.")
+    ] = None,
+    engine_env_dir: Annotated[
+        Path | None, typer.Option(help="Where to put the engine's Python environment.")
+    ] = None,
 ) -> None:
     """Install or repair everything: engine, web UI and models. Safe to re-run."""
+    if ui:
+        _setup_wizard()
+        return
+    if language is not None and language not in LANGUAGES:
+        console.print(
+            f"[red]Unknown language {language!r}.[/] Choose one of: {', '.join(LANGUAGES)}"
+        )
+        raise typer.Exit(2)
+    choices = {
+        "language": language,
+        "models_dir": models_dir.resolve() if models_dir else None,
+        "data_dir": data_dir.resolve() if data_dir else None,
+        "engine_env_dir": engine_env_dir.resolve() if engine_env_dir else None,
+    }
+    chosen = {k: v for k, v in choices.items() if v is not None}
+    if chosen:
+        prefs.update(chosen)
     settings = _settings()
     settings.ensure_dirs()
     gpu = primary_gpu(detect_gpus())
@@ -177,6 +209,58 @@ def setup(
 
     console.rule("Done")
     console.print("Start Photo with the desktop shortcut or `photo serve --open`.")
+
+
+def _port_in_use(host: str, port: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(0.5)
+        return s.connect_ex((host, port)) == 0
+
+
+def _setup_wizard() -> None:
+    """Serve the setup wizard and block until the user finishes it."""
+    import uvicorn
+
+    from photo.api.app import create_setup_app
+    from photo.events import EventBus
+    from photo.installer import SetupRunner
+    from photo.logs import setup_logging
+
+    settings = _settings()
+    settings.ensure_dirs()
+    setup_logging(settings.logs_dir)
+    if _port_in_use("127.0.0.1", settings.port):
+        console.print(
+            f"[red]Port {settings.port} is in use.[/] If Photo is running, close it and run the "
+            "installer again."
+        )
+        raise typer.Exit(1)
+    try:
+        steps.ensure_frontend(settings)
+    except steps.SetupError as exc:
+        console.print(f"[red]✗ {exc}[/]")
+        raise typer.Exit(1) from None
+
+    bus = EventBus()
+    runner = SetupRunner(settings, default_catalog(), bus, primary_gpu(detect_gpus()))
+    servers: list[uvicorn.Server] = []
+
+    def request_exit() -> None:
+        servers[0].should_exit = True
+
+    app_ = create_setup_app(settings, runner, bus, request_exit)
+    server = uvicorn.Server(
+        uvicorn.Config(app_, host="127.0.0.1", port=settings.port, log_level="warning")
+    )
+    servers.append(server)
+    url = f"http://127.0.0.1:{settings.port}/setup"
+    console.print(f"Setup is open in your browser: {url}")
+    console.print("Keep this window open until setup finishes.")
+    threading.Timer(1.0, webbrowser.open, args=(url,)).start()
+    server.run()
+    if runner.state.status != "done":
+        console.print("[yellow]Setup was closed before it finished.[/]")
+        raise typer.Exit(1)
 
 
 def _install_models(settings: Settings, gpu: object, selection: str) -> None:

@@ -91,6 +91,16 @@ class FakeEngine:
         return self.client
 
 
+@pytest.fixture(autouse=True)
+def isolated_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Never read or write the developer's real photo.toml from tests."""
+    path = tmp_path / "photo.toml"
+    monkeypatch.setenv("PHOTO_CONFIG", str(path))
+    for var in ("PHOTO_LANGUAGE", "PHOTO_MODELS_DIR", "PHOTO_DATA_DIR", "PHOTO_ENGINE_ENV_DIR"):
+        monkeypatch.delenv(var, raising=False)
+    return path
+
+
 @pytest.fixture
 def settings(tmp_path: Path) -> Settings:
     return Settings(home=tmp_path, hf_endpoint="https://hf.test")

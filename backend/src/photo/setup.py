@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import os
 import shutil
 import subprocess
 import tarfile
 import tomllib
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,7 +18,12 @@ from photo.hardware import MIN_DRIVER_MAJOR, Arch, Gpu
 
 
 class SetupError(Exception):
-    """A step failed; the message tells the user what to do."""
+    """A step failed. ``code`` lets the UI explain it in the user's language;
+    ``str(exc)`` is the English technical detail."""
+
+    def __init__(self, message: str, code: str = "setup_failed") -> None:
+        super().__init__(message)
+        self.code = code
 
 
 @dataclass(frozen=True, slots=True)
@@ -109,7 +116,9 @@ def find_uv(settings: Settings) -> str:
     for c in candidates:
         if c and Path(c).exists():
             return c
-    raise SetupError("uv not found. Run the installer (install.ps1 / install.sh) instead.")
+    raise SetupError(
+        "uv not found. Run the installer (install.ps1 / install.sh) instead.", "uv_missing"
+    )
 
 
 def _safe_extract(archive: Path, dest: Path) -> None:
@@ -124,7 +133,8 @@ def install_engine_source(settings: Settings, archive: Path) -> None:
     if digest != pin.sha256:
         raise SetupError(
             f"Engine archive checksum mismatch (expected {pin.sha256[:12]}…, got {digest[:12]}…). "
-            "The download was corrupted or tampered with; try again."
+            "The download was corrupted or tampered with; try again.",
+            "engine_checksum",
         )
     staging = settings.runtime / "comfyui.staging"
     shutil.rmtree(staging, ignore_errors=True)
@@ -132,7 +142,7 @@ def install_engine_source(settings: Settings, archive: Path) -> None:
     _safe_extract(archive, staging)
     roots = [p for p in staging.iterdir() if p.is_dir()]
     if len(roots) != 1 or not (roots[0] / "main.py").exists():
-        raise SetupError("Engine archive has an unexpected layout.")
+        raise SetupError("Engine archive has an unexpected layout.", "engine_checksum")
     (roots[0] / ".photo-commit").write_text(pin.commit)
 
     target = settings.engine_source_dir
@@ -145,16 +155,40 @@ def install_engine_source(settings: Settings, archive: Path) -> None:
     shutil.rmtree(old, ignore_errors=True)
 
 
-def sync_engine_env(settings: Settings, uv: str) -> None:
-    env = {**os.environ, "UV_PROJECT_ENVIRONMENT": str(settings.home / "engine" / ".venv")}
+def _engine_sync_cmd(settings: Settings, uv: str) -> tuple[list[str], dict[str, str]]:
+    env = {**os.environ, "UV_PROJECT_ENVIRONMENT": str(settings.engine_env)}
     env.pop("VIRTUAL_ENV", None)
-    proc = subprocess.run(  # noqa: S603 — fixed argv
-        [uv, "sync", "--locked", "--no-dev", "--project", str(settings.home / "engine")],
-        env=env,
-        check=False,
-    )
+    cmd = [uv, "sync", "--locked", "--no-dev", "--project", str(settings.home / "engine")]
+    return cmd, env
+
+
+def sync_engine_env(settings: Settings, uv: str) -> None:
+    cmd, env = _engine_sync_cmd(settings, uv)
+    proc = subprocess.run(cmd, env=env, check=False)  # noqa: S603 — fixed argv
     if proc.returncode != 0:
-        raise SetupError("Installing engine packages failed (see output above).")
+        raise SetupError("Installing engine packages failed (see output above).", "engine_packages")
+
+
+async def sync_engine_env_streaming(
+    settings: Settings, uv: str, on_line: Callable[[str], None]
+) -> None:
+    """Same as :func:`sync_engine_env`, reporting each output line (for the wizard)."""
+    cmd, env = _engine_sync_cmd(settings, uv)
+    env["NO_COLOR"] = "1"
+    proc = await asyncio.create_subprocess_exec(
+        *cmd, env=env, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
+    )
+    assert proc.stdout is not None
+    tail: list[str] = []
+    async for raw in proc.stdout:
+        line = raw.decode("utf-8", "replace").strip()
+        if line:
+            tail = [*tail[-19:], line]
+            on_line(line)
+    if await proc.wait() != 0:
+        raise SetupError(
+            "Installing engine packages failed:\n" + "\n".join(tail[-8:]), "engine_packages"
+        )
 
 
 def verify_engine_cuda(settings: Settings) -> str:
@@ -176,7 +210,7 @@ def verify_engine_cuda(settings: Settings) -> str:
     )
     if proc.returncode != 0:
         tail = (proc.stderr or proc.stdout).strip().splitlines()[-3:]
-        raise SetupError("The engine cannot use the GPU: " + " | ".join(tail))
+        raise SetupError("The engine cannot use the GPU: " + " | ".join(tail), "cuda_unavailable")
     return proc.stdout.strip()
 
 
@@ -190,11 +224,14 @@ def ensure_frontend(settings: Settings) -> str:
     if npm is None:
         raise SetupError(
             "The web UI is not built and Node.js is not installed. Download a release "
-            "package from GitHub (it includes the built UI) or install Node.js 22+."
+            "package from GitHub (it includes the built UI) or install Node.js 22+.",
+            "frontend_missing",
         )
     front = settings.home / "frontend"
     for args in (["ci", "--no-audit", "--no-fund"], ["run", "build"]):
         proc = subprocess.run([npm, *args], cwd=front, check=False)  # noqa: S603
         if proc.returncode != 0:
-            raise SetupError(f"`npm {' '.join(args)}` failed (see output above).")
+            raise SetupError(
+                f"`npm {' '.join(args)}` failed (see output above).", "frontend_missing"
+            )
     return "built"

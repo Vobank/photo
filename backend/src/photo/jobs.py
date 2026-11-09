@@ -52,6 +52,7 @@ class Job:
     seed: int
     progress: float
     error: str | None
+    error_code: str | None
     created_at: float
     started_at: float | None
     finished_at: float | None
@@ -68,6 +69,7 @@ class Job:
             "seed": self.seed,
             "progress": self.progress,
             "error": self.error,
+            "error_code": self.error_code,
             "created_at": self.created_at,
             "started_at": self.started_at,
             "finished_at": self.finished_at,
@@ -75,17 +77,20 @@ class Job:
         }
 
 
-def friendly_error(exc: BaseException) -> str:
+def friendly_error(exc: BaseException) -> tuple[str, str]:
+    """(code, English message). The UI translates by code and may show the message as detail."""
     text = str(exc)
     low = text.lower()
     if "out of memory" in low or "outofmemory" in low:
-        return (
+        return "out_of_memory", (
             "Not enough video memory for this request. Try a smaller size or batch, "
             "or close other programs that use the GPU."
         )
     if isinstance(exc, EngineUnavailable):
-        return "The engine is not running. It is being restarted; try again in a moment."
-    return text or exc.__class__.__name__
+        return "engine_unavailable", (
+            "The engine is not running. It is being restarted; try again in a moment."
+        )
+    return "engine_error", text or exc.__class__.__name__
 
 
 def installed_variant(settings: Settings, spec: ModelSpec, gpu: Gpu | None) -> Variant | None:
@@ -124,7 +129,8 @@ class JobService:
     def recover(self) -> int:
         """Fail jobs a previous process left mid-flight. Returns how many."""
         return self.db.execute(
-            "UPDATE jobs SET status='failed', error=?, finished_at=? WHERE status='running'",
+            "UPDATE jobs SET status='failed', error=?, error_code='interrupted', finished_at=? "
+            "WHERE status='running'",
             ("Interrupted: the app was closed while this job was running.", time.time()),
         )
 
@@ -153,6 +159,7 @@ class JobService:
             seed=row["seed"],
             progress=row["progress"],
             error=row["error"],
+            error_code=row["error_code"],
             created_at=row["created_at"],
             started_at=row["started_at"],
             finished_at=row["finished_at"],
@@ -217,11 +224,17 @@ class JobService:
         row = self.db.one("SELECT * FROM jobs WHERE status='queued' ORDER BY id LIMIT 1")
         return self._row_to_job(row) if row else None
 
-    def _finish(self, job_id: str, status: JobStatus, error: str | None) -> None:
+    def _finish(
+        self,
+        job_id: str,
+        status: JobStatus,
+        error: str | None,
+        error_code: str | None = None,
+    ) -> None:
         self.db.execute(
-            "UPDATE jobs SET status=?, error=?, finished_at=?, "
+            "UPDATE jobs SET status=?, error=?, error_code=?, finished_at=?, "
             "progress=CASE WHEN ?='succeeded' THEN 1 ELSE progress END WHERE id=?",
-            (status, error, time.time(), status, job_id),
+            (status, error, error_code, time.time(), status, job_id),
         )
         job = self.get(job_id)
         if job:
@@ -240,11 +253,12 @@ class JobService:
                 raise
             except Exception as exc:  # never let one job kill the worker
                 log.exception("job %s crashed the worker step", job.id)
-                self._finish(job.id, "failed", friendly_error(exc))
+                code, message = friendly_error(exc)
+                self._finish(job.id, "failed", message, code)
 
     async def _run(self, job: Job) -> None:
         if self.engine.state is EngineState.NOT_INSTALLED:
-            self._finish(job.id, "failed", self.engine.last_error)
+            self._finish(job.id, "failed", self.engine.last_error, "engine_not_installed")
             return
         client = await self.engine.wait_ready()
 
@@ -300,7 +314,8 @@ class JobService:
             else:
                 details = getattr(exc, "details", "")
                 log.error("job %s failed: %s\n%s", job.id, exc, details)
-                self._finish(job.id, "failed", friendly_error(exc))
+                code, message = friendly_error(exc)
+                self._finish(job.id, "failed", message, code)
             return
         finally:
             self._running_id = None

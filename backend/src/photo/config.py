@@ -29,6 +29,19 @@ def default_home() -> Path:
     return Path(env).expanduser().resolve() if env else _SOURCE_ROOT
 
 
+def config_file() -> Path:
+    """``photo.toml``: the user's choices from the setup wizard and the Settings page."""
+    env = os.environ.get("PHOTO_CONFIG")
+    return Path(env).expanduser().resolve() if env else default_home() / "photo.toml"
+
+
+# Interface languages. English is the default and the fallback for missing strings.
+LANGUAGES: tuple[str, ...] = (
+    "en", "zh-CN", "es", "pt-BR", "fr", "de", "it", "ru", "ja", "ko", "tr", "ar",
+)  # fmt: skip
+DEFAULT_LANGUAGE = "en"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="PHOTO_", extra="ignore", frozen=True)
 
@@ -36,6 +49,10 @@ class Settings(BaseSettings):
     data_dir: Path | None = None
     models_dir: Path | None = None
     runtime_dir: Path | None = None
+    # Python environment of the engine (~6 GB). Movable to another drive by the wizard.
+    engine_env_dir: Path | None = None
+
+    language: str = DEFAULT_LANGUAGE
 
     host: str = "127.0.0.1"
     port: int = Field(default=7860, ge=1, le=65535)
@@ -59,6 +76,13 @@ class Settings(BaseSettings):
         object.__setattr__(
             self, "runtime_dir", (self.runtime_dir or self.home / "runtime").resolve()
         )
+        object.__setattr__(
+            self,
+            "engine_env_dir",
+            (self.engine_env_dir or self.home / "engine" / ".venv").resolve(),
+        )
+        if self.language not in LANGUAGES:
+            object.__setattr__(self, "language", DEFAULT_LANGUAGE)
         return self
 
     @classmethod
@@ -70,7 +94,7 @@ class Settings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
-        toml = TomlConfigSettingsSource(settings_cls, toml_file=default_home() / "photo.toml")
+        toml = TomlConfigSettingsSource(settings_cls, toml_file=config_file())
         return (init_settings, env_settings, toml)
 
     # ---- derived paths -------------------------------------------------------------
@@ -115,10 +139,14 @@ class Settings(BaseSettings):
         """Scratch folders the engine writes to (output, temp, input, user)."""
         return self.runtime / "engine-state"
 
+    @property
+    def engine_env(self) -> Path:
+        assert self.engine_env_dir is not None
+        return self.engine_env_dir
+
     @cached_property
     def engine_python(self) -> Path:
-        venv = self.home / "engine" / ".venv"
-        return venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+        return self.engine_env / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
 
     @cached_property
     def frontend_dist(self) -> Path:

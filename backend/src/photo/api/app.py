@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from photo import __version__
-from photo.api import routes
+from photo.api import routes, setup_routes
 from photo.api.security import GuardMiddleware
 from photo.catalog import Catalog, default_catalog
 from photo.config import Settings
@@ -21,10 +21,19 @@ from photo.db import Database
 from photo.engine.process import EngineProcess
 from photo.events import EventBus
 from photo.hardware import Gpu, detect_gpus, primary_gpu
+from photo.installer import SetupRunner
 from photo.jobs import JobService
 from photo.model_manager import ModelManager
 
 log = logging.getLogger(__name__)
+
+
+@dataclass
+class SetupContext:
+    settings: Settings
+    runner: SetupRunner
+    bus: EventBus
+    request_exit: Callable[[], None]
 
 
 @dataclass
@@ -38,6 +47,7 @@ class Services:
     engine: EngineProcess
     jobs: JobService
     models: ModelManager
+    language: str = "en"
 
 
 def build_services(
@@ -67,6 +77,7 @@ def build_services(
         engine=engine,
         jobs=JobService(db, settings, catalog, engine, bus, gpu),
         models=ModelManager(settings, catalog, bus, gpu),
+        language=settings.language,
     )
 
 
@@ -97,6 +108,37 @@ def create_app(services: Services, *, start_engine: bool = True) -> FastAPI:
         openapi_url="/api/openapi.json",
     )
     app.state.services = services
+    _install_common(app, settings)
+    app.include_router(routes.router, prefix="/api/v1")
+    _mount_frontend(app, settings)
+    return app
+
+
+def create_setup_app(
+    settings: Settings,
+    runner: SetupRunner,
+    bus: EventBus,
+    request_exit: Callable[[], None],
+) -> FastAPI:
+    """The installer wizard: same UI bundle, no engine, no job queue."""
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        try:
+            yield
+        finally:
+            await runner.cancel()
+
+    app = FastAPI(title="Photo setup", version=__version__, lifespan=lifespan, docs_url=None,
+                  redoc_url=None, openapi_url=None)  # fmt: skip
+    app.state.setup = SetupContext(settings, runner, bus, request_exit)
+    _install_common(app, settings)
+    app.include_router(setup_routes.router, prefix="/api/v1")
+    _mount_frontend(app, settings)
+    return app
+
+
+def _install_common(app: FastAPI, settings: Settings) -> None:
     app.add_middleware(
         GuardMiddleware,
         allowed_hosts=settings.allowed_hosts,
@@ -122,10 +164,6 @@ def create_app(services: Services, *, start_engine: bool = True) -> FastAPI:
             {"error": {"code": "invalid_request", "message": "Invalid request", "fields": fields}},
             status_code=422,
         )
-
-    app.include_router(routes.router, prefix="/api/v1")
-    _mount_frontend(app, settings)
-    return app
 
 
 def _mount_frontend(app: FastAPI, settings: Settings) -> None:
