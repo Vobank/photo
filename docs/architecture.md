@@ -44,6 +44,25 @@ fast-moving dependencies (torch, transformers); keeping them out of the app
 server means an engine update can never break the UI or the job store, and the
 app server starts in under a second without importing torch.
 
+## Installation
+
+`install.ps1` / `install.sh` only bootstrap: they fetch a pinned `uv`, create the
+app server's environment and run `photo setup --ui`. That serves a **setup
+wizard** from the same UI bundle on the app's own port (`/api/v1/setup/*`):
+language, storage locations per drive, models, then a live install whose
+progress streams over the event socket. Choices are written to `photo.toml`.
+When the user clicks *Open Photo*, the wizard server exits, the installer starts
+the app on the same address, and the page switches to it. `--unattended` runs
+the same steps without a browser.
+
+## Languages
+
+English is the source and the fallback. Eleven more locales are loaded on demand
+(`frontend/src/i18n/locales`); a test checks every key, placeholder and CLDR
+plural form. Arabic switches the document to right-to-left, so CSS uses logical
+properties only. The server never sends user-facing prose that the UI shows
+as-is: errors carry a `code` the UI translates, with the English text as detail.
+
 ## Jobs
 
 All GPU work is a **job** persisted in SQLite (`data/photo.db`, WAL mode).

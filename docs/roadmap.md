@@ -8,7 +8,9 @@ end-to-end run on both an RTX 40 and an RTX 50 card.
 - [x] One-click install on Windows and Linux, pinned and hash-verified
 - [x] Engine supervision, job queue, live previews, gallery
 - [x] Z-Image Turbo, NVFP4/BF16 variant selection
-- [ ] Release packages with the prebuilt UI attached by CI
+- [x] Setup wizard: language, per-drive storage choice, models, live progress
+- [x] 12 interface languages, right-to-left support
+- [x] Release packages with the prebuilt UI built by CI (on tag)
 - [ ] End-to-end test on RTX 40
 
 ## 0.2 — Edit

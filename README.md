@@ -15,8 +15,10 @@ leave your computer.
 - Gallery with favourites and undoable delete. Every PNG carries its exact
   parameters (the standard `parameters` text field plus full JSON).
 - Model variants picked for your card automatically: NVFP4 on RTX 50, BF16 on RTX 40.
-- English and Russian interface; dark, light or system theme; works from a phone
-  on your home network (opt-in, token protected).
+- Interface in 12 languages: English, 简体中文, Español, Português (Brasil),
+  Français, Deutsch, Italiano, Русский, 日本語, 한국어, Türkçe, العربية (right-to-left).
+- Dark, light or system theme; works from a phone on your home network
+  (opt-in, token protected).
 
 Editing (inpainting, instruction edits, upscaling, background removal) is next —
 see [the roadmap](docs/roadmap.md).
@@ -33,22 +35,37 @@ see [the roadmap](docs/roadmap.md).
 
 ## Install
 
-**Windows** — download the release zip (or `git clone`), unpack it to a short path
-such as `C:\Photo`, and double-click **`install.cmd`**.
+**Windows** — download `Photo-<version>-windows.zip` from
+[Releases](../../releases), unpack it to a short path such as `C:\Photo`, and
+double-click **`install.cmd`**.
 
-**Linux**
+**Linux** — download `Photo-<version>-linux.tar.gz`, unpack it, and run `./install.sh`.
 
-```sh
-./install.sh
-```
+After a minute of preparation, a setup wizard opens in your browser:
 
-The installer checks your GPU and driver, sets up a private Python environment,
-installs the engine with pinned, hash-verified packages, and downloads the
-recommended model (~10 GB). Nothing is installed system-wide; delete the folder
-to uninstall. Re-running the installer repairs a broken install.
+1. **Language** — pick one of the 12; the wizard switches immediately. It also
+   checks your graphics card and driver.
+2. **Storage** — choose the drive and folder for models, for the engine and for
+   your gallery. Free space is checked per drive before anything is downloaded.
+3. **Models** — the recommended model is preselected; licences are shown.
+4. **Install** — downloads are verified by SHA-256 and resume after a dropped
+   connection. When it finishes, *Open Photo* switches the page to the app.
 
-Then start **Photo** from the desktop shortcut, `Photo.cmd`, or `./photo.sh`.
+Nothing is installed system-wide; delete the folder to uninstall. Running the
+installer again repairs an install, and moving models to another drive there
+moves the files instead of downloading them again.
+
+Start **Photo** later from the desktop shortcut, `Photo.cmd`, or `./photo.sh`.
 It opens at <http://127.0.0.1:7860>.
+
+**Unattended install** (scripts, servers without a desktop):
+
+```powershell
+install.ps1 -Unattended -Language de -ModelsDir D:\Photo\models -EngineDir D:\Photo\engine
+```
+```sh
+./install.sh --unattended --language ja --models-dir /mnt/data/photo/models
+```
 
 Behind a slow or blocked connection to Hugging Face, set a mirror before
 installing: `set PHOTO_HF_ENDPOINT=https://hf-mirror.com`.
