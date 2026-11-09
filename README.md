@@ -8,6 +8,11 @@ leave your computer.
 
 ## What it does today
 
+- **Auto mode** (the default): describe the picture in any language and Photo
+  works out what you want. Ask for a photo and you get a realistic, unretouched
+  photograph; ask for a sticker, a logo, a 3D character, anime, watercolour or an
+  oil painting and it switches recipe and model to match. It shows what it chose
+  under every picture. See [docs/auto-mode.md](docs/auto-mode.md).
 - Text-to-image with **Z-Image Turbo** (Apache-2.0, commercial use allowed),
   8 steps: about 2.7 s for a 1024×1024 image on an RTX 5080 (first image
   after start ~24 s while the model loads).
