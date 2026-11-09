@@ -20,7 +20,8 @@ from fastapi import (
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict
 
-from photo import __version__, storage
+from photo import __version__, prefs, storage
+from photo.config import LANGUAGES
 from photo.ids import is_valid_id
 from photo.jobs import JobRejected
 from photo.schemas import GenerateParams
@@ -53,10 +54,13 @@ def _check_id(value: str) -> str:
 
 
 @router.get("/system")
-def system(svc: Svc) -> dict[str, Any]:
+async def system(svc: Svc) -> dict[str, Any]:
     gpu = svc.gpu
     return {
+        "mode": "app",
         "version": __version__,
+        "language": svc.language,
+        "languages": list(LANGUAGES),
         "engine": {"state": svc.engine.state, "error": svc.engine.last_error},
         "gpu": None
         if gpu is None
@@ -77,6 +81,21 @@ async def restart_engine(svc: Svc) -> dict[str, str]:
     return {"status": "restarting"}
 
 
+class PreferencesBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    language: str
+
+
+@router.put("/preferences")
+async def put_preferences(body: PreferencesBody, svc: Svc) -> dict[str, str]:
+    """Persist the interface language so every device on the network gets it."""
+    if body.language not in LANGUAGES:
+        raise _error(422, "unsupported_language", f"Unsupported language {body.language!r}")
+    prefs.update({"language": body.language})
+    svc.language = body.language
+    return {"language": svc.language}
+
+
 # ---- models ------------------------------------------------------------------------
 
 
@@ -86,12 +105,12 @@ class InstallBody(BaseModel):
 
 
 @router.get("/models")
-def list_models(svc: Svc) -> dict[str, Any]:
+async def list_models(svc: Svc) -> dict[str, Any]:
     return {"models": [svc.models.describe(m) for m in svc.catalog.models]}
 
 
 @router.post("/models/{model_id}/install", status_code=202)
-def install_model(model_id: str, svc: Svc, body: InstallBody | None = None) -> dict[str, Any]:
+async def install_model(model_id: str, svc: Svc, body: InstallBody | None = None) -> dict[str, Any]:
     try:
         task = svc.models.install(model_id, body.variant if body else None)
     except KeyError as exc:
@@ -108,7 +127,7 @@ async def cancel_install(model_id: str, svc: Svc) -> None:
 
 
 @router.post("/jobs", status_code=202)
-def create_job(params: GenerateParams, svc: Svc) -> dict[str, Any]:
+async def create_job(params: GenerateParams, svc: Svc) -> dict[str, Any]:
     try:
         job = svc.jobs.submit(params)
     except JobRejected as exc:
@@ -117,7 +136,7 @@ def create_job(params: GenerateParams, svc: Svc) -> dict[str, Any]:
 
 
 @router.get("/jobs")
-def list_jobs(
+async def list_jobs(
     svc: Svc,
     active: bool = False,
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
@@ -126,7 +145,7 @@ def list_jobs(
 
 
 @router.get("/jobs/{job_id}")
-def get_job(job_id: str, svc: Svc) -> dict[str, Any]:
+async def get_job(job_id: str, svc: Svc) -> dict[str, Any]:
     job = svc.jobs.get(_check_id(job_id))
     if job is None:
         raise _error(404, "not_found", "Job not found")
@@ -162,7 +181,7 @@ def _image_api(row: Any) -> dict[str, Any]:
 
 
 @router.get("/images")
-def list_images(
+async def list_images(
     svc: Svc,
     before: str | None = None,
     favorites: bool = False,
@@ -196,7 +215,7 @@ def _image_row(svc: Services, image_id: str) -> Any:
 
 
 @router.get("/images/{image_id}")
-def get_image(image_id: str, svc: Svc) -> dict[str, Any]:
+async def get_image(image_id: str, svc: Svc) -> dict[str, Any]:
     return _image_api(_image_row(svc, image_id))
 
 
@@ -204,7 +223,7 @@ _IMMUTABLE = {"Cache-Control": "private, max-age=31536000, immutable"}
 
 
 @router.get("/images/{image_id}/file")
-def image_file(image_id: str, svc: Svc, download: bool = False) -> FileResponse:
+async def image_file(image_id: str, svc: Svc, download: bool = False) -> FileResponse:
     row = _image_row(svc, image_id)
     path = storage.resolve(svc.settings.images_dir, row["path"])
     return FileResponse(
@@ -216,7 +235,7 @@ def image_file(image_id: str, svc: Svc, download: bool = False) -> FileResponse:
 
 
 @router.get("/images/{image_id}/thumb")
-def image_thumb(image_id: str, svc: Svc) -> FileResponse:
+async def image_thumb(image_id: str, svc: Svc) -> FileResponse:
     row = _image_row(svc, image_id)
     path = storage.resolve(svc.settings.images_dir, row["thumb_path"])
     return FileResponse(path, media_type="image/webp", headers=_IMMUTABLE)
@@ -228,7 +247,7 @@ class ImagePatch(BaseModel):
 
 
 @router.patch("/images/{image_id}")
-def patch_image(image_id: str, body: ImagePatch, svc: Svc) -> dict[str, Any]:
+async def patch_image(image_id: str, body: ImagePatch, svc: Svc) -> dict[str, Any]:
     _image_row(svc, image_id)
     if body.favorite is not None:
         svc.db.execute("UPDATE images SET favorite=? WHERE id=?", (int(body.favorite), image_id))
@@ -236,7 +255,7 @@ def patch_image(image_id: str, body: ImagePatch, svc: Svc) -> dict[str, Any]:
 
 
 @router.delete("/images/{image_id}", status_code=204)
-def delete_image(image_id: str, svc: Svc) -> None:
+async def delete_image(image_id: str, svc: Svc) -> None:
     """Moves the image to the trash; files stay on disk until the trash is emptied."""
     _image_row(svc, image_id)
     svc.db.execute("UPDATE images SET deleted_at=? WHERE id=?", (time.time(), image_id))
@@ -244,7 +263,7 @@ def delete_image(image_id: str, svc: Svc) -> None:
 
 
 @router.post("/images/{image_id}/restore")
-def restore_image(image_id: str, svc: Svc) -> dict[str, Any]:
+async def restore_image(image_id: str, svc: Svc) -> dict[str, Any]:
     svc.db.execute("UPDATE images SET deleted_at=NULL WHERE id=?", (_check_id(image_id),))
     return _image_api(_image_row(svc, image_id))
 

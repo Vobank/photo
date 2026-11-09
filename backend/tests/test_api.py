@@ -148,3 +148,47 @@ def test_unknown_api_route_is_json_404(client: TestClient) -> None:
 def test_bad_ids_never_touch_the_db(client: TestClient) -> None:
     assert client.get("/api/v1/images/..%2F..%2Fetc/file").status_code == 404
     assert client.get("/api/v1/jobs/' OR 1=1 --").status_code == 404
+
+
+def test_install_model_route_runs_download(
+    client: TestClient, services: Services, monkeypatch
+) -> None:  # type: ignore[no-untyped-def]
+    """Regression: the route used to run in a worker thread with no event loop (HTTP 500)."""
+    from photo import model_manager
+
+    async def fake_download(req, progress=None, client=None):  # type: ignore[no-untyped-def]
+        req.dest.parent.mkdir(parents=True, exist_ok=True)
+        req.dest.write_bytes(bytes(req.size))
+        if progress:
+            progress(req.size, req.size)
+        return req.dest
+
+    monkeypatch.setattr(model_manager, "download", fake_download)
+    r = client.post("/api/v1/models/z-image-turbo/install", json={"variant": "nvfp4"})
+    assert r.status_code == 202
+    for _ in range(100):
+        if client.get("/api/v1/models").json()["models"][0]["installed"]:
+            break
+        time.sleep(0.02)
+    assert client.get("/api/v1/models").json()["models"][0]["installed"]
+
+
+def test_preferences_language(client: TestClient, isolated_config) -> None:  # type: ignore[no-untyped-def]
+    from photo import prefs
+
+    assert client.get("/api/v1/system").json()["language"] == "en"
+    assert client.put("/api/v1/preferences", json={"language": "pt-BR"}).json() == {
+        "language": "pt-BR"
+    }
+    assert client.get("/api/v1/system").json()["language"] == "pt-BR"
+    assert prefs.read()["language"] == "pt-BR"
+    assert client.put("/api/v1/preferences", json={"language": "xx"}).status_code == 422
+
+
+def test_failed_job_carries_error_code(client: TestClient, services: Services) -> None:
+    from photo.engine.client import EngineError
+
+    install_fake_model(services)
+    services.engine.client.fail_with = EngineError("CUDA error: out of memory")  # type: ignore[attr-defined]
+    job = client.post("/api/v1/jobs", json=GEN).json()
+    assert wait_for(client, job["id"], "failed")["error_code"] == "out_of_memory"
