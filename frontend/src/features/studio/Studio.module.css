@@ -8,6 +8,7 @@
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   min-width: 0;
+  min-height: 0;
   background: var(--bg-0);
 }
 
@@ -163,9 +164,12 @@
 .canvas {
   position: relative;
   display: grid;
+  /* An explicit 1fr cell gives the image a definite box, so max-height: 100% works
+     and large results scale down to fit instead of overflowing the window. */
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   place-items: center;
   min-height: 0;
-  padding: var(--space-5);
+  padding: var(--space-5) var(--space-5) calc(var(--space-5) + 8px);
   overflow: hidden;
 }
 
