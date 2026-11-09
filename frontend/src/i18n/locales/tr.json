@@ -56,7 +56,9 @@
     "results": "Son sonuçlar",
     "inProgress": "Sürüyor",
     "queued": "Sırada",
-    "noModels": "Kurulu model yok"
+    "noModels": "Kurulu model yok",
+    "modelAuto": "Otomatik — isteğe en uygun",
+    "autoChose": "Otomatik: {{style}} · {{model}}"
   },
   "actions": {
     "dismiss": "Gizle",
@@ -282,6 +284,12 @@
     "promptUsed": "Modelin aldığı istem"
   },
   "styles": {
+    "auto": "Otomatik",
+    "photo": "Fotogerçekçi",
+    "cartoon": "Çizgi film",
+    "illustration": "İllüstrasyon",
+    "painting": "Yağlı boya",
+    "graphic": "Grafik tasarım",
     "none": "Stil yok",
     "cinematic": "Sinematik",
     "film": "35 mm film",

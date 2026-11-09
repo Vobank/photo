@@ -34,6 +34,15 @@ export interface Upload {
   height: number
 }
 
+/** What automatic mode decided for a job. */
+export interface Resolved {
+  medium: string
+  style: string | null
+  model: string
+  /** English prompt sent to the image model, when the request was translated. */
+  prompt: string | null
+}
+
 export interface Job {
   id: string
   kind: string
@@ -49,6 +58,7 @@ export interface Job {
   started_at: number | null
   finished_at: number | null
   image_ids: string[]
+  resolved?: Resolved | null
 }
 
 export interface ImageInfo {
@@ -64,6 +74,7 @@ export interface ImageInfo {
   steps: number | null
   cfg: number | null
   final_prompt: string | null
+  resolved?: Resolved | null
 }
 
 export interface ModelVariant {

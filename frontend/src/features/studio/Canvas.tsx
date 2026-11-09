@@ -22,6 +22,7 @@ import { jobErrorText } from '../../lib/errors'
 import { formatDuration } from '../../lib/format'
 import { useLive } from '../../state/live'
 import { useStudio } from '../../state/studio'
+import { AutoDecision } from './AutoDecision'
 import { moreLikeThis, addAsReference } from './pictureActions'
 import styles from './Studio.module.css'
 
@@ -145,6 +146,7 @@ function LiveView({ job }: { job: Job }) {
         <span>
           {width} × {height}
         </span>
+        <AutoDecision resolved={job.resolved} />
       </div>
       <div className={styles.toolbar}>
         <IconButton label={t('actions.cancel')} onClick={() => void api.cancelJob(job.id)}>
@@ -212,6 +214,7 @@ function ImageView({ image }: { image: ImageInfo }) {
         <span>
           {t('studio.seed')} {image.seed}
         </span>
+        <AutoDecision resolved={image.resolved} />
       </div>
       <div className={styles.toolbar}>
         <IconButton

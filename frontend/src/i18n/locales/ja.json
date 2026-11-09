@@ -53,7 +53,9 @@
     "results": "最近の結果",
     "inProgress": "処理中",
     "queued": "待機中",
-    "noModels": "モデルがインストールされていません"
+    "noModels": "モデルがインストールされていません",
+    "modelAuto": "自動 — 内容に合わせて選択",
+    "autoChose": "自動：{{style}} · {{model}}"
   },
   "actions": {
     "dismiss": "閉じる",
@@ -279,6 +281,12 @@
     "promptUsed": "モデルが受け取ったプロンプト"
   },
   "styles": {
+    "auto": "自動",
+    "photo": "リアルな写真",
+    "cartoon": "カートゥーン",
+    "illustration": "イラスト",
+    "painting": "油絵",
+    "graphic": "グラフィックデザイン",
     "none": "スタイルなし",
     "cinematic": "シネマティック",
     "film": "35mm フィルム",

@@ -14,7 +14,7 @@ import { ASPECTS, SIZES, dimensionsFor, megapixels } from '../../lib/dimensions'
 import { apiErrorText } from '../../lib/errors'
 import { isMac } from '../../lib/format'
 import { activeJobs, useLive } from '../../state/live'
-import { MAX_SEED, useStudio } from '../../state/studio'
+import { AUTO, MAX_SEED, useStudio } from '../../state/studio'
 import { InputPictures } from './InputPictures'
 import { improvePrompt } from './inputs'
 import { Looks } from './Looks'
@@ -36,7 +36,20 @@ export function Inspector() {
     () => (need ? installed.filter((m) => m.features[need]) : installed),
     [installed, need],
   )
-  const model = usable.find((m) => m.id === s.model)
+  const isAuto = s.model === AUTO
+  const model = isAuto ? undefined : usable.find((m) => m.id === s.model)
+  // In automatic mode a feature is available if any model that could be chosen has it.
+  const features = useMemo(
+    () =>
+      isAuto
+        ? {
+            references: usable.some((m) => m.features.references),
+            variation: usable.some((m) => m.features.variation),
+            detail: usable.some((m) => m.features.detail),
+          }
+        : model?.features,
+    [isAuto, usable, model],
+  )
   const [improving, setImproving] = useState(false)
   const queued = useLive((st) => activeJobs(st.jobs).length)
   const upsertJob = useLive((st) => st.upsertJob)
@@ -49,8 +62,8 @@ export function Inspector() {
   // current one cannot handle the pictures the user added.
   const setStudio = s.set
   useEffect(() => {
-    if (usable.length && !model) setStudio({ model: usable[0].id, steps: null, cfg: null })
-  }, [usable, model, setStudio])
+    if (usable.length && !isAuto && !model) setStudio({ model: AUTO, steps: null, cfg: null })
+  }, [usable, isAuto, model, setStudio])
 
   const improve = async () => {
     if (!s.prompt.trim() || improving) return
@@ -156,6 +169,7 @@ export function Inspector() {
             disabled={!usable.length}
           >
             {!usable.length && <option value="">{t('studio.noModels')}</option>}
+            {usable.length > 0 && <option value={AUTO}>{t('studio.modelAuto')}</option>}
             {usable.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name}
@@ -164,7 +178,7 @@ export function Inspector() {
           </select>
         </div>
 
-        <Looks features={model?.features} />
+        <Looks features={features} />
 
         <div className={styles.divider} />
 

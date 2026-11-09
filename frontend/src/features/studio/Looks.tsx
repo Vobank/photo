@@ -3,7 +3,7 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { ModelFeatures } from '../../api/types'
-import { useStudio } from '../../state/studio'
+import { AUTO, useStudio } from '../../state/studio'
 import styles from './Studio.module.css'
 
 const useStyles = () =>
@@ -20,7 +20,8 @@ export function Looks({ features }: { features: ModelFeatures | undefined }) {
   const { data } = useStyles()
   const enhanceId = useId()
   const detailId = useId()
-  const ids = [null, ...(data?.styles.map((x) => x.id) ?? [])]
+  // "auto" first: Photo reads the prompt and picks the look; then no style; then presets.
+  const ids = [AUTO, null, ...(data?.styles.map((x) => x.id) ?? [])]
 
   return (
     <>

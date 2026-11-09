@@ -53,7 +53,9 @@
     "results": "最近结果",
     "inProgress": "进行中",
     "queued": "已排队",
-    "noModels": "未安装任何模型"
+    "noModels": "未安装任何模型",
+    "modelAuto": "自动 — 按需求选择",
+    "autoChose": "自动：{{style}} · {{model}}"
   },
   "actions": {
     "dismiss": "关闭",
@@ -279,6 +281,12 @@
     "promptUsed": "模型实际收到的提示词"
   },
   "styles": {
+    "auto": "自动",
+    "photo": "写实照片",
+    "cartoon": "卡通",
+    "illustration": "插画",
+    "painting": "油画",
+    "graphic": "平面设计",
     "none": "无风格",
     "cinematic": "电影感",
     "film": "35mm 胶片",

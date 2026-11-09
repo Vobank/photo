@@ -56,7 +56,9 @@
     "results": "Recent results",
     "inProgress": "In progress",
     "queued": "Queued",
-    "noModels": "No models installed"
+    "noModels": "No models installed",
+    "modelAuto": "Auto — best for the request",
+    "autoChose": "Auto: {{style}} · {{model}}"
   },
   "actions": {
     "dismiss": "Dismiss",
@@ -282,6 +284,12 @@
     "promptUsed": "Prompt the model received"
   },
   "styles": {
+    "auto": "Auto",
+    "photo": "Photoreal",
+    "cartoon": "Cartoon",
+    "illustration": "Illustration",
+    "painting": "Oil painting",
+    "graphic": "Graphic design",
     "none": "No style",
     "cinematic": "Cinematic",
     "film": "35mm film",

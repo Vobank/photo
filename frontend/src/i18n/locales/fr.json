@@ -59,7 +59,9 @@
     "results": "Résultats récents",
     "inProgress": "En cours",
     "queued": "En file d’attente",
-    "noModels": "Aucun modèle installé"
+    "noModels": "Aucun modèle installé",
+    "modelAuto": "Auto : le plus adapté",
+    "autoChose": "Auto : {{style}} · {{model}}"
   },
   "actions": {
     "dismiss": "Ignorer",
@@ -285,6 +287,12 @@
     "promptUsed": "Prompt reçu par le modèle"
   },
   "styles": {
+    "auto": "Auto",
+    "photo": "Photoréaliste",
+    "cartoon": "Dessin animé",
+    "illustration": "Illustration",
+    "painting": "Peinture à l’huile",
+    "graphic": "Design graphique",
     "none": "Aucun style",
     "cinematic": "Cinématographique",
     "film": "Pellicule 35 mm",

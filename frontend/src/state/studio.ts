@@ -5,6 +5,8 @@ import type { GenerateParams, ImageInfo } from '../api/types'
 import { ASPECTS, type AspectId, type SizeId, dimensionsFor } from '../lib/dimensions'
 
 export const MAX_SEED = 2 ** 53 - 1
+/** Model and style value meaning "let Photo decide from the prompt". */
+export const AUTO = 'auto'
 export const MAX_REFERENCES = 4
 
 /** A picture used as input: from the gallery or uploaded from disk. */
@@ -74,7 +76,7 @@ export const useStudio = create<StudioState>()(
     (set, get) => ({
       prompt: '',
       negativePrompt: '',
-      model: null,
+      model: AUTO,
       aspect: '1:1',
       size: 'm',
       batch: 1,
@@ -83,7 +85,7 @@ export const useStudio = create<StudioState>()(
       steps: null,
       cfg: null,
       advancedOpen: false,
-      style: null,
+      style: AUTO,
       enhance: false,
       detail: false,
       inputMode: 'references',
@@ -152,10 +154,15 @@ export const useStudio = create<StudioState>()(
     }),
     {
       name: 'photo.studio',
-      version: 2,
+      version: 3,
       partialize: ({ selectedImageId: _s, set: _set, ...rest }) => rest,
       // v1 had no looks or inputs: defaults fill them in.
-      migrate: (persisted) => persisted as StudioState,
+      // v3 introduced automatic mode; earlier defaults (no style, first model) become auto.
+      migrate: (persisted, version) => {
+        const s = persisted as StudioState
+        if (version < 3) return { ...s, model: AUTO, style: s.style ?? AUTO, steps: null, cfg: null }
+        return s
+      },
     },
   ),
 )
