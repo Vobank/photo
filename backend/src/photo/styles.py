@@ -10,6 +10,7 @@ best, and the UI translates only the style *names*. Each style has two parts:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 
@@ -18,6 +19,43 @@ class Style:
     id: str
     suffix: str
     direction: str
+    # Used instead of ``suffix`` when the prompt is about people (see mentions_people).
+    people_suffix: str | None = None
+
+
+# Realism for people, chosen from side-by-side runs (docs/realism.md). Describing the
+# *photo* as raw and the *skin* as real removes the airbrushed "AI face"; words such as
+# "wrinkles", "blemishes" or "cluttered" were left out because they aged people and
+# dirtied scenes. Never added without people: it made a person appear by a mountain lake.
+PEOPLE_REALISM = (
+    "raw unedited photo, natural uneven light, real skin with visible pores and natural "
+    "imperfections, natural hair with flyaways, candid unposed moment, true-to-life colors"
+)
+# Shorter version that other photographic looks (cinematic, noir...) append for people.
+PEOPLE_REALISM_SHORT = "real skin with visible pores, natural unposed expression, unretouched"
+
+_PEOPLE_EN = re.compile(
+    r"\b(?:man|men|woman|women|person|people|persons|girl|girls|boy|boys|child|children|kid|"
+    r"kids|baby|babies|toddler|teen|teenager|family|couple|friends?|portrait|face|faces|selfie|"
+    r"crowd|guy|guys|lady|ladies|gentleman|grandma|grandmother|grandpa|grandfather|mother|"
+    r"father|mom|mum|dad|daughter|son|sister|brother|wife|husband|bride|groom|student|"
+    r"students|worker|workers|doctor|nurse|teacher|chef|cook|waiter|waitress|farmer|fisherman|"
+    r"soldier|police(?:man|woman)?|officer|dancer|athlete|player|musician|singer|pedestrians?|"
+    r"passengers?|tourists?|elderly|old-timer|he|she|his|her)\b",
+    re.IGNORECASE,
+)
+_PEOPLE_RU = re.compile(
+    r"(?:человек|люд[иейям]|мужчин|женщин|девушк|девочк|парн|парен|мальчик|ребён|ребен|"
+    r"дети|детей|семь[яиейю]|портрет|лицо|лица|бабушк|дедушк|мама|маму|папа|друз|подруг|"
+    r"студент|рабоч|врач|рыбак|старик|старушк|невест|жених|толп|прохож|пассажир|школьни|"
+    r"подрост|солдат|полицейск|медсестр|учител|танцор|спортсмен|музыкант|певиц|певец)",
+    re.IGNORECASE,
+)
+
+
+def mentions_people(text: str) -> bool:
+    """Whether a request is (also) about people. English after translation, Russian before."""
+    return bool(_PEOPLE_EN.search(text) or _PEOPLE_RU.search(text))
 
 
 STYLES: tuple[Style, ...] = (
@@ -28,7 +66,11 @@ STYLES: tuple[Style, ...] = (
         "a genuine, unretouched photograph a real person could have taken: name the camera and "
         "lens, use natural available light, and describe real-world texture (fabric weave, dust, "
         "wear, small imperfections) in an ordinary, uncurated setting. Keep the framing the idea "
-        "implies. It must look like a real photo, never like a glossy, airbrushed render",
+        "implies. If there are people, they look like real, ordinary people caught in a candid "
+        "moment: real skin with visible pores and natural imperfections, natural hair, unposed "
+        "expressions, never model-perfect or symmetrical. It must look like a real photo, never "
+        "like a glossy, airbrushed render",
+        people_suffix=PEOPLE_REALISM,
     ),
     Style(
         "cinematic",
@@ -179,8 +221,20 @@ def enhance_request(prompt: str, style: Style | None, *, has_references: bool) -
     return "\n".join(parts)
 
 
+# Photographic looks: with people in them, faces get the short realism clause.
+PHOTO_LOOKS = frozenset(
+    {"cinematic", "film", "portrait", "golden_hour", "noir", "neon", "product", "architecture"}
+)
+
+
 def apply_style(prompt: str, style: Style | None) -> str:
     """Prompt with the style's suffix, used when enhancement is off."""
     if not style:
         return prompt
-    return f"{prompt.rstrip().rstrip('.')}. {style.suffix}."
+    base = prompt.rstrip().rstrip(".")
+    people = mentions_people(prompt)
+    if people and style.people_suffix:
+        return f"{base}. {style.people_suffix}."
+    if people and style.id in PHOTO_LOOKS:
+        return f"{base}. {style.suffix}, {PEOPLE_REALISM_SHORT}."
+    return f"{base}. {style.suffix}."

@@ -125,7 +125,8 @@ def test_photo_request_goes_to_klein_with_photo_recipe(
     job = client.post("/api/v1/jobs", json={**AUTO, "prompt": "рыбак чинит сеть"}).json()
     done = wait_for(client, job["id"], "succeeded")
     assert done["model"] == "flux2-klein-4b"
-    assert "unretouched photograph" in _graph_prompt(fake.graphs[-1])
+    # A fisherman is a person: the realism recipe for people applies.
+    assert "real skin with visible pores" in _graph_prompt(fake.graphs[-1])
 
 
 def test_only_installed_models_are_used(client: TestClient, services: Services) -> None:
