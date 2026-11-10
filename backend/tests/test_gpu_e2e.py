@@ -168,3 +168,65 @@ def test_auto_mode_routes_by_what_was_asked(
     print(f"\n{prompt!r}: {job['resolved']} in {elapsed:.1f}s")
     assert job["resolved"]["medium"] == medium
     assert job["model"] == model
+
+
+def _upload(base: str, img: Image.Image) -> str:
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    r = httpx.post(f"{base}/api/v1/uploads", files={"file": ("p.png", buf.getvalue(), "image/png")})
+    r.raise_for_status()
+    return str(r.json()["id"])
+
+
+def _edit(base: str, **body: object) -> dict:
+    job = httpx.post(f"{base}/api/v1/jobs", json={"kind": "edit", **body}).raise_for_status().json()
+    while job["status"] not in ("succeeded", "failed", "cancelled"):
+        time.sleep(0.1)
+        job = httpx.get(f"{base}/api/v1/jobs/{job['id']}").json()
+    assert job["status"] == "succeeded", job["error"]
+    return job
+
+
+def test_area_edit_on_gpu_changes_only_the_selection(server: str) -> None:
+    from PIL import ImageChops, ImageDraw, ImageFilter
+
+    from photo import editing
+
+    models = httpx.get(f"{server}/api/v1/models").json()["models"]
+    if not any(m["installed"] and m["features"].get("edit") for m in models):
+        pytest.skip("needs FLUX.2 Klein for editing")
+    made, _ = _generate(server, width=1024, height=768, seed=77)
+    png = httpx.get(f"{server}/api/v1/images/{made['image_ids'][0]}/file").content
+    with Image.open(io.BytesIO(png)) as src_img:
+        src = src_img.convert("RGB")
+    mask = Image.new("L", src.size, 0)
+    ImageDraw.Draw(mask).ellipse((380, 300, 640, 520), fill=255)
+
+    t0 = time.perf_counter()
+    job = _edit(
+        server,
+        source=made["image_ids"][0],
+        mask=_upload(server, mask.convert("RGB")),
+        prompt="поставь на это место красный воздушный шар",
+    )
+    print(f"\narea edit: {time.perf_counter() - t0:.1f}s, instruction {job['id']}")
+    out_png = httpx.get(f"{server}/api/v1/images/{job['image_ids'][0]}/file").content
+    with Image.open(io.BytesIO(out_png)) as out_img:
+        out = out_img.convert("RGB")
+    assert out.size == src.size
+    crop = editing.crop_box(src.size, mask.getbbox())  # type: ignore[arg-type]
+    guard = mask.filter(
+        ImageFilter.MaxFilter(editing.influence(editing.feather_radius(crop)) * 2 + 1)
+    )
+    diff = ImageChops.difference(src, out).convert("L")
+    assert ImageChops.multiply(diff, ImageChops.invert(guard)).getextrema()[1] == 0
+    inside = ImageChops.multiply(diff, mask).getbbox()
+    assert inside is not None  # something did change inside
+
+    hidden = _edit(
+        server,
+        source=made["image_ids"][0],
+        mask=_upload(server, mask.convert("RGB")),
+        action="pixelate",
+    )
+    assert hidden["model"] == "tools"
