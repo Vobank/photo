@@ -105,14 +105,16 @@
       "enhancer_unavailable": "Scarica prima un modello: l’assistente per il prompt usa il suo modello linguistico.",
       "invalid_image": "Questo file non è un’immagine che Photo può leggere.",
       "engine_unavailable": "Il motore si sta avviando. Riprova tra un momento.",
-      "engine_error": "Il motore non è riuscito a completare questa richiesta."
+      "engine_error": "Il motore non è riuscito a completare questa richiesta.",
+      "edit_model_missing": "Per modificare le immagini serve FLUX.2 Klein. Scaricalo dalla pagina Modelli."
     },
     "job": {
       "out_of_memory": "Memoria video insufficiente. Prova una dimensione più piccola o meno immagini, oppure chiudi altri programmi che usano la GPU.",
       "engine_unavailable": "Il motore si è arrestato e si sta riavviando. Riprova tra un momento.",
       "engine_not_installed": "Il motore non è installato. Esegui di nuovo il programma di installazione.",
       "interrupted": "Photo è stato chiuso durante la creazione di questa immagine.",
-      "engine_error": "Impossibile generare questa immagine."
+      "engine_error": "Impossibile generare questa immagine.",
+      "empty_selection": "Nessuna selezione. Seleziona un’area e riprova."
     }
   },
   "onboarding": {
@@ -306,5 +308,70 @@
     "anime": "Anime",
     "watercolor": "Acquerello",
     "render3d": "Render 3D"
+  },
+  "edit": {
+    "mode": "Modalità",
+    "modeCreate": "Crea",
+    "modeEdit": "Modifica",
+    "editThis": "Modifica questa immagine",
+    "tools": "Strumenti di selezione",
+    "brush": "Pennello",
+    "rect": "Rettangolo",
+    "lasso": "Lazo",
+    "erase": "Cancella selezione (tieni premuto Alt)",
+    "brushSize": "Dimensione pennello",
+    "undo": "Annulla passaggio di selezione",
+    "invert": "Inverti selezione",
+    "clear": "Deseleziona",
+    "compare": "Tieni premuto per vedere la versione precedente",
+    "stepBack": "Torna alla versione precedente",
+    "close": "Chiudi modifica",
+    "working": "Modifica in corso…",
+    "comparing": "Versione precedente",
+    "hint": {
+      "brush": "Dipingi sopra ciò che vuoi cambiare. [ e ] cambiano la dimensione del pennello; tieni premuto Alt per cancellare.",
+      "rect": "Trascina per selezionare un rettangolo. Tieni premuto Alt per togliere dalla selezione.",
+      "lasso": "Fai clic per aggiungere punti o trascina per tracciare un contorno. Doppio clic, Enter o un clic sul primo punto lo chiudono."
+    },
+    "panel": "Modifica",
+    "picture": "Immagine",
+    "versions_one": "{{count}} versione precedente",
+    "versions_many": "{{count}} versioni precedenti",
+    "versions_other": "{{count}} versioni precedenti",
+    "noPicture": "Nessuna immagine",
+    "open": "Apri foto…",
+    "action": "Azione",
+    "actions": {
+      "edit": "Cambia",
+      "remove": "Rimuovi",
+      "hide": "Nascondi"
+    },
+    "hideMode": "Come nascondere",
+    "hide": {
+      "blur": "Sfoca",
+      "pixelate": "Pixella",
+      "fill": "Copri"
+    },
+    "selected": "Selezionato: {{share}} dell’immagine. Cambierà solo quest’area.",
+    "noSelectionWhole": "Nessuna selezione: cambierà l’intera immagine. Seleziona un’area per cambiare solo quella parte.",
+    "selectFirst": "Prima seleziona un’area sull’immagine.",
+    "whatToDo": "Cosa deve cambiare?",
+    "whatToRemove": "Cosa rimuovere",
+    "optional": "facoltativo",
+    "promptPlaceholder": "Ad esempio: sostituisci il libro con una tazza di caffè",
+    "removePlaceholder": "Ad esempio: la barca",
+    "example1": "Trasformala in un inverno innevato",
+    "example2": "Rendila in bianco e nero",
+    "example3": "Sostituisci lo sfondo con una spiaggia",
+    "example4": "Aggiungi degli occhiali da sole",
+    "variants": "Varianti",
+    "apply": "Applica",
+    "missing": {
+      "source": "Prima apri un’immagine",
+      "prompt": "Descrivi la modifica",
+      "selection": "Prima seleziona un’area"
+    },
+    "emptyTitle": "Scegli un’immagine da modificare",
+    "emptyBody": "Apri una foto dal tuo computer, trascinala qui, incollala con Ctrl+V o fai clic su un’immagine nella barra sottostante."
   }
 }

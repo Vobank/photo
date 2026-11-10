@@ -102,14 +102,16 @@
       "enhancer_unavailable": "Download a model first: the prompt helper uses its language model.",
       "invalid_image": "This file is not a picture Photo can read.",
       "engine_unavailable": "The engine is starting. Try again in a moment.",
-      "engine_error": "The engine could not finish this request."
+      "engine_error": "The engine could not finish this request.",
+      "edit_model_missing": "Editing pictures needs FLUX.2 Klein. Download it on the Models page."
     },
     "job": {
       "out_of_memory": "Not enough video memory. Try a smaller size or fewer images, or close other programs that use the GPU.",
       "engine_unavailable": "The engine stopped and is restarting. Try again in a moment.",
       "engine_not_installed": "The engine is not installed. Run the installer again.",
       "interrupted": "Photo was closed while this image was being made.",
-      "engine_error": "This image could not be generated."
+      "engine_error": "This image could not be generated.",
+      "empty_selection": "Nothing is selected. Select an area and try again."
     }
   },
   "onboarding": {
@@ -303,5 +305,69 @@
     "anime": "Anime",
     "watercolor": "Watercolour",
     "render3d": "3D render"
+  },
+  "edit": {
+    "mode": "Mode",
+    "modeCreate": "Create",
+    "modeEdit": "Edit",
+    "editThis": "Edit this picture",
+    "tools": "Selection tools",
+    "brush": "Brush",
+    "rect": "Rectangle",
+    "lasso": "Lasso",
+    "erase": "Erase selection (hold Alt)",
+    "brushSize": "Brush size",
+    "undo": "Undo selection step",
+    "invert": "Invert selection",
+    "clear": "Clear selection",
+    "compare": "Hold to see the previous version",
+    "stepBack": "Back to the previous version",
+    "close": "Close editing",
+    "working": "Editing…",
+    "comparing": "Previous version",
+    "hint": {
+      "brush": "Paint over what you want to change. [ and ] change the brush size; hold Alt to erase.",
+      "rect": "Drag to select a rectangle. Hold Alt to remove from the selection.",
+      "lasso": "Click to place points, or drag to draw around. Double-click, Enter or the first point closes it."
+    },
+    "panel": "Editing",
+    "picture": "Picture",
+    "versions_one": "{{count}} earlier version",
+    "versions_other": "{{count}} earlier versions",
+    "noPicture": "No picture yet",
+    "open": "Open photo…",
+    "action": "What to do",
+    "actions": {
+      "edit": "Change",
+      "remove": "Remove",
+      "hide": "Hide"
+    },
+    "hideMode": "How to hide",
+    "hide": {
+      "blur": "Blur",
+      "pixelate": "Pixelate",
+      "fill": "Cover"
+    },
+    "selected": "Selected: {{share}} of the picture. Only this area will change.",
+    "noSelectionWhole": "Nothing selected: the whole picture will change. Select an area to change only that part.",
+    "selectFirst": "Select the area on the picture first.",
+    "whatToDo": "What should change?",
+    "whatToRemove": "What to remove",
+    "optional": "optional",
+    "promptPlaceholder": "For example: replace the book with a cup of coffee",
+    "removePlaceholder": "For example: the boat",
+    "example1": "Make it winter with snow",
+    "example2": "Make it black and white",
+    "example3": "Replace the background with a beach",
+    "example4": "Add sunglasses",
+    "variants": "Variants",
+    "apply": "Apply",
+    "missing": {
+      "source": "Open a picture first",
+      "prompt": "Describe the change",
+      "selection": "Select an area first"
+    },
+    "emptyTitle": "Choose a picture to edit",
+    "emptyBody": "Open a photo from your computer, drop it here, paste it with Ctrl+V, or click a picture in the strip below."
   }
 }

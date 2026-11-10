@@ -22,10 +22,25 @@ export interface GenerateParams {
   variation_strength?: number
 }
 
+/** Change an existing picture; see backend schemas.EditParams. */
+export interface EditParams {
+  kind: 'edit'
+  model?: string
+  source: string
+  mask?: string | null
+  action: 'edit' | 'remove' | 'blur' | 'pixelate' | 'fill'
+  prompt?: string
+  seed?: number | null
+  batch_size?: number
+}
+
+export type JobRequest = GenerateParams | EditParams
+
 export interface ModelFeatures {
   references: boolean
   variation: boolean
   detail: boolean
+  edit?: boolean
 }
 
 export interface Upload {
@@ -75,6 +90,8 @@ export interface ImageInfo {
   cfg: number | null
   final_prompt: string | null
   resolved?: Resolved | null
+  /** Edits: the picture this one was made from. */
+  source?: string | null
 }
 
 export interface ModelVariant {

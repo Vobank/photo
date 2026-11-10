@@ -99,14 +99,16 @@
       "enhancer_unavailable": "请先下载模型：提示词助手会使用模型自带的语言模型。",
       "invalid_image": "此文件不是 Photo 能读取的图像。",
       "engine_unavailable": "引擎正在启动。请稍后重试。",
-      "engine_error": "引擎无法完成此请求。"
+      "engine_error": "引擎无法完成此请求。",
+      "edit_model_missing": "编辑图像需要 FLUX.2 Klein。请在“模型”页面中下载。"
     },
     "job": {
       "out_of_memory": "显存不足。请尝试更小的尺寸或更少的图像数量，或关闭其他占用 GPU 的程序。",
       "engine_unavailable": "引擎已停止，正在重新启动。请稍后重试。",
       "engine_not_installed": "引擎未安装。请重新运行安装程序。",
       "interrupted": "生成此图像时 Photo 已被关闭。",
-      "engine_error": "无法生成此图像。"
+      "engine_error": "无法生成此图像。",
+      "empty_selection": "未选择任何区域。请选择一个区域后重试。"
     }
   },
   "onboarding": {
@@ -300,5 +302,68 @@
     "anime": "动漫",
     "watercolor": "水彩",
     "render3d": "3D 渲染"
+  },
+  "edit": {
+    "mode": "模式",
+    "modeCreate": "生成",
+    "modeEdit": "编辑",
+    "editThis": "编辑此图像",
+    "tools": "选区工具",
+    "brush": "画笔",
+    "rect": "矩形",
+    "lasso": "套索",
+    "erase": "擦除选区（按住 Alt）",
+    "brushSize": "画笔大小",
+    "undo": "撤销选区操作",
+    "invert": "反选",
+    "clear": "取消选择",
+    "compare": "按住可查看上一版本",
+    "stepBack": "退回上一版本",
+    "close": "关闭编辑",
+    "working": "正在编辑…",
+    "comparing": "上一版本",
+    "hint": {
+      "brush": "涂抹想要修改的部分。按 [ 和 ] 调整画笔大小，按住 Alt 可擦除。",
+      "rect": "拖动以框选矩形区域。按住 Alt 可从选区中减去。",
+      "lasso": "单击放置锚点，或拖动圈出区域。双击、按 Enter 或单击起点即可闭合。"
+    },
+    "panel": "编辑",
+    "picture": "图像",
+    "versions_other": "{{count}} 个历史版本",
+    "noPicture": "尚无图像",
+    "open": "打开照片…",
+    "action": "操作",
+    "actions": {
+      "edit": "修改",
+      "remove": "移除",
+      "hide": "隐藏"
+    },
+    "hideMode": "隐藏方式",
+    "hide": {
+      "blur": "模糊",
+      "pixelate": "像素化",
+      "fill": "遮盖"
+    },
+    "selected": "已选择图像的 {{share}}。只有该区域会被修改。",
+    "noSelectionWhole": "未选择区域：将修改整张图像。选择一个区域即可只修改该部分。",
+    "selectFirst": "请先在图像上选择区域。",
+    "whatToDo": "要修改什么？",
+    "whatToRemove": "要移除的内容",
+    "optional": "可选",
+    "promptPlaceholder": "例如：把书换成一杯咖啡",
+    "removePlaceholder": "例如：小船",
+    "example1": "变成下雪的冬天",
+    "example2": "变成黑白照片",
+    "example3": "把背景换成海滩",
+    "example4": "戴上墨镜",
+    "variants": "变体",
+    "apply": "应用",
+    "missing": {
+      "source": "请先打开图像",
+      "prompt": "请描述要做的修改",
+      "selection": "请先选择区域"
+    },
+    "emptyTitle": "选择要编辑的图像",
+    "emptyBody": "从电脑中打开照片、拖放到这里、用 Ctrl+V 粘贴，或点击下方缩略图栏中的图像。"
   }
 }

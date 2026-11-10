@@ -105,14 +105,16 @@
       "enhancer_unavailable": "Baixe um modelo primeiro: o assistente de prompt usa o modelo de linguagem dele.",
       "invalid_image": "Este arquivo não é uma imagem que o Photo consiga ler.",
       "engine_unavailable": "O mecanismo está iniciando. Tente novamente em instantes.",
-      "engine_error": "O mecanismo não conseguiu concluir esta solicitação."
+      "engine_error": "O mecanismo não conseguiu concluir esta solicitação.",
+      "edit_model_missing": "Para editar imagens é preciso o FLUX.2 Klein. Baixe-o na página Modelos."
     },
     "job": {
       "out_of_memory": "Memória de vídeo insuficiente. Tente um tamanho menor ou menos imagens, ou feche outros programas que usam a GPU.",
       "engine_unavailable": "O mecanismo parou e está reiniciando. Tente novamente em instantes.",
       "engine_not_installed": "O mecanismo não está instalado. Execute o instalador novamente.",
       "interrupted": "O Photo foi fechado enquanto esta imagem estava sendo criada.",
-      "engine_error": "Não foi possível gerar esta imagem."
+      "engine_error": "Não foi possível gerar esta imagem.",
+      "empty_selection": "Nada selecionado. Selecione uma área e tente novamente."
     }
   },
   "onboarding": {
@@ -306,5 +308,70 @@
     "anime": "Anime",
     "watercolor": "Aquarela",
     "render3d": "Render 3D"
+  },
+  "edit": {
+    "mode": "Modo",
+    "modeCreate": "Criar",
+    "modeEdit": "Editar",
+    "editThis": "Editar esta imagem",
+    "tools": "Ferramentas de seleção",
+    "brush": "Pincel",
+    "rect": "Retângulo",
+    "lasso": "Laço",
+    "erase": "Apagar seleção (segure Alt)",
+    "brushSize": "Tamanho do pincel",
+    "undo": "Desfazer etapa da seleção",
+    "invert": "Inverter seleção",
+    "clear": "Limpar seleção",
+    "compare": "Segure para ver a versão anterior",
+    "stepBack": "Voltar à versão anterior",
+    "close": "Fechar edição",
+    "working": "Editando…",
+    "comparing": "Versão anterior",
+    "hint": {
+      "brush": "Pinte sobre o que você quer mudar. [ e ] mudam o tamanho do pincel; segure Alt para apagar.",
+      "rect": "Arraste para selecionar um retângulo. Segure Alt para remover da seleção.",
+      "lasso": "Clique para marcar pontos ou arraste para contornar. Clique duplo, Enter ou um clique no primeiro ponto fecham o contorno."
+    },
+    "panel": "Edição",
+    "picture": "Imagem",
+    "versions_one": "{{count}} versão anterior",
+    "versions_many": "{{count}} versões anteriores",
+    "versions_other": "{{count}} versões anteriores",
+    "noPicture": "Nenhuma imagem ainda",
+    "open": "Abrir foto…",
+    "action": "Ação",
+    "actions": {
+      "edit": "Alterar",
+      "remove": "Remover",
+      "hide": "Ocultar"
+    },
+    "hideMode": "Como ocultar",
+    "hide": {
+      "blur": "Desfocar",
+      "pixelate": "Pixelizar",
+      "fill": "Cobrir"
+    },
+    "selected": "Selecionado: {{share}} da imagem. Só esta área será alterada.",
+    "noSelectionWhole": "Nada selecionado: a imagem inteira será alterada. Selecione uma área para alterar só essa parte.",
+    "selectFirst": "Primeiro selecione uma área na imagem.",
+    "whatToDo": "O que deve mudar?",
+    "whatToRemove": "O que remover",
+    "optional": "opcional",
+    "promptPlaceholder": "Por exemplo: troque o livro por uma xícara de café",
+    "removePlaceholder": "Por exemplo: o barco",
+    "example1": "Transforme em inverno com neve",
+    "example2": "Deixe em preto e branco",
+    "example3": "Troque o fundo por uma praia",
+    "example4": "Adicione óculos de sol",
+    "variants": "Variantes",
+    "apply": "Aplicar",
+    "missing": {
+      "source": "Primeiro abra uma imagem",
+      "prompt": "Descreva a alteração",
+      "selection": "Primeiro selecione uma área"
+    },
+    "emptyTitle": "Escolha uma imagem para editar",
+    "emptyBody": "Abra uma foto do seu computador, solte-a aqui, cole com Ctrl+V ou clique em uma imagem na faixa abaixo."
   }
 }

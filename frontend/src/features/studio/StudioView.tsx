@@ -1,6 +1,11 @@
 import { useEffect } from 'react'
 
 import { useModels } from '../../api/queries'
+import { useEdit } from '../../state/edit'
+import { EditCanvas } from '../edit/EditCanvas'
+import { EditEmpty } from '../edit/EditEmpty'
+import { EditPanel } from '../edit/EditPanel'
+import { useOpenFiles } from '../edit/openFiles'
 import { Canvas } from './Canvas'
 import { Filmstrip } from './Filmstrip'
 import { useAddFiles } from './inputs'
@@ -11,7 +16,12 @@ import styles from './Studio.module.css'
 export function StudioView() {
   const { data: models } = useModels()
   const ready = models?.some((m) => m.installed)
-  const { add } = useAddFiles()
+  const { add: addReferences } = useAddFiles()
+  const { open } = useOpenFiles()
+  const editing = useEdit((s) => s.active)
+  const hasSource = useEdit((s) => !!s.source)
+  // In edit mode a dropped or pasted picture is opened for editing; otherwise it is a reference.
+  const add = editing ? open : addReferences
 
   // Paste a picture anywhere in the studio to use it as a reference.
   useEffect(() => {
@@ -37,10 +47,10 @@ export function StudioView() {
           void add(e.dataTransfer.files)
         }}
       >
-        {models && !ready ? <Onboarding models={models} /> : <Canvas />}
+        {models && !ready ? <Onboarding models={models} /> : editing ? hasSource ? <EditCanvas /> : <EditEmpty /> : <Canvas />}
         <Filmstrip />
       </section>
-      <Inspector />
+      {editing ? <EditPanel /> : <Inspector />}
     </div>
   )
 }

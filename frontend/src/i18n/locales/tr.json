@@ -102,14 +102,16 @@
       "enhancer_unavailable": "Önce bir model indirin: istem yardımcısı onun dil modelini kullanır.",
       "invalid_image": "Bu dosya, Photo'nun okuyabileceği bir görsel değil.",
       "engine_unavailable": "Motor başlatılıyor. Birazdan yeniden deneyin.",
-      "engine_error": "Motor bu isteği tamamlayamadı."
+      "engine_error": "Motor bu isteği tamamlayamadı.",
+      "edit_model_missing": "Görselleri düzenlemek için FLUX.2 Klein gerekir. Modeller sayfasından indirin."
     },
     "job": {
       "out_of_memory": "Yeterli video belleği yok. Daha küçük bir boyut veya daha az görsel deneyin ya da GPU kullanan diğer programları kapatın.",
       "engine_unavailable": "Motor durdu ve yeniden başlatılıyor. Birazdan yeniden deneyin.",
       "engine_not_installed": "Motor kurulu değil. Kurulum programını yeniden çalıştırın.",
       "interrupted": "Bu görsel oluşturulurken Photo kapatıldı.",
-      "engine_error": "Bu görsel oluşturulamadı."
+      "engine_error": "Bu görsel oluşturulamadı.",
+      "empty_selection": "Hiçbir şey seçilmedi. Bir alan seçip yeniden deneyin."
     }
   },
   "onboarding": {
@@ -303,5 +305,69 @@
     "anime": "Anime",
     "watercolor": "Suluboya",
     "render3d": "3D render"
+  },
+  "edit": {
+    "mode": "Mod",
+    "modeCreate": "Oluştur",
+    "modeEdit": "Düzenle",
+    "editThis": "Bu görseli düzenle",
+    "tools": "Seçim araçları",
+    "brush": "Fırça",
+    "rect": "Dikdörtgen",
+    "lasso": "Kement",
+    "erase": "Seçimi sil (Alt basılı tutun)",
+    "brushSize": "Fırça boyutu",
+    "undo": "Seçim adımını geri al",
+    "invert": "Seçimi tersine çevir",
+    "clear": "Seçimi kaldır",
+    "compare": "Önceki sürümü görmek için basılı tutun",
+    "stepBack": "Önceki sürüme dön",
+    "close": "Düzenlemeyi kapat",
+    "working": "Düzenleniyor…",
+    "comparing": "Önceki sürüm",
+    "hint": {
+      "brush": "Değiştirmek istediğiniz yeri boyayın. [ ve ] fırça boyutunu değiştirir; silmek için Alt tuşunu basılı tutun.",
+      "rect": "Dikdörtgen seçmek için sürükleyin. Seçimden çıkarmak için Alt tuşunu basılı tutun.",
+      "lasso": "Nokta koymak için tıklayın veya çevresini çizmek için sürükleyin. Kapatmak için çift tıklayın, Enter'a basın ya da ilk noktaya tıklayın."
+    },
+    "panel": "Düzenleme",
+    "picture": "Görsel",
+    "versions_one": "{{count}} önceki sürüm",
+    "versions_other": "{{count}} önceki sürüm",
+    "noPicture": "Henüz görsel yok",
+    "open": "Fotoğraf aç…",
+    "action": "İşlem",
+    "actions": {
+      "edit": "Değiştir",
+      "remove": "Kaldır",
+      "hide": "Gizle"
+    },
+    "hideMode": "Gizleme biçimi",
+    "hide": {
+      "blur": "Bulanık",
+      "pixelate": "Piksel",
+      "fill": "Örtü"
+    },
+    "selected": "Seçili alan: görselin {{share}} kadarı. Yalnızca bu alan değişir.",
+    "noSelectionWhole": "Hiçbir şey seçilmedi: görselin tamamı değişecek. Yalnızca bir kısmını değiştirmek için bir alan seçin.",
+    "selectFirst": "Önce görsel üzerinde bir alan seçin.",
+    "whatToDo": "Ne değişsin?",
+    "whatToRemove": "Ne kaldırılsın?",
+    "optional": "isteğe bağlı",
+    "promptPlaceholder": "Örneğin: kitabı bir fincan kahveyle değiştir",
+    "removePlaceholder": "Örneğin: tekne",
+    "example1": "Karlı bir kış manzarasına çevir",
+    "example2": "Siyah beyaz yap",
+    "example3": "Arka planı bir plajla değiştir",
+    "example4": "Güneş gözlüğü ekle",
+    "variants": "Varyantlar",
+    "apply": "Uygula",
+    "missing": {
+      "source": "Önce bir görsel açın",
+      "prompt": "Değişikliği tarif edin",
+      "selection": "Önce bir alan seçin"
+    },
+    "emptyTitle": "Düzenlenecek bir görsel seçin",
+    "emptyBody": "Bilgisayarınızdan bir fotoğraf açın, buraya sürükleyip bırakın, Ctrl+V ile yapıştırın veya alttaki şeritte bir görsele tıklayın."
   }
 }

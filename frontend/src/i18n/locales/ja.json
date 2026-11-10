@@ -99,14 +99,16 @@
       "enhancer_unavailable": "先にモデルをダウンロードしてください。プロンプトの改善には、モデルに含まれる言語モデルを使用します。",
       "invalid_image": "このファイルは Photo で読み込める画像ではありません。",
       "engine_unavailable": "エンジンを起動しています。しばらくしてからもう一度お試しください。",
-      "engine_error": "エンジンはこのリクエストを完了できませんでした。"
+      "engine_error": "エンジンはこのリクエストを完了できませんでした。",
+      "edit_model_missing": "画像の編集には FLUX.2 Klein が必要です。「モデル」ページでダウンロードしてください。"
     },
     "job": {
       "out_of_memory": "ビデオメモリが不足しています。サイズを小さくするか枚数を減らすか、GPU を使用している他のプログラムを終了してください。",
       "engine_unavailable": "エンジンが停止したため再起動しています。しばらくしてからもう一度お試しください。",
       "engine_not_installed": "エンジンがインストールされていません。インストーラーをもう一度実行してください。",
       "interrupted": "この画像の生成中に Photo が終了しました。",
-      "engine_error": "この画像を生成できませんでした。"
+      "engine_error": "この画像を生成できませんでした。",
+      "empty_selection": "何も選択されていません。範囲を選択してから、もう一度お試しください。"
     }
   },
   "onboarding": {
@@ -300,5 +302,68 @@
     "anime": "アニメ",
     "watercolor": "水彩",
     "render3d": "3D レンダリング"
+  },
+  "edit": {
+    "mode": "モード",
+    "modeCreate": "生成",
+    "modeEdit": "編集",
+    "editThis": "この画像を編集",
+    "tools": "選択ツール",
+    "brush": "ブラシ",
+    "rect": "長方形",
+    "lasso": "なげなわ",
+    "erase": "選択範囲を消去（Alt を押しながら）",
+    "brushSize": "ブラシサイズ",
+    "undo": "選択の操作を取り消す",
+    "invert": "選択範囲を反転",
+    "clear": "選択を解除",
+    "compare": "押している間、前のバージョンを表示",
+    "stepBack": "前のバージョンに戻す",
+    "close": "編集を閉じる",
+    "working": "編集中…",
+    "comparing": "前のバージョン",
+    "hint": {
+      "brush": "変更したい部分を塗ります。[ と ] でブラシサイズを変更、Alt を押しながら塗ると消去します。",
+      "rect": "ドラッグして長方形を選択します。Alt を押しながらドラッグすると選択範囲から除外します。",
+      "lasso": "クリックで点を置くか、ドラッグで囲みます。ダブルクリック、Enter、または最初の点をクリックすると閉じます。"
+    },
+    "panel": "編集",
+    "picture": "画像",
+    "versions_other": "以前のバージョン {{count}} 件",
+    "noPicture": "画像がまだありません",
+    "open": "写真を開く…",
+    "action": "操作",
+    "actions": {
+      "edit": "変更",
+      "remove": "削除",
+      "hide": "隠す"
+    },
+    "hideMode": "隠し方",
+    "hide": {
+      "blur": "ぼかし",
+      "pixelate": "モザイク",
+      "fill": "塗りつぶし"
+    },
+    "selected": "選択範囲：画像の {{share}}。この範囲だけが変更されます。",
+    "noSelectionWhole": "選択範囲がありません。画像全体が変更されます。一部だけを変更するには範囲を選択してください。",
+    "selectFirst": "まず画像上で範囲を選択してください。",
+    "whatToDo": "何を変更しますか？",
+    "whatToRemove": "削除するもの",
+    "optional": "任意",
+    "promptPlaceholder": "例：本をコーヒーカップに置き換える",
+    "removePlaceholder": "例：ボート",
+    "example1": "雪の積もった冬の景色にする",
+    "example2": "白黒にする",
+    "example3": "背景をビーチに変える",
+    "example4": "サングラスをかけさせる",
+    "variants": "バリエーション",
+    "apply": "適用",
+    "missing": {
+      "source": "まず画像を開いてください",
+      "prompt": "変更内容を入力してください",
+      "selection": "まず範囲を選択してください"
+    },
+    "emptyTitle": "編集する画像を選択",
+    "emptyBody": "コンピューターから写真を開くか、ここにドロップするか、Ctrl+V で貼り付けるか、下のストリップの画像をクリックしてください。"
   }
 }

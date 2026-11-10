@@ -17,6 +17,7 @@ import { activeJobs, useLive } from '../../state/live'
 import { AUTO, MAX_SEED, useStudio } from '../../state/studio'
 import { InputPictures } from './InputPictures'
 import { improvePrompt } from './inputs'
+import { ModeSwitch } from '../edit/ModeSwitch'
 import { Looks } from './Looks'
 import styles from './Studio.module.css'
 
@@ -118,6 +119,7 @@ export function Inspector() {
   return (
     <aside className={styles.inspector} aria-label={t('studio.settings')}>
       <div className={styles.inspectorBody}>
+        <ModeSwitch />
         <div className={styles.section}>
           <div className={styles.promptHead}>
             <label htmlFor={promptId} className={fieldStyles.label}>

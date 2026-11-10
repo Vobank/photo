@@ -4,6 +4,7 @@ import {
   DownloadSimple,
   Heart,
   ImageSquare,
+  PencilSimpleLine,
   Plant,
   Shuffle,
   Trash,
@@ -22,6 +23,7 @@ import { jobErrorText } from '../../lib/errors'
 import { formatDuration } from '../../lib/format'
 import { useLive } from '../../state/live'
 import { useStudio } from '../../state/studio'
+import { editImage } from '../edit/openFiles'
 import { AutoDecision } from './AutoDecision'
 import { moreLikeThis, addAsReference } from './pictureActions'
 import styles from './Studio.module.css'
@@ -192,6 +194,7 @@ function ImageView({ image }: { image: ImageInfo }) {
 
   useCanvasShortcuts({
     f: () => favorite.mutate({ id: image.id, favorite: !image.favorite }),
+    e: () => editImage(image),
     m: () => void moreLikeThis(image, t),
     Delete: () => void remove(),
   })
@@ -224,6 +227,9 @@ function ImageView({ image }: { image: ImageInfo }) {
           onClick={() => favorite.mutate({ id: image.id, favorite: !image.favorite })}
         >
           <Heart size={16} weight={image.favorite ? 'fill' : 'regular'} />
+        </IconButton>
+        <IconButton label={t('edit.editThis')} shortcut="E" onClick={() => editImage(image)}>
+          <PencilSimpleLine size={16} />
         </IconButton>
         <IconButton label={t('actions.reuse')} onClick={() => reuse(image)}>
           <ArrowCounterClockwise size={16} />

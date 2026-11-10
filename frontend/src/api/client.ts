@@ -1,6 +1,6 @@
 import type {
   ApiErrorBody,
-  GenerateParams,
+  JobRequest,
   ImageInfo,
   InstallState,
   Job,
@@ -69,7 +69,7 @@ export const api = {
   cancelInstall: (id: string) =>
     request<void>(`/models/${encodeURIComponent(id)}/install`, { method: 'DELETE' }),
 
-  createJob: (params: GenerateParams) => request<Job>('/jobs', json(params)),
+  createJob: (params: JobRequest) => request<Job>('/jobs', json(params)),
   enhancePrompt: (prompt: string, style: string | null, hasReferences: boolean) =>
     request<{ prompt: string }>('/prompt/enhance', json({ prompt, style, has_references: hasReferences })),
   upload: async (file: Blob): Promise<Upload> => {
@@ -99,4 +99,5 @@ export const api = {
 export const imageUrl = (id: string) => `${BASE}/images/${id}/file`
 export const thumbUrl = (id: string) => `${BASE}/images/${id}/thumb`
 export const uploadThumbUrl = (id: string) => `${BASE}/uploads/${id}/thumb`
+export const uploadFileUrl = (id: string) => `${BASE}/uploads/${id}/file`
 export const downloadUrl = (id: string) => `${BASE}/images/${id}/file?download=true`

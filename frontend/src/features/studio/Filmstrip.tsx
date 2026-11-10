@@ -5,7 +5,9 @@ import { useShallow } from 'zustand/react/shallow'
 import { thumbUrl } from '../../api/client'
 import { useImages } from '../../api/queries'
 import { activeJobs, useLive } from '../../state/live'
+import { useEdit } from '../../state/edit'
 import { useStudio } from '../../state/studio'
+import { editImage } from '../edit/openFiles'
 import styles from './Studio.module.css'
 
 export function Filmstrip() {
@@ -77,7 +79,7 @@ export function Filmstrip() {
           className={styles.thumb}
           aria-current={img.id === shownId}
           aria-label={img.params.prompt}
-          onClick={() => select(img.id)}
+          onClick={() => (useEdit.getState().active ? editImage(img) : select(img.id))}
         >
           <img src={thumbUrl(img.id)} alt="" loading="lazy" decoding="async" />
         </button>

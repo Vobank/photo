@@ -102,14 +102,16 @@
       "enhancer_unavailable": "Laden Sie zuerst ein Modell herunter: Der Prompt-Assistent nutzt dessen Sprachmodell.",
       "invalid_image": "Diese Datei ist kein Bild, das Photo lesen kann.",
       "engine_unavailable": "Die Engine wird gestartet. Versuchen Sie es gleich noch einmal.",
-      "engine_error": "Die Engine konnte diese Anfrage nicht abschließen."
+      "engine_error": "Die Engine konnte diese Anfrage nicht abschließen.",
+      "edit_model_missing": "Zum Bearbeiten von Bildern wird FLUX.2 Klein benötigt. Laden Sie es auf der Seite „Modelle“ herunter."
     },
     "job": {
       "out_of_memory": "Nicht genügend Grafikspeicher. Wählen Sie eine kleinere Größe oder weniger Bilder, oder schließen Sie andere Programme, die die GPU nutzen.",
       "engine_unavailable": "Die Engine wurde angehalten und startet neu. Versuchen Sie es gleich noch einmal.",
       "engine_not_installed": "Die Engine ist nicht installiert. Führen Sie das Installationsprogramm erneut aus.",
       "interrupted": "Photo wurde geschlossen, während dieses Bild erstellt wurde.",
-      "engine_error": "Dieses Bild konnte nicht erstellt werden."
+      "engine_error": "Dieses Bild konnte nicht erstellt werden.",
+      "empty_selection": "Nichts ausgewählt. Wählen Sie einen Bereich aus und versuchen Sie es erneut."
     }
   },
   "onboarding": {
@@ -303,5 +305,69 @@
     "anime": "Anime",
     "watercolor": "Aquarell",
     "render3d": "3D-Rendering"
+  },
+  "edit": {
+    "mode": "Modus",
+    "modeCreate": "Erstellen",
+    "modeEdit": "Bearbeiten",
+    "editThis": "Dieses Bild bearbeiten",
+    "tools": "Auswahlwerkzeuge",
+    "brush": "Pinsel",
+    "rect": "Rechteck",
+    "lasso": "Lasso",
+    "erase": "Auswahl radieren (Alt gedrückt halten)",
+    "brushSize": "Pinselgröße",
+    "undo": "Auswahlschritt rückgängig machen",
+    "invert": "Auswahl umkehren",
+    "clear": "Auswahl aufheben",
+    "compare": "Gedrückt halten, um die vorherige Version zu sehen",
+    "stepBack": "Zurück zur vorherigen Version",
+    "close": "Bearbeitung schließen",
+    "working": "Wird bearbeitet…",
+    "comparing": "Vorherige Version",
+    "hint": {
+      "brush": "Übermalen Sie, was sich ändern soll. [ und ] ändern die Pinselgröße, mit gedrückter Alt-Taste radieren Sie.",
+      "rect": "Ziehen Sie, um ein Rechteck auszuwählen. Mit gedrückter Alt-Taste entfernen Sie Bereiche aus der Auswahl.",
+      "lasso": "Klicken Sie, um Punkte zu setzen, oder ziehen Sie, um frei zu umranden. Doppelklick, Enter oder ein Klick auf den ersten Punkt schließt die Form."
+    },
+    "panel": "Bearbeitung",
+    "picture": "Bild",
+    "versions_one": "{{count}} frühere Version",
+    "versions_other": "{{count}} frühere Versionen",
+    "noPicture": "Noch kein Bild",
+    "open": "Foto öffnen…",
+    "action": "Aktion",
+    "actions": {
+      "edit": "Ändern",
+      "remove": "Entfernen",
+      "hide": "Verbergen"
+    },
+    "hideMode": "Verbergen durch",
+    "hide": {
+      "blur": "Weichzeichnen",
+      "pixelate": "Verpixeln",
+      "fill": "Abdecken"
+    },
+    "selected": "Ausgewählt: {{share}} des Bildes. Nur dieser Bereich wird geändert.",
+    "noSelectionWhole": "Nichts ausgewählt: Das ganze Bild wird geändert. Wählen Sie einen Bereich aus, um nur diesen zu ändern.",
+    "selectFirst": "Wählen Sie zuerst einen Bereich im Bild aus.",
+    "whatToDo": "Was soll sich ändern?",
+    "whatToRemove": "Was soll entfernt werden?",
+    "optional": "optional",
+    "promptPlaceholder": "Zum Beispiel: Ersetze das Buch durch eine Tasse Kaffee",
+    "removePlaceholder": "Zum Beispiel: das Boot",
+    "example1": "Mach eine verschneite Winterszene daraus",
+    "example2": "Mach es schwarz-weiß",
+    "example3": "Ersetze den Hintergrund durch einen Strand",
+    "example4": "Füge eine Sonnenbrille hinzu",
+    "variants": "Varianten",
+    "apply": "Anwenden",
+    "missing": {
+      "source": "Öffnen Sie zuerst ein Bild",
+      "prompt": "Beschreiben Sie die Änderung",
+      "selection": "Wählen Sie zuerst einen Bereich aus"
+    },
+    "emptyTitle": "Wählen Sie ein Bild zum Bearbeiten",
+    "emptyBody": "Öffnen Sie ein Foto von Ihrem Computer, ziehen Sie es hierher, fügen Sie es mit Ctrl+V ein oder klicken Sie auf ein Bild in der Leiste unten."
   }
 }

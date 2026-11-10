@@ -105,14 +105,16 @@
       "enhancer_unavailable": "Téléchargez d’abord un modèle : l’assistant de prompt utilise son modèle de langage.",
       "invalid_image": "Ce fichier n’est pas une image que Photo peut lire.",
       "engine_unavailable": "Le moteur démarre. Réessayez dans un instant.",
-      "engine_error": "Le moteur n’a pas pu terminer cette requête."
+      "engine_error": "Le moteur n’a pas pu terminer cette requête.",
+      "edit_model_missing": "La modification d’images nécessite FLUX.2 Klein. Téléchargez-le depuis la page Modèles."
     },
     "job": {
       "out_of_memory": "Mémoire vidéo insuffisante. Essayez une taille plus petite ou moins d’images, ou fermez les autres programmes qui utilisent le GPU.",
       "engine_unavailable": "Le moteur s’est arrêté et redémarre. Réessayez dans un instant.",
       "engine_not_installed": "Le moteur n’est pas installé. Relancez le programme d’installation.",
       "interrupted": "Photo a été fermé pendant la création de cette image.",
-      "engine_error": "Impossible de générer cette image."
+      "engine_error": "Impossible de générer cette image.",
+      "empty_selection": "Rien n’est sélectionné. Sélectionnez une zone et réessayez."
     }
   },
   "onboarding": {
@@ -306,5 +308,70 @@
     "anime": "Anime",
     "watercolor": "Aquarelle",
     "render3d": "Rendu 3D"
+  },
+  "edit": {
+    "mode": "Mode",
+    "modeCreate": "Créer",
+    "modeEdit": "Modifier",
+    "editThis": "Modifier cette image",
+    "tools": "Outils de sélection",
+    "brush": "Pinceau",
+    "rect": "Rectangle",
+    "lasso": "Lasso",
+    "erase": "Effacer la sélection (maintenir Alt)",
+    "brushSize": "Taille du pinceau",
+    "undo": "Annuler l’étape de sélection",
+    "invert": "Intervertir la sélection",
+    "clear": "Désélectionner",
+    "compare": "Maintenez pour voir la version précédente",
+    "stepBack": "Revenir à la version précédente",
+    "close": "Fermer l’édition",
+    "working": "Modification en cours…",
+    "comparing": "Version précédente",
+    "hint": {
+      "brush": "Peignez sur ce que vous voulez modifier. [ et ] changent la taille du pinceau ; maintenez Alt pour effacer.",
+      "rect": "Faites glisser pour sélectionner un rectangle. Maintenez Alt pour retirer de la sélection.",
+      "lasso": "Cliquez pour placer des points ou faites glisser pour tracer un contour. Double-clic, Enter ou un clic sur le premier point ferme le tracé."
+    },
+    "panel": "Édition",
+    "picture": "Image",
+    "versions_one": "{{count}} version précédente",
+    "versions_many": "{{count}} versions précédentes",
+    "versions_other": "{{count}} versions précédentes",
+    "noPicture": "Aucune image pour l’instant",
+    "open": "Ouvrir une photo…",
+    "action": "Action",
+    "actions": {
+      "edit": "Modifier",
+      "remove": "Supprimer",
+      "hide": "Masquer"
+    },
+    "hideMode": "Masquer par",
+    "hide": {
+      "blur": "Flou",
+      "pixelate": "Pixellisation",
+      "fill": "Aplat"
+    },
+    "selected": "Sélection : {{share}} de l’image. Seule cette zone sera modifiée.",
+    "noSelectionWhole": "Aucune sélection : toute l’image sera modifiée. Sélectionnez une zone pour ne modifier qu’elle.",
+    "selectFirst": "Sélectionnez d’abord une zone sur l’image.",
+    "whatToDo": "Que faut-il modifier ?",
+    "whatToRemove": "Que faut-il supprimer ?",
+    "optional": "facultatif",
+    "promptPlaceholder": "Par exemple : remplace le livre par une tasse de café",
+    "removePlaceholder": "Par exemple : le bateau",
+    "example1": "Transforme la scène en hiver enneigé",
+    "example2": "Passe en noir et blanc",
+    "example3": "Remplace l’arrière-plan par une plage",
+    "example4": "Ajoute des lunettes de soleil",
+    "variants": "Variantes",
+    "apply": "Appliquer",
+    "missing": {
+      "source": "Ouvrez d’abord une image",
+      "prompt": "Décrivez la modification",
+      "selection": "Sélectionnez d’abord une zone"
+    },
+    "emptyTitle": "Choisissez une image à modifier",
+    "emptyBody": "Ouvrez une photo depuis votre ordinateur, déposez-la ici, collez-la avec Ctrl+V ou cliquez sur une image dans le bandeau ci-dessous."
   }
 }
