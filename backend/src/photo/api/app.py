@@ -156,10 +156,7 @@ def _install_common(app: FastAPI, settings: Settings) -> None:
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
-        fields = [
-            {"field": ".".join(str(p) for p in e["loc"][1:]), "message": e["msg"]}
-            for e in exc.errors()
-        ]
+        fields = [{"field": _field_name(e["loc"]), "message": e["msg"]} for e in exc.errors()]
         return JSONResponse(
             {"error": {"code": "invalid_request", "message": "Invalid request", "fields": fields}},
             status_code=422,
@@ -188,3 +185,11 @@ def _mount_frontend(app: FastAPI, settings: Settings) -> None:
             headers = {"Cache-Control": "public, max-age=31536000, immutable"} if immutable else {}
             return FileResponse(candidate, headers=headers)
         return FileResponse(index, headers={"Cache-Control": "no-cache"})
+
+
+def _field_name(loc: tuple[int | str, ...]) -> str:
+    """("body", "generate", "width") -> "width": drop the location and the union tag."""
+    parts = [str(p) for p in loc[1:]]
+    if parts and parts[0] in ("generate", "edit"):
+        parts = parts[1:]
+    return ".".join(parts)

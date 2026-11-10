@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import io
 import json
 import logging
 import secrets
@@ -12,7 +13,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from photo import storage
+from PIL import Image
+
+from photo import editing, edits, storage
 from photo.auto import (
     AUTO,
     MEDIUM_STYLE,
@@ -37,7 +40,15 @@ from photo.engine.process import EngineProcess, EngineState
 from photo.events import EventBus
 from photo.hardware import Gpu
 from photo.ids import new_id
-from photo.schemas import MAX_SEED, TERMINAL_STATUSES, GenerateParams, JobParams, JobStatus
+from photo.schemas import (
+    MAX_SEED,
+    OBSCURE_ACTIONS,
+    TERMINAL_STATUSES,
+    EditParams,
+    GenerateParams,
+    JobParams,
+    JobStatus,
+)
 from photo.styles import Style, apply_style, get_style
 
 log = logging.getLogger(__name__)
@@ -193,6 +204,8 @@ class JobService:
     # ---- commands ------------------------------------------------------------------
 
     def submit(self, params: JobParams) -> Job:
+        if isinstance(params, EditParams):
+            return self._submit_edit(params)
         if params.model == AUTO:
             # Provisional pick; the real one is made when the job runs (see _resolve_auto).
             candidates = self._candidates(params)
@@ -219,18 +232,249 @@ class JobService:
             raise JobRejected("engine_not_installed", self.engine.last_error or "Engine missing.")
 
         seed = params.seed if params.seed is not None else secrets.randbelow(MAX_SEED + 1)
+        return self._insert_job(params.kind, params.model_dump_json(), spec.id, variant.id, seed)
+
+    # ---- editing ---------------------------------------------------------------------
+
+    def _edit_model(self, requested: str) -> ModelSpec:
+        """An installed model that can edit pictures ("auto": the first one)."""
+        for spec in self.catalog.models:
+            if (
+                pipelines.capabilities(spec).edit
+                and requested in (AUTO, spec.id)
+                and installed_variant(self.settings, spec, self.gpu) is not None
+            ):
+                return spec
+        raise JobRejected(
+            "edit_model_missing",
+            "Editing pictures needs FLUX.2 Klein. Download it on the Models page.",
+        )
+
+    def _submit_edit(self, params: EditParams) -> Job:
+        for input_id in (params.source, *([params.mask] if params.mask else [])):
+            if self.input_path(input_id) is None:
+                raise JobRejected("input_not_found", "The picture to edit no longer exists.")
+        if params.action in OBSCURE_ACTIONS:
+            model_id, variant_id = TOOLS_MODEL, "builtin"
+        else:
+            if self.engine.state is EngineState.NOT_INSTALLED:
+                raise JobRejected(
+                    "engine_not_installed", self.engine.last_error or "Engine missing."
+                )
+            spec = self._edit_model(params.model)
+            variant = installed_variant(self.settings, spec, self.gpu)
+            assert variant is not None
+            model_id, variant_id = spec.id, variant.id
+        seed = params.seed if params.seed is not None else secrets.randbelow(MAX_SEED + 1)
+        return self._insert_job("edit", params.model_dump_json(), model_id, variant_id, seed)
+
+    def _insert_job(self, kind: str, params_json: str, model: str, variant: str, seed: int) -> Job:
         job_id = new_id()
-        now = time.time()
         self.db.execute(
             "INSERT INTO jobs (id, kind, status, params, model, variant, seed, created_at) "
             "VALUES (?, ?, 'queued', ?, ?, ?, ?, ?)",
-            (job_id, params.kind, params.model_dump_json(), spec.id, variant.id, seed, now),
+            (job_id, kind, params_json, model, variant, seed, time.time()),
         )
         job = self.get(job_id)
         assert job is not None
         self.bus.publish("job", {"job": job.to_api()})
         self._wakeup.set()
         return job
+
+    def _load_picture(self, input_id: str) -> Image.Image:
+        path = self.input_path(input_id)
+        if path is None:
+            raise EngineError("The picture to edit no longer exists.")
+        with Image.open(path) as img:
+            img.load()
+            return img.convert("RGB")
+
+    def _load_mask(self, mask_id: str, size: tuple[int, int]) -> Image.Image:
+        path = self.input_path(mask_id)
+        if path is None:
+            raise EngineError("The selection no longer exists.")
+        return editing.load_mask(path.read_bytes(), size)
+
+    async def _translate(self, client: Any, text: str) -> str:
+        """English version of an edit instruction; the original on any trouble."""
+        name = self._writer_file()
+        if name is None or not edits.needs_translation(text):
+            return text
+        built = pipelines.build_text(name, edits.TRANSLATE_SYSTEM, text, edits.TRANSLATE_MAX_TOKENS)
+        try:
+            result = await client.run(built.graph.to_api(), built.output_node)
+        except (EngineError, EngineUnavailable) as exc:
+            log.warning("could not translate the edit instruction: %s", exc)
+            return text
+        return edits.clean_translation(result.texts.get(built.output_node, ""), text)
+
+    async def _ai_edit(
+        self,
+        client: Any,
+        job: Job,
+        params: EditParams,
+        source: Image.Image,
+        mask: Image.Image | None,
+        on_progress: Any,
+        on_preview: Any,
+    ) -> tuple[list[Image.Image], str]:
+        prompt = await self._translate(client, params.prompt) if params.prompt else ""
+        text = edits.instruction(params, prompt)
+        spec = self.catalog.get(job.model)
+        variant = spec.variant(job.variant)
+
+        crop = editing.prepare(source, mask) if mask is not None else None
+        reference = (
+            crop.image
+            if crop
+            else source.resize(editing.work_size(*source.size), Image.Resampling.LANCZOS)
+        )
+        name: str = await client.upload_image(f"photo-edit-{job.id}.png", _png(reference))
+        width, height = reference.size
+        request = GenerateParams(
+            model=spec.id,
+            prompt=text,
+            width=width,
+            height=height,
+            batch_size=params.batch_size,
+            references=[params.source],
+        )
+        built = pipelines.build(
+            request,
+            spec,
+            spec.variant_files(variant),
+            job.seed,
+            f"photo/{job.id}",
+            pipelines.BuildInputs(references=(name,)),
+        )
+        result = await client.run(
+            built.graph.to_api(), built.output_node, on_progress=on_progress, on_preview=on_preview
+        )
+        if not result.images:
+            raise EngineError("The engine finished without producing an image.")
+        outputs: list[Image.Image] = []
+        for img in result.images:
+            with Image.open(io.BytesIO(await client.fetch_image(img))) as edited:
+                edited.load()
+                if crop is not None and mask is not None:
+                    outputs.append(
+                        await asyncio.to_thread(editing.stitch, source, edited, mask, crop.box)
+                    )
+                else:
+                    outputs.append(edited.convert("RGB"))
+        return outputs, text
+
+    async def _run_edit(self, job: Job) -> None:
+        params = EditParams.model_validate(job.params)
+        uses_model = params.action not in OBSCURE_ACTIONS
+        client: Any = None
+        if uses_model:
+            if self.engine.state is EngineState.NOT_INSTALLED:
+                self._finish(job.id, "failed", self.engine.last_error, "engine_not_installed")
+                return
+            client = await self.engine.wait_ready()
+        if not self._claim(job):
+            return
+        on_progress, on_preview = self._live_callbacks(job)
+        try:
+            source = await asyncio.to_thread(self._load_picture, params.source)
+            mask = (
+                await asyncio.to_thread(self._load_mask, params.mask, source.size)
+                if params.mask
+                else None
+            )
+            if uses_model:
+                outputs, text = await self._ai_edit(
+                    client, job, params, source, mask, on_progress, on_preview
+                )
+            else:
+                assert mask is not None
+                hidden = await asyncio.to_thread(
+                    editing.obscure,
+                    source,
+                    mask,
+                    params.action,  # type: ignore[arg-type]
+                )
+                outputs, text = [hidden], ""
+            await self._store_edit(job, params, outputs, text or None)
+        except editing.EmptyMaskError:
+            self._finish(job.id, "failed", "Nothing is selected.", "empty_selection")
+            return
+        except EngineInterrupted:
+            self._finish(job.id, "cancelled", None)
+            return
+        except (EngineError, EngineUnavailable) as exc:
+            if job.id in self._cancel_requested:
+                self._finish(job.id, "cancelled", None)
+            else:
+                log.error("edit %s failed: %s\n%s", job.id, exc, getattr(exc, "details", ""))
+                code, message = friendly_error(exc)
+                self._finish(job.id, "failed", message, code)
+            return
+        finally:
+            self._running_id = None
+            self._cancel_requested.discard(job.id)
+        self._finish(job.id, "succeeded", None)
+
+    async def _store_edit(
+        self, job: Job, params: EditParams, outputs: list[Image.Image], text: str | None
+    ) -> None:
+        for index, image in enumerate(outputs):
+            meta = {
+                "schema": 1,
+                "params": params.model_dump(),
+                "seed": job.seed,
+                "batch_index": index,
+                "model_variant": job.variant,
+                "final_prompt": text,
+                "source": params.source,
+            }
+            await self._store_image(job, job.model, await asyncio.to_thread(_png, image), meta)
+
+    async def _store_image(self, job: Job, model: str, raw: bytes, meta: dict[str, Any]) -> None:
+        image_id = new_id()
+        stored = await asyncio.to_thread(
+            storage.save_result, self.settings.images_dir, image_id, raw, meta
+        )
+        self.db.execute(
+            "INSERT INTO images (id, job_id, path, thumb_path, width, height, seed, model, "
+            "params, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                stored.id, job.id, stored.path, stored.thumb_path, stored.width,
+                stored.height, job.seed, model, json.dumps(meta), time.time(),
+            ),
+        )  # fmt: skip
+        self.bus.publish("image", {"image_id": image_id, "job_id": job.id})
+
+    def _claim(self, job: Job) -> bool:
+        """queued -> running, unless it was cancelled meanwhile."""
+        claimed = self.db.execute(
+            "UPDATE jobs SET status='running', started_at=? WHERE id=? AND status='queued'",
+            (time.time(), job.id),
+        )
+        if not claimed:
+            return False
+        self._running_id = job.id
+        running = self.get(job.id)
+        assert running is not None
+        self.bus.publish("job", {"job": running.to_api()})
+        return True
+
+    def _live_callbacks(self, job: Job) -> tuple[Any, Any]:
+        last = 0.0
+
+        async def on_progress(p: Progress) -> None:
+            nonlocal last
+            frac = p.value / p.max if p.max else 0.0
+            if frac - last >= 0.01 or frac >= 1:
+                last = frac
+                self.db.execute("UPDATE jobs SET progress=? WHERE id=?", (frac, job.id))
+                self.bus.publish("progress", {"job_id": job.id, "value": p.value, "max": p.max})
+
+        async def on_preview(pv: Preview) -> None:
+            self.bus.publish_preview(job.id, pv.mime, pv.data)
+
+        return on_progress, on_preview
 
     def _check_features(self, spec: ModelSpec, params: GenerateParams) -> None:
         caps = pipelines.capabilities(spec)
@@ -433,6 +677,9 @@ class JobService:
                 self._finish(job.id, "failed", message, code)
 
     async def _run(self, job: Job) -> None:
+        if job.kind == "edit":
+            await self._run_edit(job)
+            return
         if self.engine.state is EngineState.NOT_INSTALLED:
             self._finish(job.id, "failed", self.engine.last_error, "engine_not_installed")
             return
@@ -552,3 +799,13 @@ class JobService:
                 ),
             )  # fmt: skip
             self.bus.publish("image", {"image_id": image_id, "job_id": job.id})
+
+
+# Model id recorded for edits made without AI (blur, pixelate, fill).
+TOOLS_MODEL = "tools"
+
+
+def _png(image: Image.Image) -> bytes:
+    buf = io.BytesIO()
+    image.save(buf, format="PNG", compress_level=1)
+    return buf.getvalue()

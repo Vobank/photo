@@ -252,6 +252,7 @@ def test_models_expose_features(client: TestClient) -> None:
         "references": True,
         "variation": False,
         "detail": False,
+        "edit": True,
     }
     assert models["z-image-turbo"]["features"]["variation"] is True
 

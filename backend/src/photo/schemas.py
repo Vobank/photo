@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Discriminator, Field, Tag, model_validator
 
 # JavaScript numbers are exact only up to 2**53 - 1; seeds round-trip through the UI.
 MAX_SEED = 2**53 - 1
@@ -61,8 +61,50 @@ class GenerateParams(_Strict):
         return self
 
 
-# Becomes a discriminated union on `kind` as edit/upscale/... job kinds are added.
-type JobParams = GenerateParams
+EditAction = Literal["edit", "remove", "blur", "pixelate", "fill"]
+# Actions done with plain image processing: exact, instant, no model needed.
+OBSCURE_ACTIONS: frozenset[str] = frozenset({"blur", "pixelate", "fill"})
+
+
+class EditParams(_Strict):
+    """Change an existing picture, optionally only inside a selection.
+
+    * ``edit`` — do what ``prompt`` says (whole picture, or only the selection);
+    * ``remove`` — take out what is selected (``prompt`` may name it);
+    * ``blur`` / ``pixelate`` / ``fill`` — hide the selection, no AI involved.
+    """
+
+    kind: Literal["edit"] = "edit"
+    model: str = Field(default="auto", pattern=r"^[a-z0-9-]+$", max_length=64)
+    source: Id  # gallery image or upload
+    mask: Id | None = None  # upload: white = selected
+    action: EditAction = "edit"
+    prompt: str = Field(default="", max_length=4000)
+    seed: int | None = Field(default=None, ge=0, le=MAX_SEED)
+    batch_size: int = Field(default=1, ge=1, le=4)
+
+    @model_validator(mode="after")
+    def _checks(self) -> EditParams:
+        if self.action in OBSCURE_ACTIONS and self.mask is None:
+            raise ValueError("select the area to hide first")
+        if self.action == "edit" and not self.prompt:
+            raise ValueError("describe the change")
+        if self.action == "remove" and self.mask is None and not self.prompt:
+            raise ValueError("select what to remove, or name it")
+        if self.action in OBSCURE_ACTIONS:
+            self.batch_size = 1  # deterministic: one result
+        return self
+
+
+def _job_kind(value: Any) -> str:
+    kind = value.get("kind") if isinstance(value, dict) else getattr(value, "kind", None)
+    return kind or "generate"  # older clients never sent a kind
+
+
+JobParams = Annotated[
+    Annotated[GenerateParams, Tag("generate")] | Annotated[EditParams, Tag("edit")],
+    Discriminator(_job_kind),
+]
 
 JobStatus = Literal["queued", "running", "succeeded", "failed", "cancelled"]
 TERMINAL_STATUSES: frozenset[str] = frozenset({"succeeded", "failed", "cancelled"})

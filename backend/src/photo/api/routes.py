@@ -27,7 +27,7 @@ from photo import __version__, prefs, storage
 from photo.config import LANGUAGES
 from photo.ids import is_valid_id, new_id
 from photo.jobs import JobRejected
-from photo.schemas import GenerateParams
+from photo.schemas import JobParams
 from photo.styles import STYLES, get_style
 
 if TYPE_CHECKING:
@@ -207,7 +207,7 @@ async def cancel_install(model_id: str, svc: Svc) -> None:
 
 
 @router.post("/jobs", status_code=202)
-async def create_job(params: GenerateParams, svc: Svc) -> dict[str, Any]:
+async def create_job(params: JobParams, svc: Svc) -> dict[str, Any]:
     try:
         job = svc.jobs.submit(params)
     except JobRejected as exc:
@@ -259,6 +259,8 @@ def _image_api(row: Any) -> dict[str, Any]:
         "cfg": meta.get("cfg"),
         "final_prompt": meta.get("final_prompt"),
         "resolved": meta.get("resolved"),
+        # Edits: the picture this one was made from (gallery image or upload id).
+        "source": meta.get("source"),
     }
 
 

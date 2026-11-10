@@ -29,6 +29,8 @@ class Capabilities:
     references: bool = False
     variation: bool = False
     detail: bool = False
+    # Change an existing picture from an instruction (whole or inside a selection).
+    edit: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -286,19 +288,16 @@ def build_enhance(
     return BuiltGraph(g, preview, preview)
 
 
-def build_classify(text_encoder: str, prompt: str) -> BuiltGraph:
-    """A graph that labels the request's medium and translates it (automatic mode).
-
-    Greedy decoding: the same request always routes the same way, so seeds reproduce.
-    """
+def build_text(text_encoder: str, system: str, prompt: str, max_tokens: int) -> BuiltGraph:
+    """A graph that only runs the language model once, greedily (same input, same output)."""
     g = Graph()
     clip = g.node("CLIPLoader", clip_name=text_encoder, type="lumina2", device="default")
     answer = g.node(
         "TextGenerateV2",
         clip=clip[0],
         prompt=prompt,
-        system_prompt=CLASSIFY_SYSTEM,
-        max_length=CLASSIFY_MAX_TOKENS,
+        system_prompt=system,
+        max_length=max_tokens,
         sampling_mode="off",
         thinking=False,
         use_default_template=True,
@@ -308,9 +307,17 @@ def build_classify(text_encoder: str, prompt: str) -> BuiltGraph:
     return BuiltGraph(g, preview.id, preview.id)
 
 
+def build_classify(text_encoder: str, prompt: str) -> BuiltGraph:
+    """Label the request's medium and translate it (automatic mode).
+
+    Greedy decoding: the same request always routes the same way, so seeds reproduce.
+    """
+    return build_text(text_encoder, CLASSIFY_SYSTEM, prompt, CLASSIFY_MAX_TOKENS)
+
+
 PIPELINES: dict[str, _Pipeline] = {
     "z_image": _Pipeline(build_z_image, Capabilities(variation=True, detail=True)),
-    "flux2_klein": _Pipeline(build_flux2_klein, Capabilities(references=True)),
+    "flux2_klein": _Pipeline(build_flux2_klein, Capabilities(references=True, edit=True)),
 }
 
 
