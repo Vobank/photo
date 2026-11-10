@@ -50,3 +50,24 @@ grain, a milky low-contrast haze and soft, smeared detail at 1 MP. Same seeds ag
 Consequences: the photo recipe asks for crisp, deep, clean images and names no camera
 equipment; the people recipe keeps real skin but adds sharp focus and depth; the
 studio's default size is now XL (~2.4 MP).
+
+## Maximum quality and Enlarge 2x
+
+Two further steps, both optional so the default stays fast (RTX 5090, 1584 px):
+
+| Variant | Result | Time |
+|---|---|---|
+| Fast: FLUX.2 Klein 4B distilled, 4 steps | Clean and crisp; light is a little flat. | ~3 s |
+| **Maximum**: FLUX.2 Klein 4B *base* (undistilled, NVFP4), 20 steps, CFG 5, quality negative prompt | Richer, warmer, more dimensional light (steam, haze, golden street light, deeper mountains). | ~21 s |
+| Same base model in bf16 | Same look, twice as slow. | ~40 s |
+| Language-model prompt expansion before rendering | Slightly nicer light, but the 4B text model runs at 4–7 tokens/s. | +20–50 s |
+| **Enlarge 2x**: Real-ESRGAN x4 → 2x, then a tiled Klein detail pass (1536 px tiles, 256 px overlap, denoise 0.3) | True new detail at 3168 px; seams invisible; no new faces invented. | ~40 s |
+| Nomos8k SCHAT-L instead of Real-ESRGAN | Marginally cleaner, but 70–150 s for the upscale alone. | — |
+
+Consequences: Automatic mode offers *Fast* and *Maximum* (the studio defaults to
+Maximum; Fast never picks the slow model). Every picture gets an *Enlarge 2x with detail*
+button (U). Prompt expansion stays opt-in.
+
+Known caveat: with the base model an elderly woman in one test came out with a
+different apparent ethnicity than in Fast mode; the auto translator now keeps gender and
+age explicitly, but appearance drift between models is worth watching.

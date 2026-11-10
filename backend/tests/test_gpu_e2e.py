@@ -230,3 +230,22 @@ def test_area_edit_on_gpu_changes_only_the_selection(server: str) -> None:
         action="pixelate",
     )
     assert hidden["model"] == "tools"
+
+
+def test_enlarge_and_max_quality_on_gpu(server: str) -> None:
+    models = {m["id"]: m for m in httpx.get(f"{server}/api/v1/models").json()["models"]}
+    if not (models["real-esrgan-x4"]["installed"] and models["flux2-klein-4b-base"]["installed"]):
+        pytest.skip("needs Real-ESRGAN and FLUX.2 Klein Max installed")
+    t0 = time.perf_counter()
+    job, _ = _generate(
+        server, model="auto", style="auto", quality="max", prompt="озеро в горах на рассвете",
+        width=1024, height=1024, seed=3,
+    )  # fmt: skip
+    print(f"\nmax quality 1024: {time.perf_counter() - t0:.1f}s via {job['model']}")
+    assert job["model"] == "flux2-klein-4b-base"
+
+    t0 = time.perf_counter()
+    up = _edit(server, action="upscale", source=job["image_ids"][0])
+    info = httpx.get(f"{server}/api/v1/images/{up['image_ids'][0]}").json()
+    print(f"enlarge to {info['width']}x{info['height']}: {time.perf_counter() - t0:.1f}s")
+    assert (info["width"], info["height"]) == (2048, 2048)

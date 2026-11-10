@@ -100,7 +100,9 @@
       "invalid_image": "此文件不是 Photo 能读取的图像。",
       "engine_unavailable": "引擎正在启动。请稍后重试。",
       "engine_error": "引擎无法完成此请求。",
-      "edit_model_missing": "编辑图像需要 FLUX.2 Klein。请在“模型”页面中下载。"
+      "edit_model_missing": "编辑图像需要 FLUX.2 Klein。请在“模型”页面中下载。",
+      "upscaler_missing": "放大需要 Real-ESRGAN。请在“模型”页面下载。",
+      "already_large": "这张图片已达到最大尺寸。"
     },
     "job": {
       "out_of_memory": "显存不足。请尝试更小的尺寸或更少的图像数量，或关闭其他占用 GPU 的程序。",
@@ -280,7 +282,14 @@
     "moreLikeThis": "生成类似图像",
     "useAsReference": "用作参考图像",
     "addedAsReference": "已添加到参考图像",
-    "promptUsed": "模型实际收到的提示词"
+    "promptUsed": "模型实际收到的提示词",
+    "quality": "质量",
+    "qualityFast": "快速",
+    "qualityMax": "最高",
+    "qualityMaxHint": "最佳的光线、层次和细节。较慢：每张约 20–30 秒。",
+    "qualityFastHint": "每张只需几秒。",
+    "enlarge": "放大 2 倍并补充细节",
+    "enlarging": "正在放大并补充细节…"
   },
   "styles": {
     "auto": "自动",

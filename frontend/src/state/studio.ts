@@ -36,6 +36,8 @@ interface StudioState {
   style: string | null
   enhance: boolean
   detail: boolean
+  /** Automatic mode: "max" uses the slower, undistilled models. */
+  quality: 'fast' | 'max'
   inputMode: InputMode
   inputs: InputPicture[]
   /** 0.05 = stay very close to the source, 0.95 = barely related. */
@@ -89,6 +91,7 @@ export const useStudio = create<StudioState>()(
       style: AUTO,
       enhance: false,
       detail: false,
+      quality: 'max',
       inputMode: 'references',
       inputs: [],
       variationStrength: 0.5,
@@ -123,6 +126,7 @@ export const useStudio = create<StudioState>()(
           style: p.style ?? null,
           enhance: p.enhance ?? false,
           detail: p.detail ?? false,
+          quality: p.quality ?? 'fast',
           ...(opts.withSeed ? { seed: image.seed, seedLocked: true } : {}),
           ...matchDimensions(p.width, p.height),
         })
@@ -147,6 +151,7 @@ export const useStudio = create<StudioState>()(
           style: s.style,
           enhance: s.enhance,
           detail: s.detail,
+          quality: s.quality,
           references: s.inputMode === 'references' ? ids : [],
           variation_of: s.inputMode === 'variation' ? (ids[0] ?? null) : null,
           variation_strength: s.variationStrength,

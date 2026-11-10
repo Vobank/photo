@@ -46,3 +46,19 @@ export async function moreLikeThis(image: ImageInfo, t: TFunction): Promise<void
     toastError(apiErrorText(t, e))
   }
 }
+
+/** Pictures with a longer side than this cannot gain from Enlarge (server limit 4096). */
+const ENLARGE_LIMIT = Math.floor(4096 / 1.2)
+
+export const canEnlarge = (image: Pick<ImageInfo, 'width' | 'height'>) => Math.max(image.width, image.height) <= ENLARGE_LIMIT
+
+/** Enlarge 2x with a detail pass; the result arrives as a new picture. */
+export async function enlarge(image: ImageInfo, t: TFunction): Promise<void> {
+  try {
+    const job = await api.createJob({ kind: 'edit', action: 'upscale', source: image.id })
+    useLive.getState().upsertJob(job)
+    toast(t('looks.enlarging'))
+  } catch (e) {
+    toastError(apiErrorText(t, e))
+  }
+}

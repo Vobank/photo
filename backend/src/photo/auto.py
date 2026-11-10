@@ -160,9 +160,18 @@ def parse_classification(answer: str, original: str) -> Classification:
     return Classification(medium, text, understood=True)
 
 
-def route(medium: Medium, candidates: list[str]) -> str | None:
+# With quality "max", the undistilled Klein goes first wherever Klein would be used.
+MAX_MODEL = "flux2-klein-4b-base"
+
+
+def route(medium: Medium, candidates: list[str], quality: str = "fast") -> str | None:
     """First preferred model among ``candidates`` (installed and capable)."""
-    for model_id in MODEL_PREFERENCE[medium]:
+    preference = MODEL_PREFERENCE[medium]
+    if quality == "max" and preference[0] == "flux2-klein-4b":
+        preference = (MAX_MODEL, *preference)
+    else:
+        candidates = [c for c in candidates if c != MAX_MODEL] or candidates
+    for model_id in preference:
         if model_id in candidates:
             return model_id
     return candidates[0] if candidates else None

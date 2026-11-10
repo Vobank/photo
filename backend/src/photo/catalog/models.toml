@@ -147,3 +147,98 @@ label = "FP8"
 archs = []
 min_vram_gb = 8
 files = { diffusion = "dit_fp8", text_encoder = "text_encoder", vae = "vae" }
+
+[[models]]
+id = "flux2-klein-4b-base"
+name = "FLUX.2 Klein 4B Max"
+vendor = "Black Forest Labs"
+description = "The full, undistilled Klein: 20 steps instead of 4. About ten times slower, with richer light, depth and fine detail. Used by the Maximum quality setting."
+tasks = ["generate", "reference"]
+pipeline = "flux2_klein_base"
+license = "Apache-2.0"
+license_url = "https://huggingface.co/black-forest-labs/FLUX.2-klein-base-4B"
+commercial_use = true
+
+[models.defaults]
+steps = 20
+cfg = 5.0
+sampler = "euler"
+scheduler = "flux2"
+
+[models.files.dit_nvfp4]
+dir = "diffusion_models"
+name = "flux-2-klein-base-4b-nvfp4.safetensors"
+repo = "black-forest-labs/FLUX.2-klein-base-4b-nvfp4"
+revision = "e655535fb8c2c148b47308cfa559a86a73273d55"
+path = "flux-2-klein-base-4b-nvfp4.safetensors"
+size = 2487544776
+sha256 = "f66faefe951b8eefe0ff3d4082b393fb6dc76d9a34861bd9f4ac54dc3ef381ab"
+
+[models.files.dit_fp8]
+dir = "diffusion_models"
+name = "flux-2-klein-base-4b-fp8.safetensors"
+repo = "black-forest-labs/FLUX.2-klein-base-4b-fp8"
+revision = "103db268c10d4d3921101b46057671f9ac460da6"
+path = "flux-2-klein-base-4b-fp8.safetensors"
+size = 4089498488
+sha256 = "44bab3a86fe98b85d21dd2a4729ebdc3ae51fb8a39f76e457e18c724219e6840"
+
+# Shared with FLUX.2 Klein 4B and Z-Image Turbo: downloaded once.
+[models.files.text_encoder]
+dir = "text_encoders"
+name = "qwen_3_4b_fp8_mixed.safetensors"
+repo = "Comfy-Org/z_image_turbo"
+revision = "6fc90a3b1b653e935a0d175e260736de25b84df5"
+path = "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors"
+size = 5631994051
+sha256 = "72450b19758172c5a7273cf7de729d1c17e7f434a104a00167624cba94f68f15"
+
+[models.files.vae]
+dir = "vae"
+name = "flux2-vae.safetensors"
+repo = "Comfy-Org/Flux-2-Klein-4B"
+revision = "5b3abca5c0dc1ecd4eaf3340868d09063fc1c965"
+path = "split_files/vae/flux2-vae.safetensors"
+size = 336211292
+sha256 = "868fe7b343cc8f3a19dbcfcafbc3d5f888802be3f89bd81b65b3621a066ce8f3"
+
+[[models.variants]]
+id = "nvfp4"
+label = "NVFP4 (RTX 50)"
+archs = ["blackwell"]
+min_vram_gb = 8
+files = { diffusion = "dit_nvfp4", text_encoder = "text_encoder", vae = "vae" }
+
+[[models.variants]]
+id = "fp8"
+label = "FP8"
+archs = []
+min_vram_gb = 8
+files = { diffusion = "dit_fp8", text_encoder = "text_encoder", vae = "vae" }
+
+[[models]]
+id = "real-esrgan-x4"
+name = "Real-ESRGAN x4"
+vendor = "Xintao Wang et al."
+description = "Upscaler used by Enlarge 2x before the detail pass. Small and fast."
+tasks = ["upscale"]
+pipeline = "upscale"
+license = "BSD-3-Clause"
+license_url = "https://github.com/xinntao/Real-ESRGAN"
+commercial_use = true
+
+[models.files.upscaler]
+dir = "upscale_models"
+name = "RealESRGAN_x4plus.safetensors"
+repo = "Comfy-Org/Real-ESRGAN_repackaged"
+revision = "5fd49b7b278836f48af63ecd314d0f98ab336105"
+path = "RealESRGAN_x4plus.safetensors"
+size = 66857836
+sha256 = "37f9a931c215f040aa6d50f711f2cb115f713c46df1d0d6469a8bd7bfe9a60bb"
+
+[[models.variants]]
+id = "default"
+label = "x4"
+archs = []
+min_vram_gb = 0
+files = { upscaler = "upscaler" }

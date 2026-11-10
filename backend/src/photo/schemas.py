@@ -41,6 +41,8 @@ class GenerateParams(_Strict):
     enhance: bool = False
     # Second pass at a higher resolution for finer detail.
     detail: bool = False
+    # Automatic mode only: "max" uses the slower, undistilled models (docs/realism.md).
+    quality: Literal["fast", "max"] = "fast"
 
     # Pictures the result should follow (style, subject, product…). Gallery image or
     # upload ids; needs a model with the "reference" task.
@@ -61,7 +63,7 @@ class GenerateParams(_Strict):
         return self
 
 
-EditAction = Literal["edit", "remove", "blur", "pixelate", "fill"]
+EditAction = Literal["edit", "remove", "blur", "pixelate", "fill", "upscale"]
 # Actions done with plain image processing: exact, instant, no model needed.
 OBSCURE_ACTIONS: frozenset[str] = frozenset({"blur", "pixelate", "fill"})
 
@@ -71,7 +73,8 @@ class EditParams(_Strict):
 
     * ``edit`` — do what ``prompt`` says (whole picture, or only the selection);
     * ``remove`` — take out what is selected (``prompt`` may name it);
-    * ``blur`` / ``pixelate`` / ``fill`` — hide the selection, no AI involved.
+    * ``blur`` / ``pixelate`` / ``fill`` — hide the selection, no AI involved;
+    * ``upscale`` — enlarge 2x and redraw fine detail (the whole picture).
     """
 
     kind: Literal["edit"] = "edit"
@@ -91,6 +94,8 @@ class EditParams(_Strict):
             raise ValueError("describe the change")
         if self.action == "remove" and self.mask is None and not self.prompt:
             raise ValueError("select what to remove, or name it")
+        if self.action == "upscale":
+            self.batch_size = 1
         if self.action in OBSCURE_ACTIONS:
             self.batch_size = 1  # deterministic: one result
         return self

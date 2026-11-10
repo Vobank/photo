@@ -17,6 +17,7 @@ export interface GenerateParams {
   style?: string | null
   enhance?: boolean
   detail?: boolean
+  quality?: 'fast' | 'max'
   references?: string[]
   variation_of?: string | null
   variation_strength?: number
@@ -28,7 +29,7 @@ export interface EditParams {
   model?: string
   source: string
   mask?: string | null
-  action: 'edit' | 'remove' | 'blur' | 'pixelate' | 'fill'
+  action: 'edit' | 'remove' | 'blur' | 'pixelate' | 'fill' | 'upscale'
   prompt?: string
   seed?: number | null
   batch_size?: number

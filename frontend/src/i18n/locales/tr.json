@@ -103,7 +103,9 @@
       "invalid_image": "Bu dosya, Photo'nun okuyabileceği bir görsel değil.",
       "engine_unavailable": "Motor başlatılıyor. Birazdan yeniden deneyin.",
       "engine_error": "Motor bu isteği tamamlayamadı.",
-      "edit_model_missing": "Görselleri düzenlemek için FLUX.2 Klein gerekir. Modeller sayfasından indirin."
+      "edit_model_missing": "Görselleri düzenlemek için FLUX.2 Klein gerekir. Modeller sayfasından indirin.",
+      "upscaler_missing": "Büyütmek için Real-ESRGAN gerekir. Modeller sayfasından indirin.",
+      "already_large": "Bu görsel zaten en büyük boyutta."
     },
     "job": {
       "out_of_memory": "Yeterli video belleği yok. Daha küçük bir boyut veya daha az görsel deneyin ya da GPU kullanan diğer programları kapatın.",
@@ -283,7 +285,14 @@
     "moreLikeThis": "Buna benzer daha fazla",
     "useAsReference": "Referans olarak kullan",
     "addedAsReference": "Takip edilecek görsellere eklendi",
-    "promptUsed": "Modelin aldığı istem"
+    "promptUsed": "Modelin aldığı istem",
+    "quality": "Kalite",
+    "qualityFast": "Hızlı",
+    "qualityMax": "En yüksek",
+    "qualityMaxHint": "En iyi ışık, derinlik ve ayrıntı. Daha yavaş: görsel başına yaklaşık 20–30 sn.",
+    "qualityFastHint": "Görsel başına birkaç saniye.",
+    "enlarge": "Ayrıntıyla 2× büyüt",
+    "enlarging": "Büyütülüyor ve ayrıntı ekleniyor…"
   },
   "styles": {
     "auto": "Otomatik",

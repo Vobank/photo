@@ -159,3 +159,46 @@ def obscure(source: Image.Image, mask: Image.Image, mode: ObscureMode) -> Image.
         hidden = Image.new("RGB", img.size, mean)
     edge = soft_mask(mask, 2) if mode != "fill" else mask
     return Image.composite(hidden, img, edge)
+
+
+# ---- enlarge: tiles ------------------------------------------------------------------------
+
+MAX_UPSCALE_SIDE = 4096
+
+
+def upscale_size(width: int, height: int, factor: float = 2.0) -> tuple[int, int] | None:
+    """Enlarged size (multiples of 16, longest side <= MAX_UPSCALE_SIDE), or None if the
+    picture is already too large to gain anything."""
+    scale = min(factor, MAX_UPSCALE_SIDE / max(width, height))
+    if scale < 1.2:
+        return None
+    return round(width * scale / 16) * 16, round(height * scale / 16) * 16
+
+
+def tile_positions(total: int, tile: int, overlap: int) -> list[int]:
+    """Start offsets of overlapping tiles covering ``total`` (last tile flush with the end)."""
+    if total <= tile:
+        return [0]
+    step = tile - overlap
+    starts = list(range(0, total - tile, step))
+    starts.append(total - tile)
+    return sorted(set(starts))
+
+
+def tile_mask(width: int, height: int, overlap: int, left: bool, top: bool) -> Image.Image:
+    """Blend weight for a tile: 255 inside, linear ramps over the overlap on the left/top
+    edges that are shared with already-placed tiles."""
+    col = bytes(
+        min(255, round(255 * (x + 1) / overlap)) if left and x < overlap else 255
+        for x in range(width)
+    )
+    row = Image.frombytes("L", (width, 1), col).resize((width, height))
+    if top:
+        ramp = bytes(
+            min(255, round(255 * (y + 1) / overlap)) if y < overlap else 255 for y in range(height)
+        )
+        vert = Image.frombytes("L", (1, height), ramp).resize((width, height))
+        from PIL import ImageChops
+
+        row = ImageChops.multiply(row, vert)
+    return row

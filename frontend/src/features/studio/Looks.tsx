@@ -2,9 +2,14 @@ import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useModels } from '../../api/queries'
 import type { ModelFeatures } from '../../api/types'
+import { Segmented } from '../../components/Segmented'
 import { AUTO, useStudio } from '../../state/studio'
+import { ModelInstallLine } from './Onboarding'
 import styles from './Studio.module.css'
+
+const MAX_MODEL = 'flux2-klein-4b-base'
 
 const useStyles = () =>
   useQuery({
@@ -23,8 +28,29 @@ export function Looks({ features }: { features: ModelFeatures | undefined }) {
   // "auto" first: Photo reads the prompt and picks the look; then no style; then presets.
   const ids = [AUTO, null, ...(data?.styles.map((x) => x.id) ?? [])]
 
+  const { data: models } = useModels()
+  // The undistilled model behind "Maximum"; offered for download when missing.
+  const maxModel = models?.find((m) => m.id === MAX_MODEL)
+
   return (
     <>
+      {s.model === AUTO && (
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>{t('looks.quality')}</div>
+          <Segmented<'fast' | 'max'>
+            label={t('looks.quality')}
+            value={s.quality}
+            options={[
+              { value: 'fast', label: t('looks.qualityFast') },
+              { value: 'max', label: t('looks.qualityMax') },
+            ]}
+            onChange={(quality) => s.set({ quality })}
+          />
+          <small className={styles.qualityHint}>{s.quality === 'max' ? t('looks.qualityMaxHint') : t('looks.qualityFastHint')}</small>
+          {s.quality === 'max' && maxModel && !maxModel.installed && <ModelInstallLine model={maxModel} />}
+        </div>
+      )}
+
       <div className={styles.section}>
         <div className={styles.sectionTitle} id="style-label">
           {t('looks.style')}

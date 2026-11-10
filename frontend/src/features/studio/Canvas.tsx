@@ -3,6 +3,7 @@ import {
   Copy,
   DownloadSimple,
   Heart,
+  ArrowsOut,
   ImageSquare,
   PencilSimpleLine,
   Plant,
@@ -25,7 +26,7 @@ import { useLive } from '../../state/live'
 import { useStudio } from '../../state/studio'
 import { editImage } from '../edit/openFiles'
 import { AutoDecision } from './AutoDecision'
-import { moreLikeThis, addAsReference } from './pictureActions'
+import { addAsReference, canEnlarge, enlarge, moreLikeThis } from './pictureActions'
 import styles from './Studio.module.css'
 
 /** The job the canvas should follow: running first, then the oldest queued. */
@@ -110,7 +111,9 @@ function LiveView({ job }: { job: Job }) {
     return () => clearInterval(id)
   }, [])
 
-  const { width, height } = job.params
+  // Edits (enlarge, ...) carry no size of their own; show a neutral square until the result.
+  const width = job.params.width ?? 1024
+  const height = job.params.height ?? 1024
   const frac = progress ? progress.value / progress.max : 0
   const elapsed = progress ? (now - progress.startedAt) / 1000 : 0
 
@@ -196,6 +199,7 @@ function ImageView({ image }: { image: ImageInfo }) {
     f: () => favorite.mutate({ id: image.id, favorite: !image.favorite }),
     e: () => editImage(image),
     m: () => void moreLikeThis(image, t),
+    u: () => canEnlarge(image) && void enlarge(image, t),
     Delete: () => void remove(),
   })
 
@@ -238,6 +242,14 @@ function ImageView({ image }: { image: ImageInfo }) {
           <Plant size={16} />
         </IconButton>
         <span className={styles.toolbarSep} />
+        <IconButton
+          label={t('looks.enlarge')}
+          shortcut="U"
+          disabled={!canEnlarge(image)}
+          onClick={() => void enlarge(image, t)}
+        >
+          <ArrowsOut size={16} />
+        </IconButton>
         <IconButton label={t('looks.moreLikeThis')} shortcut="M" onClick={() => void moreLikeThis(image, t)}>
           <Shuffle size={16} />
         </IconButton>

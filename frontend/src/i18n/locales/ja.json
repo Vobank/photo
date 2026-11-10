@@ -100,7 +100,9 @@
       "invalid_image": "このファイルは Photo で読み込める画像ではありません。",
       "engine_unavailable": "エンジンを起動しています。しばらくしてからもう一度お試しください。",
       "engine_error": "エンジンはこのリクエストを完了できませんでした。",
-      "edit_model_missing": "画像の編集には FLUX.2 Klein が必要です。「モデル」ページでダウンロードしてください。"
+      "edit_model_missing": "画像の編集には FLUX.2 Klein が必要です。「モデル」ページでダウンロードしてください。",
+      "upscaler_missing": "拡大には Real-ESRGAN が必要です。「モデル」ページでダウンロードしてください。",
+      "already_large": "この画像はすでに最大サイズです。"
     },
     "job": {
       "out_of_memory": "ビデオメモリが不足しています。サイズを小さくするか枚数を減らすか、GPU を使用している他のプログラムを終了してください。",
@@ -280,7 +282,14 @@
     "moreLikeThis": "似た画像を生成",
     "useAsReference": "参照画像として使用",
     "addedAsReference": "参照する画像に追加しました",
-    "promptUsed": "モデルが受け取ったプロンプト"
+    "promptUsed": "モデルが受け取ったプロンプト",
+    "quality": "品質",
+    "qualityFast": "高速",
+    "qualityMax": "最高",
+    "qualityMaxHint": "光・奥行き・ディテールが最も良くなります。時間がかかります（1 枚あたり約 20〜30 秒）。",
+    "qualityFastHint": "1 枚あたり数秒です。",
+    "enlarge": "ディテール付きで 2 倍に拡大",
+    "enlarging": "拡大してディテールを描き込んでいます…"
   },
   "styles": {
     "auto": "自動",

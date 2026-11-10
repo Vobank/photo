@@ -102,6 +102,12 @@
   border-radius: 1.5px;
 }
 
+.qualityHint {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
 .dims {
   display: flex;
   justify-content: space-between;

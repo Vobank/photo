@@ -25,7 +25,7 @@ from photo.auto import (
     parse_classification,
     route,
 )
-from photo.catalog import Catalog, ModelSpec, Variant, is_installed
+from photo.catalog import Catalog, ModelFile, ModelSpec, Variant, is_installed
 from photo.config import Settings
 from photo.db import Database
 from photo.engine import pipelines
@@ -214,7 +214,7 @@ class JobService:
                     "model_not_installed", "No installed model can do this. Install one first."
                 )
             provisional = STYLE_MEDIUM.get(params.style or "", "photo")
-            spec = self.catalog.get(route(provisional, candidates) or candidates[0])
+            spec = self.catalog.get(route(provisional, candidates, params.quality) or candidates[0])
         else:
             try:
                 spec = self.catalog.get(params.model)
@@ -254,6 +254,15 @@ class JobService:
         for input_id in (params.source, *([params.mask] if params.mask else [])):
             if self.input_path(input_id) is None:
                 raise JobRejected("input_not_found", "The picture to edit no longer exists.")
+        if params.action == "upscale":
+            self._upscaler_file()  # raises when missing
+            path = self.input_path(params.source)
+            assert path is not None
+            with Image.open(path) as probe:
+                if editing.upscale_size(*probe.size) is None:
+                    raise JobRejected(
+                        "already_large", "This picture is already as large as it gets."
+                    )
         if params.action in OBSCURE_ACTIONS:
             model_id, variant_id = TOOLS_MODEL, "builtin"
         else:
@@ -364,6 +373,69 @@ class JobService:
                     outputs.append(edited.convert("RGB"))
         return outputs, text
 
+    def _upscaler_file(self) -> ModelFile:
+        for spec in self.catalog.models:
+            if "upscale" in spec.tasks:
+                variant = installed_variant(self.settings, spec, self.gpu)
+                if variant is not None:
+                    return next(iter(spec.variant_files(variant).values()))
+        raise JobRejected(
+            "upscaler_missing", "Enlarging needs Real-ESRGAN. Download it on the Models page."
+        )
+
+    def _prompt_for(self, input_id: str) -> str:
+        """What a gallery picture was made from (what the model saw), for the detail pass."""
+        row = self.db.one("SELECT params FROM images WHERE id=?", (input_id,))
+        if row:
+            meta = json.loads(row["params"])
+            text = meta.get("final_prompt") or (meta.get("params") or {}).get("prompt")
+            if text:
+                return str(text)
+        return UPSCALE_FALLBACK_PROMPT
+
+    async def _upscale(
+        self, client: Any, job: Job, params: EditParams, source: Image.Image
+    ) -> tuple[list[Image.Image], str]:
+        """Model upscale to 2x, then redraw fine detail tile by tile at low denoise."""
+        size = editing.upscale_size(*source.size)
+        if size is None:
+            raise EngineError("This picture is already as large as it gets.")
+        name = await client.upload_image(f"photo-up-{job.id}.png", _png(source))
+        built = pipelines.build_model_upscale(self._upscaler_file().name, name, *size)
+        result = await client.run(built.graph.to_api(), built.output_node)
+        with Image.open(io.BytesIO(await client.fetch_image(result.images[0]))) as big_img:
+            big = big_img.convert("RGB")
+
+        prompt = self._prompt_for(params.source)
+        spec = self.catalog.get(job.model)
+        files = spec.variant_files(spec.variant(job.variant))
+        width, height = big.size
+        tile_w, tile_h = min(pipelines.REFINE_TILE, width), min(pipelines.REFINE_TILE, height)
+        overlap = pipelines.REFINE_OVERLAP
+        xs = editing.tile_positions(width, tile_w, overlap)
+        ys = editing.tile_positions(height, tile_h, overlap)
+        total, done = len(xs) * len(ys), 0
+        out = big.copy()
+        for ty in ys:
+            for tx in xs:
+                if job.id in self._cancel_requested:
+                    raise EngineInterrupted()
+                box = (tx, ty, tx + tile_w, ty + tile_h)
+                tile_name = await client.upload_image(
+                    f"photo-tile-{job.id}-{tx}-{ty}.png", _png(big.crop(box))
+                )
+                tile = pipelines.build_refine_tile(
+                    files, tile_name, prompt, job.seed + done, tile_w, tile_h
+                )
+                res = await client.run(tile.graph.to_api(), tile.output_node)
+                with Image.open(io.BytesIO(await client.fetch_image(res.images[0]))) as t_img:
+                    mask = editing.tile_mask(tile_w, tile_h, overlap, tx > 0, ty > 0)
+                    out.paste(t_img.convert("RGB"), box[:2], mask)
+                done += 1
+                self.db.execute("UPDATE jobs SET progress=? WHERE id=?", (done / total, job.id))
+                self.bus.publish("progress", {"job_id": job.id, "value": done, "max": total})
+        return [out], prompt
+
     async def _run_edit(self, job: Job) -> None:
         params = EditParams.model_validate(job.params)
         uses_model = params.action not in OBSCURE_ACTIONS
@@ -383,7 +455,9 @@ class JobService:
                 if params.mask
                 else None
             )
-            if uses_model:
+            if params.action == "upscale":
+                outputs, text = await self._upscale(client, job, params, source)
+            elif uses_model:
                 outputs, text = await self._ai_edit(
                     client, job, params, source, mask, on_progress, on_preview
                 )
@@ -543,11 +617,14 @@ class JobService:
 
         model_id = params.model
         if model_id == AUTO:
-            model_id = route(medium, self._candidates(params)) or job.model
+            model_id = route(medium, self._candidates(params), params.quality) or job.model
         spec = self.catalog.get(model_id)
         variant = installed_variant(self.settings, spec, self.gpu) or spec.variant(job.variant)
-        if params.detail and not pipelines.capabilities(spec).detail:
+        caps = pipelines.capabilities(spec)
+        if params.detail and not caps.detail:
             update["detail"] = False
+        if params.quality == "max" and caps.detail:
+            update["detail"] = True  # Z-Image's higher-resolution second pass
         update["model"] = spec.id
 
         resolved = {
@@ -800,6 +877,12 @@ class JobService:
             )  # fmt: skip
             self.bus.publish("image", {"image_id": image_id, "job_id": job.id})
 
+
+# Detail-pass prompt for uploaded pictures, whose content we were never told.
+UPSCALE_FALLBACK_PROMPT = (
+    "a high quality photograph with crisp fine detail, natural colors and a clean image "
+    "without noise"
+)
 
 # Model id recorded for edits made without AI (blur, pixelate, fill).
 TOOLS_MODEL = "tools"

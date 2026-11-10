@@ -106,7 +106,9 @@
       "invalid_image": "Ce fichier n’est pas une image que Photo peut lire.",
       "engine_unavailable": "Le moteur démarre. Réessayez dans un instant.",
       "engine_error": "Le moteur n’a pas pu terminer cette requête.",
-      "edit_model_missing": "La modification d’images nécessite FLUX.2 Klein. Téléchargez-le depuis la page Modèles."
+      "edit_model_missing": "La modification d’images nécessite FLUX.2 Klein. Téléchargez-le depuis la page Modèles.",
+      "upscaler_missing": "L’agrandissement nécessite Real-ESRGAN. Téléchargez-le sur la page Modèles.",
+      "already_large": "Cette image est déjà à la taille maximale."
     },
     "job": {
       "out_of_memory": "Mémoire vidéo insuffisante. Essayez une taille plus petite ou moins d’images, ou fermez les autres programmes qui utilisent le GPU.",
@@ -286,7 +288,14 @@
     "moreLikeThis": "D’autres comme celle-ci",
     "useAsReference": "Utiliser comme référence",
     "addedAsReference": "Ajoutée aux images à suivre",
-    "promptUsed": "Prompt reçu par le modèle"
+    "promptUsed": "Prompt reçu par le modèle",
+    "quality": "Qualité",
+    "qualityFast": "Rapide",
+    "qualityMax": "Maximale",
+    "qualityMaxHint": "La meilleure lumière, profondeur et finesse. Plus lent : environ 20 à 30 s par image.",
+    "qualityFastHint": "Quelques secondes par image.",
+    "enlarge": "Agrandir ×2 avec détails",
+    "enlarging": "Agrandissement et ajout de détails…"
   },
   "styles": {
     "auto": "Auto",

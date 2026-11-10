@@ -17,6 +17,17 @@ from photo.engine.graph import Graph, Link, NodeRef
 from photo.schemas import MAX_PIXELS, GenerateParams
 from photo.styles import ENHANCE_SYSTEM, Style, apply_style, enhance_request, get_style
 
+# What the undistilled models steer away from by default (docs/realism.md).
+QUALITY_NEGATIVE = (
+    "blurry, soft focus, noise, grain, jpeg artifacts, lowres, oversaturated, plastic skin, "
+    "airbrushed, cgi, 3d render, deformed, watermark, text"
+)
+# Enlarge 2x: tile size and overlap of the detail pass, and how much it may change.
+REFINE_TILE = 1536
+REFINE_OVERLAP = 256
+REFINE_DENOISE = 0.3
+REFINE_STEPS = 8
+
 # Longest prompt the language model may write (tokens).
 ENHANCE_MAX_TOKENS = 320
 # Second "detail" pass: how much larger, and how much it may change.
@@ -234,7 +245,13 @@ def build_flux2_klein(
         text, prompt_node = _prompt(g, clip, p, seed, has_refs=bool(inputs.references))
 
     positive: NodeRef = g.node("CLIPTextEncode", text=text, clip=clip[0])
-    negative: NodeRef = g.node("ConditioningZeroOut", conditioning=positive[0])
+    if d.cfg > 1:
+        # Undistilled model: real guidance, so a negative prompt steers away from flaws.
+        negative: NodeRef = g.node(
+            "CLIPTextEncode", text=p.negative_prompt or QUALITY_NEGATIVE, clip=clip[0]
+        )
+    else:
+        negative = g.node("ConditioningZeroOut", conditioning=positive[0])
     # Each reference conditions both branches, as in the reference workflow.
     for name in inputs.references:
         loaded = g.node("LoadImage", image=name)
@@ -315,9 +332,56 @@ def build_classify(text_encoder: str, prompt: str) -> BuiltGraph:
     return build_text(text_encoder, CLASSIFY_SYSTEM, prompt, CLASSIFY_MAX_TOKENS)
 
 
+def build_model_upscale(upscaler: str, image: str, width: int, height: int) -> BuiltGraph:
+    """Enlarge with an upscaling model, then resize to exactly ``width`` x ``height``."""
+    g = Graph()
+    src = g.node("LoadImage", image=image)
+    model = g.node("UpscaleModelLoader", model_name=upscaler)
+    big = g.node("ImageUpscaleWithModel", upscale_model=model[0], image=src[0])
+    fit = g.node(
+        "ImageScale", image=big[0], upscale_method="lanczos", width=width, height=height,
+        crop="disabled",
+    )  # fmt: skip
+    out = g.node("SaveImage", images=fit[0], filename_prefix="photo/upscale")
+    return BuiltGraph(g, out.id)
+
+
+def build_refine_tile(
+    files: dict[str, ModelFile], image: str, prompt: str, seed: int, width: int, height: int
+) -> BuiltGraph:
+    """Re-draw the last part of the schedule over one tile: adds real fine detail while
+    keeping its content (low denoise)."""
+    g = Graph()
+    unet = g.node("UNETLoader", unet_name=files["diffusion"].name, weight_dtype="default")
+    clip = g.node(
+        "CLIPLoader", clip_name=files["text_encoder"].name, type="flux2", device="default"
+    )
+    vae = g.node("VAELoader", vae_name=files["vae"].name)
+    src = g.node("LoadImage", image=image)
+    latent = g.node("VAEEncode", pixels=src[0], vae=vae[0])
+    positive = g.node("CLIPTextEncode", text=prompt, clip=clip[0])
+    negative = g.node("ConditioningZeroOut", conditioning=positive[0])
+    guider = g.node("CFGGuider", model=unet[0], positive=positive[0], negative=negative[0], cfg=1.0)
+    sigmas = g.node("Flux2Scheduler", steps=REFINE_STEPS, width=width, height=height)
+    tail = g.node("SplitSigmasDenoise", sigmas=sigmas[0], denoise=REFINE_DENOISE)
+    samples = g.node(
+        "SamplerCustomAdvanced",
+        noise=g.node("RandomNoise", noise_seed=seed)[0],
+        guider=guider[0],
+        sampler=g.node("KSamplerSelect", sampler_name="euler")[0],
+        sigmas=tail[1],
+        latent_image=latent[0],
+    )
+    image_out = g.node("VAEDecode", samples=samples[0], vae=vae[0])
+    out = g.node("SaveImage", images=image_out[0], filename_prefix="photo/refine")
+    return BuiltGraph(g, out.id)
+
+
 PIPELINES: dict[str, _Pipeline] = {
     "z_image": _Pipeline(build_z_image, Capabilities(variation=True, detail=True)),
     "flux2_klein": _Pipeline(build_flux2_klein, Capabilities(references=True, edit=True)),
+    # Same graph; the catalog's defaults (20 steps, cfg 5) make it the undistilled model.
+    "flux2_klein_base": _Pipeline(build_flux2_klein, Capabilities(references=True)),
 }
 
 
