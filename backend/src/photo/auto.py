@@ -77,8 +77,9 @@ CLASSIFY_SYSTEM = (
     "watercolor - watercolour painting;\n"
     "graphic - logo, icon, poster, sticker, lettering or other graphic design.\n"
     "PROMPT is a faithful English translation of the request: keep every subject, count, "
-    "colour and quoted text exactly as written, add nothing, and drop the words that only "
-    "name the medium.\n"
+    "colour and quoted text exactly as written, keep the gender and age of every person "
+    "(Russian 'подруги' are female friends, 'бабушка' is an old woman), add nothing, and drop "
+    "the words that only name the medium.\n"
     "Examples:\n"
     "наклейка с котиком в очках -> graphic | a sticker of a kitten wearing glasses\n"
     'логотип пекарни «Хлеб» -> graphic | a bakery logo with the text "Хлеб"\n'
@@ -87,6 +88,7 @@ CLASSIFY_SYSTEM = (
     "мультяшный ёжик в 3D -> render3d | a cartoonish hedgehog in 3D\n"
     "постер к фильму про пиратов -> graphic | a movie poster about pirates\n"
     "старик ловит рыбу на рассвете -> photo | an old man fishing at dawn\n"
+    "подруги пьют чай на балконе -> photo | two female friends drinking tea on a balcony\n"
     "девушка с мечом, аниме -> anime | a girl with a sword"
 )
 CLASSIFY_MAX_TOKENS = 160
