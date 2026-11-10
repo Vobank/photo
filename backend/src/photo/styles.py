@@ -24,12 +24,14 @@ class Style:
 
 
 # Realism for people, chosen from side-by-side runs (docs/realism.md). Describing the
-# *photo* as raw and the *skin* as real removes the airbrushed "AI face"; words such as
+# *skin* as real removes the airbrushed "AI face"; the quality words keep it crisp and
+# deep instead of flat and noisy ("raw unedited photo" did that). Words such as
 # "wrinkles", "blemishes" or "cluttered" were left out because they aged people and
 # dirtied scenes. Never added without people: it made a person appear by a mountain lake.
 PEOPLE_REALISM = (
-    "raw unedited photo, natural uneven light, real skin with visible pores and natural "
-    "imperfections, natural hair with flyaways, candid unposed moment, true-to-life colors"
+    "real skin with visible pores and natural imperfections, natural hair with flyaways, "
+    "candid unposed moment, ordinary real person, true-to-life colors, sharp focus, crisp "
+    "detail, clear depth and dimension, directional natural light, clean image without noise"
 )
 # Shorter version that other photographic looks (cinematic, noir...) append for people.
 PEOPLE_REALISM_SHORT = "real skin with visible pores, natural unposed expression, unretouched"
@@ -61,15 +63,19 @@ def mentions_people(text: str) -> bool:
 STYLES: tuple[Style, ...] = (
     Style(
         "photo",
-        "candid unretouched photograph, full-frame camera, natural available light, true-to-life "
-        "colour, realistic textures and small everyday imperfections, subtle sensor grain",
-        "a genuine, unretouched photograph a real person could have taken: name the camera and "
-        "lens, use natural available light, and describe real-world texture (fabric weave, dust, "
-        "wear, small imperfections) in an ordinary, uncurated setting. Keep the framing the idea "
-        "implies. If there are people, they look like real, ordinary people caught in a candid "
-        "moment: real skin with visible pores and natural imperfections, natural hair, unposed "
-        "expressions, never model-perfect or symmetrical. It must look like a real photo, never "
-        "like a glossy, airbrushed render",
+        # No grain, no "imperfections": they made pictures noisy, milky and flat. No camera
+        # nouns either: Z-Image drew a camera into the scene (docs/realism.md).
+        "professional photograph, crisp fine detail, natural vibrant colors, deep contrast with "
+        "clear depth and dimension, directional natural light with soft shadows, atmospheric "
+        "perspective, clean image without noise",
+        "a genuine photograph by a skilled photographer: crisp fine detail, natural vibrant "
+        "colour, deep contrast, clear depth and dimension, directional natural light with soft "
+        "shadows and atmospheric perspective, a clean image without noise. Describe real-world "
+        "materials and light precisely. Keep the framing the idea implies. If there are people, "
+        "they look like real, ordinary people caught in a candid moment: real skin with visible "
+        "pores and natural imperfections, natural hair, unposed expressions, never "
+        "model-perfect or symmetrical. It must look like a real photo, never like a glossy, "
+        "airbrushed render",
         people_suffix=PEOPLE_REALISM,
     ),
     Style(

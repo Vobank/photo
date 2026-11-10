@@ -78,7 +78,8 @@ export const useStudio = create<StudioState>()(
       negativePrompt: '',
       model: AUTO,
       aspect: '1:1',
-      size: 'm',
+      // ~2.4 MP: native high resolution is the biggest single quality gain (docs/realism.md).
+      size: 'xl',
       batch: 1,
       seedLocked: false,
       seed: randomSeed(),
@@ -154,13 +155,15 @@ export const useStudio = create<StudioState>()(
     }),
     {
       name: 'photo.studio',
-      version: 3,
+      version: 4,
       partialize: ({ selectedImageId: _s, set: _set, ...rest }) => rest,
       // v1 had no looks or inputs: defaults fill them in.
       // v3 introduced automatic mode; earlier defaults (no style, first model) become auto.
       migrate: (persisted, version) => {
         const s = persisted as StudioState
-        if (version < 3) return { ...s, model: AUTO, style: s.style ?? AUTO, steps: null, cfg: null }
+        if (version < 3) return { ...s, model: AUTO, style: s.style ?? AUTO, steps: null, cfg: null, size: 'xl' as const }
+        // v4 made XL the default; people still on the old default move up with it.
+        if (version < 4 && s.size === 'm') return { ...s, size: 'xl' as const }
         return s
       },
     },

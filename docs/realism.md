@@ -32,3 +32,21 @@ Two traps found along the way:
   (`styles.mentions_people`, English and Russian).
 * **Translation lost gender.** "подруги" (female friends) became "friends" and a man
   appeared. The classification step now keeps every person's gender and age.
+
+## Image quality: noise, flatness, resolution
+
+The first realism recipe made pictures look *real* but technically poor: visible
+grain, a milky low-contrast haze and soft, smeared detail at 1 MP. Same seeds again:
+
+| Variant | Result | Time |
+|---|---|---|
+| Old photo recipe ("unretouched", "imperfections", "sensor grain") | Noisy, washed out, flat. | 1.5 s |
+| **Clean recipe**: crisp detail, deep contrast, depth, directional light, no noise | Vivid, three-dimensional, clean. | 1.5 s |
+| Clean recipe, native **1584 px (~2.4 MP)** | Big jump in fine detail (foliage, stone, eyes, hair). | ~3 s |
+| Clean recipe, native 2048 px | A little more detail. | ~6.5 s |
+| 1 MP + upscale + refine to 2048 px | Detail similar to native, keeps the 1 MP composition. | ~7.5 s |
+| Same recipe on Z-Image Turbo | Drew **a camera into the scene** from "full-frame camera, prime lens". | 11 s |
+
+Consequences: the photo recipe asks for crisp, deep, clean images and names no camera
+equipment; the people recipe keeps real skin but adds sharp focus and depth; the
+studio's default size is now XL (~2.4 MP).
