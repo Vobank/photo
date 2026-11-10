@@ -40,6 +40,26 @@ export function Filmstrip() {
     return () => window.removeEventListener('keydown', onKey)
   }, [images, shownId])
 
+  // A mouse wheel scrolls the strip sideways. Native horizontal scrolling (trackpads,
+  // Shift+wheel, tilt wheels) is left alone. Needs a non-passive listener to stop the
+  // page from scrolling, which React's onWheel cannot provide.
+  const hasItems = images.length > 0 || pending.length > 0
+  useEffect(() => {
+    const el = listRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.shiftKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return
+      if (el.scrollWidth <= el.clientWidth) return
+      e.preventDefault()
+      const px = e.deltaMode === WheelEvent.DOM_DELTA_LINE ? e.deltaY * 40 : e.deltaMode === WheelEvent.DOM_DELTA_PAGE ? e.deltaY * el.clientWidth : e.deltaY
+      // Right-to-left layouts (Arabic) run the strip the other way.
+      const forward = getComputedStyle(el).direction === 'rtl' ? -1 : 1
+      el.scrollBy({ left: px * forward })
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [hasItems])
+
   const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget
     if (hasNextPage && !isFetchingNextPage && el.scrollLeft + el.clientWidth > el.scrollWidth - 400) {
