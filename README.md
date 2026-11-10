@@ -16,6 +16,11 @@ leave your computer.
 - Text-to-image with **Z-Image Turbo** (Apache-2.0, commercial use allowed),
   8 steps: about 2.7 s for a 1024×1024 image on an RTX 5080 (first image
   after start ~24 s while the model loads).
+- **Edit any photo with words**: open a picture, select an area with a brush,
+  rectangle or lasso (or select nothing) and say what to change — "replace the
+  book with a cup of coffee", "make it winter". Remove things, or hide faces and
+  number plates with blur, pixelation or a cover. Outside the selection not a
+  single pixel changes. See [docs/editing.md](docs/editing.md).
 - Live step previews, a queue you can keep adding to, and cancellation.
 - Gallery with favourites and undoable delete. Every PNG carries its exact
   parameters (the standard `parameters` text field plus full JSON).
